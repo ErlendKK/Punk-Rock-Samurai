@@ -13,15 +13,15 @@ class Level1fight3 extends BaseScene {
         let self = this;      
         this.baseCreate('bakgrunnCity3');
         this.resetPlayer(gameState.player); //BaseScene
-        let turnsTillPoliceArrive = 8; // NB! LEVEL SPECIFIC! DO NOT COPY ELSEWHERE!
+        let turnsTillPoliceArrive = 7; // NB! LEVEL SPECIFIC! DO NOT COPY ELSEWHERE!
 
         gameState.enemy1 = {
             name: 'Police Informant',
             sprite: this.add.sprite(700, 340, 'skinhead1').setScale(0.25).setFlipX(false).setInteractive(), //690 / 350 / .33
             alive: true,
             actions: [],         
-            health: 60,
-            healthMax: 60,
+            health: 55,
+            healthMax: 55,
             strength: 0,
             strengthBase: 0,
             strengthMax: 15,  
@@ -35,8 +35,8 @@ class Level1fight3 extends BaseScene {
             sprite: this.add.sprite(880, 340, 'skinhead2').setScale(0.25).setFlipX(true).setInteractive(), //910 / 310 / .25
             alive: true,
             actions: [],        
-            health: 75, // Set = 0 to reduce the number of enemies to 1
-            healthMax: 75,
+            health: 70, // Set = 0 to reduce the number of enemies to 1
+            healthMax: 70,
             strength: 0,
             strengthBase: 0,
             strengthMax: 15, 
@@ -625,7 +625,7 @@ class Level1fight3 extends BaseScene {
                         enemyText.destroy();
                         enemyTextBackground.destroy();
 
-                        const policeText = self.add.text(550, 300, 'Police snipers\n will hit you\n  in 6 turns!', textConfig).setOrigin(0.5).setDepth(201);
+                        const policeText = self.add.text(550, 300, 'Police snipers\n will hit you\n  in 5 turns!', textConfig).setOrigin(0.5).setDepth(201);
                         let textWidth = policeText.width;
                         let textHeight = policeText.height;
                         let paddingX = 20;
@@ -740,7 +740,7 @@ class Level1fight3 extends BaseScene {
 
             gameState.enemy1.actions = [ 
                 {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.235 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.235 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
@@ -751,7 +751,7 @@ class Level1fight3 extends BaseScene {
 
             gameState.enemy2.actions = [ 
                 {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 5 fire damage', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.235 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.235 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
