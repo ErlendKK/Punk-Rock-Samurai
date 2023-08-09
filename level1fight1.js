@@ -705,7 +705,7 @@ class Level1fight1 extends BaseScene {
             ] 
         } else if (gameState.turn === 2) {
             gameState.enemy1.actions = [
-                {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 1},
+                {key: () => `Intends to\nDeal ${Math.round(13 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 13 damage', probability: 1},
             ]
             
         } else if (gameState.turn === 3) {
