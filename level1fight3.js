@@ -194,9 +194,10 @@ class Level1fight3 extends BaseScene {
             let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
             gameState.turn += 1;
             turnsTillPoliceArrive -= 1;
+            console.log(turnsTillPoliceArrive);
             gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarte, so keep both!
-            if (gameState.turn === 2) displayCountdownBox() // Level-specific function
-            if (gameState.turn > 2) gameState.turnsText.setText(`${turnsTillPoliceArrive}`)
+            if (gameState.turn === 2) displayCountdownBox(); // Level-specific function
+            if (gameState.turn > 2) gameState.turnsText.setText(`${turnsTillPoliceArrive}`);
 
             if (turnsTillPoliceArrive === 0) {
                 self.sound.add('gunShotSound').play({ volume: 1.2 });
