@@ -249,7 +249,7 @@ class Level2fight1 extends BaseScene {
                 gameState.player.poisonText.destroy();
                 if (gameState.turn === 1) {
                     let textConfig = { fontSize: '38px', fill: '#ff0000', fontWeight: 'bold' };
-                    treesInfoText  = self.add.text(550, 300, `Trees start with full\narmor, and lose 1 Armor\n  when attacked`, textConfig).setOrigin(0.5).setDepth(201);
+                    let treesInfoText  = self.add.text(550, 300, `Trees start with full\narmor, and lose 1 Armor\n  when attacked`, textConfig).setOrigin(0.5).setDepth(201);
                     let textWidth = treesInfoText.width;
                     let textHeight = treesInfoText.height;
                     let paddingX = 20;
@@ -304,7 +304,7 @@ class Level2fight1 extends BaseScene {
             gameState.endOfTurnButton.setTexture('rectangularButton');
             gameState.endOfTurnButton.setInteractive();
 
-            let startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2)
+            let startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
             
             for (let i = 0; i < numCards; i++) {
                 self.time.delayedCall(i * 75, () => {
