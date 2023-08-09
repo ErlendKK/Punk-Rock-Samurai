@@ -1,5 +1,5 @@
 function updateLeaderboard(username, score) {
-    let leaderboardUrl = `http://dreamlo.com/lb/CBGhFikNak2i8KjH3UPThAfGJFnWo9A0O8mjvU19hS2Q/add/${username}/${score}`;
+    let leaderboardUrl = `https://www.dreamlo.com/lb/CBGhFikNak2i8KjH3UPThAfGJFnWo9A0O8mjvU19hS2Q/add/${username}/${score}`;
 
     fetch(leaderboardUrl)
         .then(response => response.text())
@@ -16,7 +16,7 @@ class Endscene extends Phaser.Scene {
 
     async getTopScores() {
         try {
-            const response = await fetch('http://dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
+            const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
             
             if (!response.ok) {
                 throw new Error('Failed to fetch leaderboard data');
