@@ -35,7 +35,7 @@ class Level1fight3 extends BaseScene {
             sprite: this.add.sprite(880, 340, 'skinhead2').setScale(0.25).setFlipX(true).setInteractive(), //910 / 310 / .25
             alive: true,
             actions: [],        
-            health: 70, // Set = 0 to reduce the number of enemies to 1
+            health: 75, // Set = 0 to reduce the number of enemies to 1
             healthMax: 75,
             strength: 0,
             strengthBase: 0,
