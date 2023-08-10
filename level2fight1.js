@@ -23,8 +23,8 @@ class Level2fight1 extends BaseScene {
             sprite: this.add.sprite(690, 330, 'tree1').setScale(0.29).setFlipX(false).setInteractive(), //690 / 350 / .33
             alive: true,
             actions: [],         
-            health: 60,
-            healthMax: 60,
+            health: 55,
+            healthMax: 55,
             strength: 0,
             strengthBase: 0,
             strengthMax: 15,  
