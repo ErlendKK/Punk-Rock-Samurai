@@ -51,6 +51,7 @@ class BaseScene extends Phaser.Scene {
         player.strengthBase = 0;
         player.strengthStance = 0;
         player.strengthCard = 0;
+        player.strengthMax = 15;
         player.armorBase = 0;
         player.armorStance = 0;
         player.armorCard = 0;
