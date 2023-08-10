@@ -1137,7 +1137,7 @@ class Level2fight2 extends BaseScene {
                 gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 gameState.enemies.forEach(enemy => {
-                    enemy.poison += 5;
+                    enemy.poison += 4;
                     updateStats(enemy);
                 });
             }
@@ -1296,7 +1296,7 @@ class Level2fight2 extends BaseScene {
         function updateStats(character) {
             
             if (character != gameState.player) { // Account for Toxic Avenger
-                character.strength = (gameState.toxicAvenger && character.poison > 0) ? character.strengthBase - 5 : character.strengthBase; 
+                character.strength = (gameState.toxicAvenger && character.poison > 0) ? character.strengthBase - 4 : character.strengthBase; 
             };
 
             // Update displayed stats
