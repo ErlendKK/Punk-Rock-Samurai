@@ -163,6 +163,7 @@ class Level2fight1 extends BaseScene {
             card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(0.08).setInteractive(); 
             slot.available = false; 
             card.tokenSlot = slot;
+            console.log(`Recreated permanent: ${card.key}\nfor slot ${slot.index}`);
             displayTokenCard(card);  
             activatePermanentFromToken(card);
         });
@@ -249,7 +250,7 @@ class Level2fight1 extends BaseScene {
                 gameState.player.poisonText.destroy();
                 if (gameState.turn === 1) {
                     let textConfig = { fontSize: '38px', fill: '#ff0000', fontWeight: 'bold' };
-                    let treesInfoText  = self.add.text(550, 300, `Trees start with full\narmor, and lose 1 Armor\n  when attacked`, textConfig).setOrigin(0.5).setDepth(201);
+                    let treesInfoText  = self.add.text(550, 300, `Trees start with full\nArmor, and lose 1 Armor\n    when attacked`, textConfig).setOrigin(0.5).setDepth(201);
                     let textWidth = treesInfoText.width;
                     let textHeight = treesInfoText.height;
                     let paddingX = 20;
@@ -304,7 +305,7 @@ class Level2fight1 extends BaseScene {
             gameState.endOfTurnButton.setTexture('rectangularButton');
             gameState.endOfTurnButton.setInteractive();
 
-            let startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
+            let startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2)
             
             for (let i = 0; i < numCards; i++) {
                 self.time.delayedCall(i * 75, () => {
@@ -1007,7 +1008,7 @@ class Level2fight1 extends BaseScene {
                     card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(0.08).setInteractive();
                     slot.available = false;
                     card.tokenSlot = slot;
-                    gameState.permanents.push({ card: card, slot: slot }); 
+                    gameState.permanents.push({ card: card, slot: slot, tokenSprite: card.tokenSprite }); 
     
                     displayTokenCard(card);
                     activatePermanentFromToken(card);
@@ -1093,8 +1094,6 @@ class Level2fight1 extends BaseScene {
                     // These will be closed over in the event callback function, ensuring that 
                     // the correct sprite and slot are manipulated when the sprite is clicked, 
                     // even if the card object is later updated with new sprite and slot references.
-                    //let tokenSprite = card.tokenSprite;
-                    //let tokenSlot = card.tokenSlot
                     let tokenSprite = card.tokenSprite
                     let tokenSlot = card.tokenSlot
                     gameState.kamishimoUberAlles += 1;
@@ -1176,6 +1175,7 @@ class Level2fight1 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 drawNewCards(8);
             }
@@ -1187,6 +1187,7 @@ class Level2fight1 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                
                 gameState.player.mana += 3;
                 gameState.player.manaMax += 3;
@@ -1200,6 +1201,7 @@ class Level2fight1 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + 12);
                 updateHealthBar(gameState.player);
@@ -1212,6 +1214,7 @@ class Level2fight1 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                
                 gameState.player.strengthBase += 6;
                 updateStrengthAndArmor(gameState.player);
@@ -1224,6 +1227,7 @@ class Level2fight1 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 gameState.enemies.forEach(enemy => {
                     enemy.poison += 5;
@@ -1233,6 +1237,7 @@ class Level2fight1 extends BaseScene {
     
             function depleteKirisuteGomen(card) { 
                 if (gameState.enemies.some(enemy => enemy.health < 30)) {
+                    gameState.deck = gameState.deck.filter(c => c !== card);
                     gameState.targetingCursor.setVisible(true);
                     let functionActive = true;
     
@@ -1250,16 +1255,19 @@ class Level2fight1 extends BaseScene {
                                 enemy.health = 0;
                                 gameState.attackSound.play({ volume: 1 });
                                 self.cameras.main.shake(150, .02, false);    
-                                gameState.player.strengthMax -= 5
-                                checkIfDead(enemy);
-                                checkGameOver();
-                                updateStrengthAndArmor(gameState.player)
                                 
-                                if (card.tokenSlot) card.tokenSlot.available = true;
+                                if (card.tokenSlot) {
+                                    card.tokenSlot.available = true;
+                                    gameState.player.strengthMax -= 5
+                                }
                                 if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
                                 if (card.tokenSprite) card.tokenSprite.destroy();
                                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+
+                                checkIfDead(enemy);
+                                checkGameOver();
+                                updateStrengthAndArmor(gameState.player)
     
                             } else {
                                 self.cameras.main.shake(70, .002, false);
@@ -1278,6 +1286,8 @@ class Level2fight1 extends BaseScene {
                     // The condition prevents multiple copies if the card is clicked repeatedly
                     if ( !gameState.currentCards.some( card => card.key === 'kirisuteGomen') ) {
                         gameState.currentCards.push(card)
+                        gameState.player.mana += 1; //NB! FINN EN BEDRE LØSNING FOR DETTE!
+                        updateManaBar(gameState.player);
                     }
                 }
     
@@ -1287,7 +1297,7 @@ class Level2fight1 extends BaseScene {
                 if (tokenSlot) tokenSlot.available = true;
                 if (tokenSprite) tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
     
                 gameState.kamishimoUberAlles -= 1;
                 updateStrengthAndArmor(gameState.player);
@@ -1297,7 +1307,7 @@ class Level2fight1 extends BaseScene {
                 if (tokenSlot) tokenSlot.available = true;
                 if (tokenSprite) tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
     
                 gameState.player.manaMax += 1;
                 gameState.player.mana += 1;
@@ -1724,5 +1734,3 @@ class Level2fight1 extends BaseScene {
         }
     }
 } //end of scene
-
-
