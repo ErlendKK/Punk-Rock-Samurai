@@ -20,8 +20,8 @@ class Level1fight3 extends BaseScene {
             sprite: this.add.sprite(700, 340, 'skinhead1').setScale(0.25).setFlipX(false).setInteractive(), //690 / 350 / .33
             alive: true,
             actions: [],         
-            health: 55,
-            healthMax: 55,
+            health: 60,
+            healthMax: 60,
             strength: 0,
             strengthBase: 0,
             strengthMax: 15,  
@@ -36,7 +36,7 @@ class Level1fight3 extends BaseScene {
             alive: true,
             actions: [],        
             health: 70, // Set = 0 to reduce the number of enemies to 1
-            healthMax: 70,
+            healthMax: 75,
             strength: 0,
             strengthBase: 0,
             strengthMax: 15, 
@@ -160,6 +160,7 @@ class Level1fight3 extends BaseScene {
             card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(0.08).setInteractive(); 
             slot.available = false; 
             card.tokenSlot = slot;
+            console.log(`Recreated permanent: ${card.key}\nfor slot ${slot.index}`); 
             displayTokenCard(card);  
             activatePermanentFromToken(card);
         });
@@ -194,10 +195,9 @@ class Level1fight3 extends BaseScene {
             let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
             gameState.turn += 1;
             turnsTillPoliceArrive -= 1;
-            console.log(turnsTillPoliceArrive);
             gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarte, so keep both!
-            if (gameState.turn === 2) displayCountdownBox(); // Level-specific function
-            if (gameState.turn > 2) gameState.turnsText.setText(`${turnsTillPoliceArrive}`);
+            if (gameState.turn === 2) displayCountdownBox() // Level-specific function
+            if (gameState.turn > 2) gameState.turnsText.setText(`${turnsTillPoliceArrive}`)
 
             if (turnsTillPoliceArrive === 0) {
                 self.sound.add('gunShotSound').play({ volume: 1.2 });
@@ -741,7 +741,7 @@ class Level1fight3 extends BaseScene {
 
             gameState.enemy1.actions = [ 
                 {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.235 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.235 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
@@ -752,7 +752,7 @@ class Level1fight3 extends BaseScene {
 
             gameState.enemy2.actions = [ 
                 {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 5 fire damage', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.235 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.235 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
@@ -1063,7 +1063,7 @@ class Level1fight3 extends BaseScene {
                     card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(0.08).setInteractive();
                     slot.available = false;
                     card.tokenSlot = slot;
-                    gameState.permanents.push({ card: card, slot: slot }); 
+                    gameState.permanents.push({ card: card, slot: slot, tokenSprite: card.tokenSprite }); 
     
                     displayTokenCard(card);
                     activatePermanentFromToken(card);
@@ -1133,8 +1133,8 @@ class Level1fight3 extends BaseScene {
                     })
                 
                 } else if (card.key === 'kirisuteGomen') {
-                    gameState.player.strengthMax += 5;
-                    updateStrengthAndArmor(gameState.player);
+                        gameState.player.strengthMax += 5;
+                        updateStrengthAndArmor(gameState.player);
     
                     card.tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn && gameState.enemies.some(enemy => enemy.health < 30)) { // Deactivate tokens during the enemys turn
@@ -1149,8 +1149,6 @@ class Level1fight3 extends BaseScene {
                     // These will be closed over in the event callback function, ensuring that 
                     // the correct sprite and slot are manipulated when the sprite is clicked, 
                     // even if the card object is later updated with new sprite and slot references.
-                    //let tokenSprite = card.tokenSprite;
-                    //let tokenSlot = card.tokenSlot
                     let tokenSprite = card.tokenSprite
                     let tokenSlot = card.tokenSlot
                     gameState.kamishimoUberAlles += 1;
@@ -1232,6 +1230,7 @@ class Level1fight3 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 drawNewCards(8);
             }
@@ -1243,6 +1242,7 @@ class Level1fight3 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                
                 gameState.player.mana += 3;
                 gameState.player.manaMax += 3;
@@ -1256,6 +1256,7 @@ class Level1fight3 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + 12);
                 updateHealthBar(gameState.player);
@@ -1268,6 +1269,7 @@ class Level1fight3 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                
                 gameState.player.strengthBase += 6;
                 updateStrengthAndArmor(gameState.player);
@@ -1280,6 +1282,7 @@ class Level1fight3 extends BaseScene {
                 if (card.tokenSprite) card.tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card);
                 
                 gameState.enemies.forEach(enemy => {
                     enemy.poison += 5;
@@ -1289,6 +1292,7 @@ class Level1fight3 extends BaseScene {
     
             function depleteKirisuteGomen(card) { 
                 if (gameState.enemies.some(enemy => enemy.health < 30)) {
+                    gameState.deck = gameState.deck.filter(c => c !== card);
                     gameState.targetingCursor.setVisible(true);
                     let functionActive = true;
     
@@ -1306,16 +1310,19 @@ class Level1fight3 extends BaseScene {
                                 enemy.health = 0;
                                 gameState.attackSound.play({ volume: 1 });
                                 self.cameras.main.shake(150, .02, false);    
-                                gameState.player.strengthMax -= 5
-                                checkIfDead(enemy);
-                                checkGameOver();
-                                updateStrengthAndArmor(gameState.player)
                                 
-                                if (card.tokenSlot) card.tokenSlot.available = true;
+                                if (card.tokenSlot) {
+                                    card.tokenSlot.available = true;
+                                    gameState.player.strengthMax -= 5
+                                }
                                 if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
                                 if (card.tokenSprite) card.tokenSprite.destroy();
                                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                                 gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+
+                                checkIfDead(enemy);
+                                checkGameOver();
+                                updateStrengthAndArmor(gameState.player)
     
                             } else {
                                 self.cameras.main.shake(70, .002, false);
@@ -1334,6 +1341,8 @@ class Level1fight3 extends BaseScene {
                     // The condition prevents multiple copies if the card is clicked repeatedly
                     if ( !gameState.currentCards.some( card => card.key === 'kirisuteGomen') ) {
                         gameState.currentCards.push(card)
+                        gameState.player.mana += 1; //NB! FINN EN BEDRE LØSNING FOR DETTE!
+                        updateManaBar(gameState.player);
                     }
                 }
     
@@ -1343,7 +1352,7 @@ class Level1fight3 extends BaseScene {
                 if (tokenSlot) tokenSlot.available = true;
                 if (tokenSprite) tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
     
                 gameState.kamishimoUberAlles -= 1;
                 updateStrengthAndArmor(gameState.player);
@@ -1353,7 +1362,7 @@ class Level1fight3 extends BaseScene {
                 if (tokenSlot) tokenSlot.available = true;
                 if (tokenSprite) tokenSprite.destroy();
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
     
                 gameState.player.manaMax += 1;
                 gameState.player.mana += 1;
@@ -1782,5 +1791,3 @@ class Level1fight3 extends BaseScene {
         }
     }
 } //end of scene
-
-
