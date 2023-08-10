@@ -932,7 +932,7 @@ class Level1fight1 extends BaseScene {
         function startNextLevel() {
             self.cameras.main.fadeOut(1000);
             self.time.delayedCall(1000, () => {
-            self.scene.start('Level1fight2'); //fiks til level1fight2
+            self.scene.start('Level3fight1'); //fiks til level1fight2
             });
         }
 
