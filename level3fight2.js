@@ -46,7 +46,6 @@ class Level3fight2 extends BaseScene {
             poison: 0
         }
 
-
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
         gameState.characters = [...gameState.enemies, gameState.player];
         let statsTextConfig = { fontSize: '11px', fill: '#FFFFFF' }
@@ -172,7 +171,7 @@ class Level3fight2 extends BaseScene {
         function startFight() {
             gameState.turn = 0;
             let startTextConfig = { fontSize: '60px', fill: '#ff0000', fontFamily: 'Rock Kapak' }
-            gameState.startText = self.add.text(550, 300, 'Level 1\nFight 2!', startTextConfig).setDepth(200).setOrigin(0.5); 
+            gameState.startText = self.add.text(550, 300, 'Level 3\nFight 2!', startTextConfig).setDepth(200).setOrigin(0.5); 
             gameState.musicTheme.stop();
             updateHealthBar(gameState.enemy2); // Removes the enemy if health is set = 0
             shuffleDeck(gameState.drawPile);
@@ -678,11 +677,11 @@ class Level3fight2 extends BaseScene {
 
         if (gameState.turn === 1) {
             gameState.enemy1.actions = [
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 1};
+                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 1},
             ] 
 
             gameState.enemy2.actions = [
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 1};
+                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 1},
             ]
         
         } else {
