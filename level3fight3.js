@@ -171,7 +171,7 @@ class Level3fight3 extends BaseScene {
         function startFight() {
             gameState.turn = 0;
             let startTextConfig = { fontSize: '60px', fill: '#ff0000', fontFamily: 'Rock Kapak' }
-            gameState.startText = self.add.text(550, 300, 'Level 1\nFight 2!', startTextConfig).setDepth(200).setOrigin(0.5); 
+            gameState.startText = self.add.text(550, 300, 'Level 3\nFight 3!', startTextConfig).setDepth(200).setOrigin(0.5); 
             gameState.musicTheme.stop();
             updateHealthBar(gameState.enemy2); // Removes the enemy if health is set = 0
             shuffleDeck(gameState.drawPile);
