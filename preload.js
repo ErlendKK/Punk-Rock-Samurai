@@ -10,8 +10,8 @@ document.getElementById('bug-report-form').addEventListener('submit', function(e
     
     const bugDescription = document.getElementById('bug-description').value;
     const consoleLog = document.getElementById('console-log').value;
-    const mailtoLink = `mailto:erlendk@live.com?subject=Punk Rock Samurai - BUG REPORT&body=${encodeURIComponent(`Bug Description:\n\n${bugDescription}\n\nConsole Log:\n\n${consoleLog}`)}`;
-    
+    const formattedMailtoLinkBody = encodeURIComponent(`Bug Description:\n\n${bugDescription}\n\nConsole Log:\n\n${consoleLog}`).replace(/%20/g, ' ');
+    const mailtoLink = `mailto:erlendk@live.com?subject=Punk Rock Samurai - BUG REPORT&body=${formattedMailtoLinkBody}`;
     window.location.href = mailtoLink;
 });
 
