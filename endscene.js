@@ -111,7 +111,7 @@ class Endscene extends Phaser.Scene {
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 
-        self.time.delayedCall(300, () => {  // Give time for leaderboard to update with players score  
+        self.time.delayedCall(600, () => {  // Give time for leaderboard to update with players score  
             displayLeaderBoard();
          })
 
