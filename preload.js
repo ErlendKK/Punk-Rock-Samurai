@@ -152,7 +152,7 @@ class Preload extends Phaser.Scene {
         this.load.image('endscene', 'assets/images/endscene.jpg');
 
         this.load.audio('cardsDealtSound', 'assets/sounds/cardsdealt.wav');
-        this.load.audio('thundersound', 'assets/sounds/thundersound.ogg');
+        this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
         this.load.audio('buttonPressedSound', 'assets/sounds/buttonpressed.wav');
         this.load.audio('attackSound', 'assets/sounds/attacksound.wav');
         this.load.audio('powerUpSound', 'assets/sounds/powerupsound.wav');
