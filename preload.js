@@ -187,7 +187,6 @@ class Preload extends Phaser.Scene {
         };
 
         gameState.player = {
-            name: gameState.playerName ? gameState.playerName : 'Punk Rock Samurai',
             sprite: this.add.sprite(320, 350, 'player').setScale(0.38).setFlipX(true).setInteractive(), //320 / 330 / 0.41
             healthBarColor: '0x00ff00',
             alive: true,

@@ -14,7 +14,7 @@ class Mainmenu extends Phaser.Scene {
     }
 
     async getTopScores() {
-        const response = await fetch('https://dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
+        const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
         const data = await response.json();
         let scores = data.dreamlo.leaderboard.entry;
         
@@ -123,7 +123,7 @@ class Mainmenu extends Phaser.Scene {
 
 
         // Implement New Game
-        let isEnteringName = false;
+        gameState.isEnteringName = false;
         gameState.name = '';
 
         newGameButton.on('pointerdown', () => {
@@ -139,17 +139,20 @@ class Mainmenu extends Phaser.Scene {
                 clearElements();
                 
                 gameState.name = 'Enter your name...';
-                sceneState.nameText = this.add.text(420, 315, gameState.name, { fontSize: '23px', fill: '#000000' } ).setDepth(21);
+                const nameTextConfig = { fontSize: '23px', fill: '#000000' };
+                sceneState.nameText = this.add.text(420, 315, gameState.name, nameTextConfig ).setDepth(21);
 
+                const buttonTextConfig = { fontSize: '28px', fill: '#000000' };
                 sceneState.startGameButton = this.add.image(550, 400, 'rectangularButton').setScale(1.2, 0.60).setInteractive();
-                sceneState.startGameText = this.add.text(470, 387, "Let\'s go!", { fontSize: '28px', fill: '#000000' } );
+                sceneState.startGameText = this.add.text(470, 387, "Let\'s go!", buttonTextConfig );
                 
                 animateButton(sceneState.startGameButton);
                 sceneState.startGameButton.on('pointerdown', () => saveNameAndExitMenu() );
 
-                sceneState.formCursor = this.add.text(420, 310, '|', { fontSize: '32px', fill: '#000000' } ).setDepth(21).setAlpha(0);
+                const formCursorConfig = { fontSize: '32px', fill: '#000000' }
+                sceneState.formCursor = this.add.text(420, 310, '|', formCursorConfig).setDepth(21).setAlpha(0);
 
-                sceneState.blinkingTween = this.tweens.add({
+                sceneState.cursorTween = this.tweens.add({
                     targets: sceneState.formCursor,
                     alpha: 1,
                     duration: 300,
@@ -159,7 +162,8 @@ class Mainmenu extends Phaser.Scene {
                     paused: true
                 });
 
-                sceneState.formFrame = this.add.image(550, 325, 'rectangularFrame').setScale(1.2, 0.60).setInteractive().setDepth(22);
+                sceneState.formFrame = this.add.image(550, 325, 'rectangularFrame');
+                sceneState.formFrame.setScale(1.2, 0.60).setInteractive().setDepth(22);
                 sceneState.nameForm = this.add.graphics({x: 400, y: 290});
                 sceneState.nameForm.fillStyle(0xFFFFFF, 1).setAlpha(0.90).setInteractive().setDepth(20);
                 sceneState.nameForm.fillRect(0, 0, 300, 65);
@@ -183,62 +187,89 @@ class Mainmenu extends Phaser.Scene {
             }
         });
 
-        function activateNameForm(gameObject) {
-            if (!isEnteringName) {     
-                gameObject.on('pointerup', () => {
-                    isEnteringName = true;
-                    console.log('nameForm has been clicked');
+        // Activate/ deactivate the input form
+        function activateNameForm (gameObject) {   
+            gameObject.on('pointerup', () => {
+
+                if (!gameState.isEnteringName) { 
+
+                    // isEnteringName is used to turn on and off the recording of key strokes, and 
+                    // activate/ deactivate the cursor. 
+                    gameState.isEnteringName = true;
+                    console.log('isEnteringName has been activated');
+
+                    // Reset name form
+                    if (gameState.name === 'Enter your name...') {
+                        gameState.name = '';
+                    }
+
+                    // Add blinking cursor
+                    sceneState.formCursor.setAlpha(0);
+                    sceneState.cursorTween.resume();
 
                     // Activate the on-screen keyboard for mobile devices
                     if (isMobileDevice()) {
                         hiddenInput.focus();
                     }
-
-                    if (gameState.name === 'Enter your name...') {
-                        gameState.name = '';
-                    }
-
-                    sceneState.formCursor.setAlpha(0);
-                    sceneState.blinkingTween.resume();
                     
-                    self.time.delayedCall(100, () => {
+                    // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
+                    // event that called activateNameForm() doesn't inadvertently call it as well.
+                    self.time.delayedCall(200, () => {
                         deactivateNameForm();
                     })
-                });
-            }
-        }
+                };
+            })
+        };
 
         function deactivateNameForm() {
-            self.input.off('pointerdown');
+            self.input.off('pointerup');
+            self.input.once('pointerup', () => {
 
-            self.input.once('pointerdown', () => {
-                if (isEnteringName) {
-                    isEnteringName = false;
-                    console.log('the background has been clicked');
+                if (gameState.isEnteringName) {
+                    let delayTime = 0;
                     
+                    // Reset form if it's empty
+                    if (!gameState.name) {
+                        gameState.name = 'Enter your name...';
+                        delayTime = 100; // Gives Update() time to update the name field before !isEnteringName.
+                    };
+
+                    // Deactivates typing
+                    self.time.delayedCall(delayTime, () => {
+                        gameState.isEnteringName = false;
+                        console.log('isEnteringName has been deactivated');
+                    })
+
+                    // Remove cursor
+                    sceneState.formCursor.setAlpha(0);
+                    sceneState.cursorTween.pause();
+
                     // Deactivate the on-screen keyboard for mobile devices
                     if (isMobileDevice()) {
                         hiddenInput.focus();
                     }
-
-                    sceneState.blinkingTween.pause();
-                    sceneState.formCursor.setAlpha(0);
                 }
             });
         }
         
+        // Log key strokes if isEnteringName === true
         this.input.keyboard.on('keydown', (event) => {
-            if (isEnteringName) {
+            if (gameState.isEnteringName) {
+
+                // Cap the name length to keep the text from overflowing the form
                 const maxNameLength = 16
                 
+                // Implement backspace
                 if (event.keyCode === 8 && gameState.name.length > 0) {
                     gameState.name = gameState.name.slice(0, -1);
                     
+                // Add any other characters you want to allow    
                 } else if (event.key.length === 1 && event.key.match(/[a-zA-Z0-9\s\-_]/) && gameState.name.length < maxNameLength) {
                     gameState.name += event.key;
 
+                // Gently informs the player that its time to stop typing
                 } else if (gameState.name.length === maxNameLength) {
-                    self.cameras.main.shake(40, .0015, false);
+                    self.cameras.main.shake(30, .0010, false);
                 }
             }    
         });
@@ -567,15 +598,14 @@ class Mainmenu extends Phaser.Scene {
     update() {
         let textWidth = 0;
 
-        if (sceneState.nameText && gameState.name) {
+        if (gameState.isEnteringName) {
+            // Dynamically updates the displayed input text as it is being typed
             sceneState.nameText.setText(gameState.name);
             textWidth = sceneState.nameText.width;
-        }
 
-        if (sceneState.formCursor) {
+            // Dynamically positions the cursor at the end of the typed text
             sceneState.formCursor.x = sceneState.nameText.x + textWidth - 7;
         }
-        
     };
 
 } // end of scene

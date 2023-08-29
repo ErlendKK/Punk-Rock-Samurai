@@ -36,6 +36,8 @@ class Level1Fight1 extends BaseScene {self
         gameState.cardImages = [];
         gameState.permanents = [];
 
+        gameState.player.name = gameState.playerName ? gameState.playerName : 'Punk Rock Samurai';
+
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Nazi Punk';
         gameState.enemy1.sprite = this.add.sprite(710, 350, 'nazi').setScale(0.38).setFlipX(false).setInteractive(); //690 / 350 / .33
