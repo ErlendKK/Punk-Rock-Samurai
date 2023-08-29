@@ -211,7 +211,7 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.resume();
 
                     // Activate the on-screen keyboard for mobile devices
-                    if (deviceIsMobile()) {
+                    if (deviceIsMobile) {
                         mobileInput()
                     }
                     
@@ -248,7 +248,7 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.pause();
 
                     // Deactivate the on-screen keyboard for mobile devices
-                    if (deviceIsMobile()) {
+                    if (deviceIsMobile) {
                         hiddenInput.blur();
                     }
                 }
