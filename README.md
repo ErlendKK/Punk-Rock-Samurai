@@ -1,7 +1,7 @@
 # Punk-Rock-Samurai
-Punk Rock Samurai Alpha1.1
+Punk Rock Samurai
 
-Uploaded for alpha testing and revision
+Uploaded for testing and revision
 
 Game Design and Programming is copyright 2023 Erlend Kulander Kvitrud, all rights reserved.
 
