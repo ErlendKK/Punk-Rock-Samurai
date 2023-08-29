@@ -47,12 +47,17 @@ class Endscene extends Phaser.Scene {
 
     create() {
         self = this;
+        const mainTextConfig = { fontSize: '57px', fill: '#a9a9a9', fontFamily: 'Rock Kapak' }
         this.cameras.main.fadeIn(800, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,320, 'endscene').setScale(0.95).setOrigin(0.5, 0.5).on('pointerup', () => returnToMenu() );
-        this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai alpha v1.1', { fontSize: '57px', fill: '#a9a9a9', fontFamily: 'Rock Kapak' }).setOrigin(0.5, 0.5);
+        this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai alpha v1.1', mainTextConfig).setOrigin(0.5, 0.5);
         
-        gameState.score.totalScore = gameState.score.levelsCompleted > 0 ? gameState.score.levelsCompleted * ( 15 + Math.max(0, 7 - gameState.score.numberOfTurns / gameState.score.levelsCompleted) ): 0;
+        gameState.score.totalScore = (
+          gameState.score.levelsCompleted > 0 ? 
+          gameState.score.levelsCompleted * ( 15 + Math.max(0, 7 - gameState.score.numberOfTurns / gameState.score.levelsCompleted) ): 
+          0
+        ); 
 
         let labels = {
             numberOfTurns: "Number of turns played",
@@ -93,7 +98,8 @@ class Endscene extends Phaser.Scene {
                 if (topScores) {
                     topScores.forEach((score, index) => {
                         let dateOnly = score.date.split(' ')[0];  // Splitting the date string and keeping only the first part
-                        let displayedScore = self.add.text(x + 50, y + 190, `${index + 1}. Name: ${score.name}, Score: ${score.score}, Date: ${dateOnly}`, textConfig).setOrigin(0);
+                        const scoreText = `${index + 1}. Name: ${score.name}, Score: ${score.score}, Date: ${dateOnly}`
+                        let displayedScore = self.add.text(x + 50, y + 190, scoreText, textConfig).setOrigin(0);
                         sceneState.displayedScoreArray.push(displayedScore);
                         y += spacing;
                     });
