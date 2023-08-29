@@ -1,12 +1,21 @@
+/*____              _      ____            _      ____                                  _ 
+ |  _ \ _   _ _ __ | | __ |  _ \ ___   ___| | __ / ___|  __ _ _ __ ___  _   _ _ __ __ _(_)
+ | |_) | | | | '_ \| |/ / | |_) / _ \ / __| |/ / \___ \ / _` | '_ ` _ \| | | | '__/ _` | |
+ |  __/| |_| | | | |   <  |  _ < (_) | (__|   <   ___) | (_| | | | | | | |_| | | | (_| | |
+ |_|    \__,_|_| |_|_|\_\ |_| \_\___/ \___|_|\_\ |____/ \__,_|_| |_| |_|\__,_|_|  \__,_|_|
+
+Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
+
+
 function updateLeaderboard(username, score) {
-    let leaderboardUrl = `https://www.dreamlo.com/lb/CBGhFikNak2i8KjH3UPThAfGJFnWo9A0O8mjvU19hS2Q/add/${username}/${score}`;
+    let leaderboardUrl = `http://dreamlo.com/lb/CBGhFikNak2i8KjH3UPThAfGJFnWo9A0O8mjvU19hS2Q/add/${username}/${score}`;
 
     fetch(leaderboardUrl)
         .then(response => response.text())
         .then(data => console.log(data))
         .catch( (error) => {
             console.error('Error:', error);
-        })    
+        });  
 }
 
 class Endscene extends Phaser.Scene {
@@ -16,7 +25,7 @@ class Endscene extends Phaser.Scene {
 
     async getTopScores() {
         try {
-            const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
+            const response = await fetch('http://dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
             
             if (!response.ok) {
                 throw new Error('Failed to fetch leaderboard data');
@@ -59,7 +68,7 @@ class Endscene extends Phaser.Scene {
         
         async function displayLeaderBoard() {
             try {
-                console.log(`displayLeaderBoard called`)
+                console.log(`displayLeaderBoard called`);
                 let topScores = await self.getTopScores();
             
                 const leaderboardBackground = self.add.graphics();
@@ -72,22 +81,24 @@ class Endscene extends Phaser.Scene {
                     console.log(`${key}: ${value}`);
                 
                     if (labels[key]) { // if there is a matching label for the key
-                        let text = `${labels[key]}: ${value}`;
-                        self.add.text(x + 50, y + 90, text, { color: '#000', fontSize: '16px' });
+                        let resultsText = `${labels[key]}: ${value}`;
+                        self.add.text(x + 50, y + 90, resultsText, { color: '#000', fontSize: '16px' });
                         y += spacing;
                     }
                 })
+
+                const textConfig = { fontSize: '16px', fill: '#000000' };
                 
                 self.add.text(x + 50, y + 150, 'Leaderboard', { fontSize: '25px', fill: '#000000' }).setOrigin(0);
                 if (topScores) {
                     topScores.forEach((score, index) => {
                         let dateOnly = score.date.split(' ')[0];  // Splitting the date string and keeping only the first part
-                        let displayedScore = self.add.text(x + 50, y + 190, `${index + 1}. Name: ${score.name}, Score: ${score.score}, Date: ${dateOnly}`, { fontSize: '16px', fill: '#000000' }).setOrigin(0);
+                        let displayedScore = self.add.text(x + 50, y + 190, `${index + 1}. Name: ${score.name}, Score: ${score.score}, Date: ${dateOnly}`, textConfig).setOrigin(0);
                         sceneState.displayedScoreArray.push(displayedScore);
                         y += spacing;
                     });
                 } else {
-                    self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', { fontSize: '16px', fill: '#000000' }).setOrigin(0);
+                    self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', textConfig).setOrigin(0);
                 }
 
             }  catch (error) {
@@ -97,9 +108,11 @@ class Endscene extends Phaser.Scene {
         }
 
         function returnToMenu() {
-            console.log(`returnto meny called`)
+            console.log(`returnto meny called`);
+            gameState.name = '';
+            
             self.cameras.main.shake(1500, .0015, false);
-            self.cameras.main.flash(350);
+            self.cameras.main.flash(500);
 
             self.time.delayedCall(500, () => {
                 self.cameras.main.fadeOut(1000);
@@ -111,15 +124,15 @@ class Endscene extends Phaser.Scene {
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 
-        self.time.delayedCall(600, () => {  // Give time for leaderboard to update with players score  
+        // Give time for leaderboard to update with players score 
+        self.time.delayedCall(300, () => {   
             displayLeaderBoard();
          })
 
          self.time.delayedCall(7000, () => {
-            console.log(`timeout`)
-            returnToMenu() 
+            console.log(`timeout`);
+            returnToMenu();
         }) 
-         
    
     }; // End of create()
     
