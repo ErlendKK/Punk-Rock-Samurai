@@ -8,6 +8,38 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 
 const gameState = {};
 
+/*
+const gameSettings = {
+    cardFrameMapping: { // Update keys when sprite sheet is updated to multiple rows.
+      'knuckleFist': 0,
+      'kabutu': 1,
+      'discontent': 2,
+      'tantoBlade': 3,
+      'masakari': 4,
+      'combatBoots': 5,
+      'bushido': 6,
+      'kirisuteGomen': 7,
+      'rebelSpirit': 8,
+      'hollidayInKamakura': 9,
+      'boneShredder': 10,
+      'powerChord': 11,
+      'foreverTrue': 12,
+      'circlePit': 13,
+      'toxicAvenger': 14,
+      'studdedLeather': 15,
+      'stageInvasion': 16,
+      'seppuku': 17,
+      'rocknRonin': 18,
+      'kamishimoUberAlles': 19,
+      'dogsOfWar': 20,
+      'blackFumes': 21,
+      'rebelHeart': 22,
+      'rawEnergy': 23,
+      'pyromania': 24
+    }
+};
+*/  
+
 window.addEventListener('error', function() {
     let errorMessage = document.getElementById('error-message');
     errorMessage.style.display = 'block';
