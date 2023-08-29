@@ -14,7 +14,7 @@ class Mainmenu extends Phaser.Scene {
     }
 
     async getTopScores() {
-        const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
+        const response = await fetch('https://dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
         const data = await response.json();
         let scores = data.dreamlo.leaderboard.entry;
         
