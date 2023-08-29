@@ -54,9 +54,9 @@ class Endscene extends Phaser.Scene {
         this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai alpha v1.1', mainTextConfig).setOrigin(0.5, 0.5);
         
         gameState.score.totalScore = (
-          gameState.score.levelsCompleted > 0 ? 
-          gameState.score.levelsCompleted * ( 15 + Math.max(0, 7 - gameState.score.numberOfTurns / gameState.score.levelsCompleted) ): 
-          0
+           gameState.score.levelsCompleted > 0 ? 
+           gameState.score.levelsCompleted * ( 15 + Math.max(0, 7 - gameState.score.numberOfTurns / gameState.score.levelsCompleted) ): 
+           0
         ); 
 
         let labels = {
@@ -109,7 +109,8 @@ class Endscene extends Phaser.Scene {
 
             }  catch (error) {
                 console.error("Error in displayLeaderBoard: ", error);
-                self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', { fontSize: '16px', fill: '#FF0000' }).setOrigin(0);
+                const errorTextConfig = { fontSize: '16px', fill: '#FF0000' }
+                self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', errorTextConfig).setOrigin(0);
             }
         }
 
