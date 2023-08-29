@@ -38,6 +38,8 @@ class Mainmenu extends Phaser.Scene {
         this.add.text(15, 5, `Punk Rock Samurai Beta v1.00`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         sceneState.isEnteringName = false;
+        let deviceIsMobile = false;
+        let hiddenInput; 
         sceneState.name = '';
 
         sceneState.cardsDealtSound = this.sound.add('cardsDealtSound'); 
@@ -107,20 +109,22 @@ class Mainmenu extends Phaser.Scene {
 
 
         // Initiate the on-screen keyboard for mobile devices
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        };
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            deviceIsMobile = true;
+        }
+                
+        function mobileInput() {
+            hiddenInput = document.createElement('input');
+            hiddenInput.style.position = 'absolute';
+            hiddenInput.style.opacity = '0';
+            hiddenInput.style.zIndex = '-1';
+            document.body.appendChild(hiddenInput);
 
-        if (isMobileDevice()) {
-            sceneState.hiddenInput = document.createElement('input');
-            sceneState.hiddenInput.style.position = 'absolute';
-            sceneState.hiddenInput.style.opacity = '0';
-            sceneState.hiddenInput.style.zIndex = '-1';
-            document.body.appendChild(sceneState.hiddenInput);
-
-            sceneState.hiddenInput.addEventListener('input', function(event) {
+            hiddenInput.addEventListener('input', function(event) {
                 gameState.name = event.target.value;
             });
+
+            hiddenInput.focus()
         };
 
 
@@ -207,8 +211,8 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.resume();
 
                     // Activate the on-screen keyboard for mobile devices
-                    if (isMobileDevice()) {
-                        sceneState.hiddenInput.focus();
+                    if (deviceIsMobile()) {
+                        mobileInput()
                     }
                     
                     // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
@@ -244,8 +248,8 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.pause();
 
                     // Deactivate the on-screen keyboard for mobile devices
-                    if (isMobileDevice()) {
-                        sceneState.hiddenInput.blur();
+                    if (deviceIsMobile()) {
+                        hiddenInput.blur();
                     }
                 }
             });
