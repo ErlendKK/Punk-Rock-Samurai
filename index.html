@@ -1,7 +1,7 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Punk Rock Samurai ALPHA 1.1</title>
+    <title>Punk Rock Samurai</title>
     <style> 
         body {
         margin: 0;
@@ -16,11 +16,6 @@
             font-style: normal;
         }
 
-        #nameform {
-            display: none;
-            position: absolute;
-        }
-
         #error-message {
             display: none;
             position: absolute;
@@ -32,11 +27,6 @@
             z-index: 1000;
         }
 
-        textarea {
-            width: 95%;
-            height: 30px;
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
@@ -47,24 +37,17 @@
         <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     </div>
 
-    <div id="nameform">
-        <input type="text" id="nameField" placeholder="Enter your name" style="font-size: 25px">
-        <input type="button" id="playButton" value="Let's Go!" style="font-size: 25px">
-    </div>
-
     <div id="error-message">
         <h2>The game crashed!</h2>
-         <p>Evidently you found a new bug, well done :D! Please let me know what happened, so I can try to patch it.</p>
-         <p>If you have an email client installed, please use the attached form. Otherwise, drop an email to erlendk(at)live.com</p>
-         <form id="bug-report-form">
-            <textarea id="bug-description" placeholder="Describe what happened..."></textarea><br><br>
-            <input type="submit" value="Submit Bug Report">
-        </form>
+        <p>I see you discovered a bug! Please let me know what happened, so I can fix it.</p>
+        <p>You can drop me an email at erlendk(at)live.com</p>
     </div>
     
     <div id="game-container">
         <script src="preload.js"></script>
+        <script src="basescene.js"></script>
         <script src="mainmenu.js"></script>
+        
         <script src="level1fight1.js"></script>
         <script src="level1fight2.js"></script>
         <script src="level1fight3.js"></script>
@@ -74,10 +57,13 @@
         <script src="level3fight1.js"></script>
         <script src="level3fight2.js"></script>
         <script src="level3fight3.js"></script>
+        <script src="level4fight1.js"></script>
+        <script src="level4fight2.js"></script>
+        <script src="level4fight3.js"></script>
+
         <script src="endscene.js"></script>
         <script src="config.js"></script>
     </div>
-
 </body>
 </html>
       
