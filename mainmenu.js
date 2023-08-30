@@ -37,7 +37,7 @@ class Mainmenu extends Phaser.Scene {
         this.add.image(550,480, 'bgLoadingScreen').setScale(1.40);
         this.add.text(15, 5, `Punk Rock Samurai Beta v1.00`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
-        sceneState.isEnteringName = false;
+        gameState.isEnteringName = false;
         sceneState.name = '';
 
         sceneState.cardsDealtSound = this.sound.add('cardsDealtSound'); 
@@ -128,9 +128,12 @@ class Mainmenu extends Phaser.Scene {
                 sceneState.startGameText = this.add.text(470, 387, "Let\'s go!", buttonTextConfig );
                 
                 animateButton(sceneState.startGameButton);
-                sceneState.startGameButton.on('pointerdown', () => saveNameAndExitMenu() );
+                sceneState.startGameButton.on('pointerdown', () => {
+                   gameState.isEnteringName = false;
+                   saveNameAndExitMenu();
+                };
 
-                const formCursorConfig = { fontSize: '32px', fill: '#000000' }
+                const formCursorConfig = { fontSize: '32px', fill: '#000000' };
                 sceneState.formCursor = this.add.text(420, 310, '|', formCursorConfig).setDepth(21).setAlpha(0);
 
                 sceneState.cursorTween = this.tweens.add({
