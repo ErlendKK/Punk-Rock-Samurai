@@ -40,14 +40,14 @@ class Level4Fight1 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Mong\nSteals Strength and Armor';
         gameState.enemy1.sprite = this.add.sprite(600, 355, 'monster1').setScale(0.160).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy1.health = 60;
-        gameState.enemy1.healthMax = 60;
+        gameState.enemy1.health = 50;
+        gameState.enemy1.healthMax = 50;
             
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Goh\nSteals Strength and Armor';
         gameState.enemy2.sprite = this.add.sprite(790, 350, 'monster2').setScale(0.36).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy2.health = 80;
-        gameState.enemy2.healthMax = 80;
+        gameState.enemy2.health = 60;
+        gameState.enemy2.healthMax = 60;
 
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
@@ -696,9 +696,9 @@ class Level4Fight1 extends BaseScene {self
                 {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.27 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(17 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 17, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Heals 15 HP\nSteals 1 Armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Heals 25 HP\nSteals 1 Strength', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.06},
+                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Heals 25 HP\nSteals 1 Strength', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
                 {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 1, reduceTargetStrength: 2, reduceTargetArmor: 1, text: 'Steals 2 Strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 3, text: 'Steals 3 Armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 2, text: 'Steals 2 Armor', probability: 0.11 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 5, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 5 poison', probability: 0.00}
             ]
         }
