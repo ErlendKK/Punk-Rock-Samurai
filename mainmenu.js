@@ -38,8 +38,6 @@ class Mainmenu extends Phaser.Scene {
         this.add.text(15, 5, `Punk Rock Samurai Beta v1.00`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         sceneState.isEnteringName = false;
-        let deviceIsMobile = false;
-        let hiddenInput; 
         sceneState.name = '';
 
         sceneState.cardsDealtSound = this.sound.add('cardsDealtSound'); 
@@ -107,27 +105,7 @@ class Mainmenu extends Phaser.Scene {
             button.setScale(0.8, 0.5).setInteractive().setOrigin(0.5);
         });
 
-
-        // Initiate the on-screen keyboard for mobile devices
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            deviceIsMobile = true;
-        }
-                
-        function mobileInput() {
-            hiddenInput = document.createElement('input');
-            hiddenInput.style.position = 'absolute';
-            hiddenInput.style.opacity = '0';
-            hiddenInput.style.zIndex = '-1';
-            document.body.appendChild(hiddenInput);
-
-            hiddenInput.addEventListener('input', function(event) {
-                gameState.name = event.target.value;
-            });
-
-            hiddenInput.focus()
-        };
-
-
+     
         // Implement New Game
         newGameButton.on('pointerdown', () => {
             if (!newGameButtonClicked) {
@@ -209,11 +187,6 @@ class Mainmenu extends Phaser.Scene {
                     // Add blinking cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.resume();
-
-                    // Activate the on-screen keyboard for mobile devices
-                    if (deviceIsMobile) {
-                        mobileInput()
-                    }
                     
                     // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
                     // event that called activateNameForm() doesn't inadvertently call it as well.
@@ -246,11 +219,6 @@ class Mainmenu extends Phaser.Scene {
                     // Remove cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.pause();
-
-                    // Deactivate the on-screen keyboard for mobile devices
-                    if (deviceIsMobile) {
-                        hiddenInput.blur();
-                    }
                 }
             });
         }
@@ -563,7 +531,7 @@ class Mainmenu extends Phaser.Scene {
                     textConfig
                 );
 
-                sceneState.instructionsText.setLineSpacing(2);
+                sceneState.instructionsText.setLineSpacing(1.5);
 
                 sceneState.instructionsElements = [
                     sceneState.instructionsBackground, 
