@@ -131,7 +131,7 @@ class Mainmenu extends Phaser.Scene {
                 sceneState.startGameButton.on('pointerdown', () => {
                    gameState.isEnteringName = false;
                    saveNameAndExitMenu();
-                };
+                });
 
                 const formCursorConfig = { fontSize: '32px', fill: '#000000' };
                 sceneState.formCursor = this.add.text(420, 310, '|', formCursorConfig).setDepth(21).setAlpha(0);
