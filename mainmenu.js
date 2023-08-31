@@ -61,7 +61,7 @@ class Mainmenu extends Phaser.Scene {
         
         const newGameButton = self.add.image(x, y, 'rectangularButton');
         const newGameText = self.add.text(x, y, 'New Game', buttonTextConfig).setOrigin(0.5);
-        let newGameButtonClicked = false;
+        sceneState.newGameButtonClicked = false;
 
         const loadGameButton = self.add.image(x, y + offset * 1, 'rectangularButton');
         const loadGameText = self.add.text(x, y + offset * 1, 'Load Game', { fontSize: '16px', fill: '#a9a9a9' }).setOrigin(0.5);
@@ -108,10 +108,10 @@ class Mainmenu extends Phaser.Scene {
      
         // Implement New Game
         newGameButton.on('pointerdown', () => {
-            if (!newGameButtonClicked) {
+            if (!sceneState.newGameButtonClicked) {
                 sceneState.buttonPressedSound.play({ volume: 0.7 });
 
-                newGameButtonClicked = true;
+                sceneState.newGameButtonClicked = true;
                 loadGameButtonClicked = false;
                 leaderBoardButtonClicked = false;
                 creditsButtonClicked = false;
@@ -166,7 +166,7 @@ class Mainmenu extends Phaser.Scene {
                 activateNameForm(sceneState.formFrame);
         
             } else {
-                newGameButtonClicked = false;
+                sceneState.newGameButtonClicked = false;
                 clearElements();
             }
         });
@@ -388,7 +388,7 @@ class Mainmenu extends Phaser.Scene {
                 const x = 250;
                 let y = 200;
 
-                newGameButtonClicked = false;
+                sceneState.newGameButtonClicked = false;
                 loadGameButtonClicked = false;
                 leaderBoardButtonClicked = true;
                 creditsButtonClicked = false;
@@ -432,7 +432,7 @@ class Mainmenu extends Phaser.Scene {
             if (!creditsButtonClicked) {
                 sceneState.buttonPressedSound.play({ volume: 0.7 });
 
-                newGameButtonClicked = false;
+                sceneState.newGameButtonClicked = false;
                 loadGameButtonClicked = false;
                 leaderBoardButtonClicked = false;
                 creditsButtonClicked = true;
@@ -481,7 +481,7 @@ class Mainmenu extends Phaser.Scene {
             sceneState.buttonPressedSound.play({ volume: 0.7 });
             if (!instructionsButtonClicked) {
                 
-                newGameButtonClicked = false;
+                sceneState.newGameButtonClicked = false;
                 loadGameButtonClicked = false;
                 leaderBoardButtonClicked = false;
                 creditsButtonClicked = false;
@@ -572,7 +572,7 @@ class Mainmenu extends Phaser.Scene {
     update() {
         let textWidth = 0;
 
-        if (gameState.isEnteringName) {
+        if (gameState.isEnteringName && sceneState.newGameButtonClicked) {
             // Dynamically updates the displayed input text as it is being typed
             sceneState.nameText.setText(gameState.name);
             textWidth = sceneState.nameText.width;
