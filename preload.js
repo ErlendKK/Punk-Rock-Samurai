@@ -218,7 +218,6 @@ class Preload extends Phaser.Scene {
             {key: 'toxicFrets',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicFretsToken'},
             {key: 'ashenEncore',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'ashenEncoreToken'},
             {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
-            {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
             
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -251,7 +250,8 @@ class Preload extends Phaser.Scene {
             {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
             {key: 'bushido',            type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bushidoToken'},
             {key: 'toxicAvenger',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicAvengerToken'},
-           
+            {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
+            
         ];
              
         let bgLoadingScreen = this.add.image(550,480, 'bgLoadingScreen').setScale(1.40).setInteractive();
