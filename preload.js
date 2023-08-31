@@ -84,6 +84,7 @@ class Preload extends Phaser.Scene {
         this.load.image('scorchedSoul', 'assets/images/cards/scorchedSoul.jpg');
         this.load.image('risingWakizashi', 'assets/images/cards/risingWakizashi.jpg');
         this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
+     this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
      
         this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
         this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
@@ -241,6 +242,7 @@ class Preload extends Phaser.Scene {
             {key: 'katana',             type: 'targetSelected', cost: 3, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 13 * (1 - gameState.player.stancePoints * gameState.player.strength / 10) : 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'risingWakizashi',    type: 'targetSelected', cost: 1, stancePoints: -1, damage: 9, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'deadCities',         type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'nastyNihonto',       type: 'targetSelected', cost: 2, stancePoints: 0, damage: 10, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
         ];
 
