@@ -123,15 +123,6 @@ class Preload extends Phaser.Scene {
         this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
         this.load.image('endscene', 'assets/images/endscene.jpg');
 
-        /*
-        this.load.spritesheet('cardSpriteSheet', 'assets/images/cardSpriteSheet.jpg', {
-            frameWidth: 400,
-            frameHeight: 597,
-            margin: 0,
-            spacing: 0
-        });
-        */  
-
         this.load.audio('cardsDealtSound', 'assets/sounds/cardsdealt.wav');
         this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
         this.load.audio('buttonPressedSound', 'assets/sounds/buttonpressed.wav');
