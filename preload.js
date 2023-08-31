@@ -8,38 +8,6 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 
 const gameState = {};
 
-/*
-const gameSettings = {
-    cardFrameMapping: { // Update keys when sprite sheet is updated to multiple rows.
-      'knuckleFist': 0,
-      'kabutu': 1,
-      'discontent': 2,
-      'tantoBlade': 3,
-      'masakari': 4,
-      'combatBoots': 5,
-      'bushido': 6,
-      'kirisuteGomen': 7,
-      'rebelSpirit': 8,
-      'hollidayInKamakura': 9,
-      'boneShredder': 10,
-      'powerChord': 11,
-      'foreverTrue': 12,
-      'circlePit': 13,
-      'toxicAvenger': 14,
-      'studdedLeather': 15,
-      'stageInvasion': 16,
-      'seppuku': 17,
-      'rocknRonin': 18,
-      'kamishimoUberAlles': 19,
-      'dogsOfWar': 20,
-      'blackFumes': 21,
-      'rebelHeart': 22,
-      'rawEnergy': 23,
-      'pyromania': 24
-    }
-};
-*/  
-
 window.addEventListener('error', function() {
     let errorMessage = document.getElementById('error-message');
     errorMessage.style.display = 'block';
@@ -115,7 +83,8 @@ class Preload extends Phaser.Scene {
         this.load.image('bladesBlight', 'assets/images/cards/bladesBlight.jpg');
         this.load.image('scorchedSoul', 'assets/images/cards/scorchedSoul.jpg');
         this.load.image('risingWakizashi', 'assets/images/cards/risingWakizashi.jpg');
-        
+        this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
+     
         this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
         this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
         this.load.image('ashenEncore', 'assets/images/cards/ashenEncore.jpg');
@@ -281,6 +250,7 @@ class Preload extends Phaser.Scene {
             {key: 'scorchedSoul',       type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 8, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'katana',             type: 'targetSelected', cost: 3, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 13 * (1 - gameState.player.stancePoints * gameState.player.strength / 10) : 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'risingWakizashi',    type: 'targetSelected', cost: 1, stancePoints: -1, damage: 9, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'deadCities',         type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
         ];
 
