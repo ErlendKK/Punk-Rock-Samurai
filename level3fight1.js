@@ -40,15 +40,15 @@ class Level3Fight1 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Voidling';
         gameState.enemy1.sprite = this.add.sprite(680, 350, 'demon1').setScale(0.32).setFlipX(false).setInteractive(); //690 / 350 / .33
-        gameState.enemy1.health = 50;
-        gameState.enemy1.healthMax = 50;
+        gameState.enemy1.health = 45;
+        gameState.enemy1.healthMax = 45;
         gameState.enemy1.armor = 0;
             
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Infernus';
         gameState.enemy2.sprite = this.add.sprite(890, 330, 'demon2').setScale(0.26).setFlipX(false).setInteractive(), //910 / 310 / .25
-        gameState.enemy2.health = 70;
-        gameState.enemy2.healthMax = 70;
+        gameState.enemy2.health = 65;
+        gameState.enemy2.healthMax = 65;
         gameState.enemy2.armor = 0;
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
