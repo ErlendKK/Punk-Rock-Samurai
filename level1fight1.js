@@ -100,7 +100,7 @@ class Level1Fight1 extends BaseScene {self
                 gameState.music.play( { loop: true, volume: 0.35 } );
             })
         
-            self.time.delayedCall(3000, () => { //timer: 3000
+            self.time.delayedCall(2800, () => { //timer: 2800
                 fadeOutGameObject(gameState.startText, 200);
                 self.time.delayedCall(300, startPlayerTurn());
             });      
@@ -139,7 +139,7 @@ class Level1Fight1 extends BaseScene {self
             removeIfDead(gameState.player);
             updateStrengthAndArmor(gameState.player);
 
-            self.time.delayedCall(2200, () => { //timer: 2200
+            self.time.delayedCall(2000, () => { //timer: 2000
                 gameState.player.poisonText.destroy();
                 fadeOutGameObject(gameState.yourTurnText, 200);
                 drawCards(numCards);
@@ -530,7 +530,7 @@ class Level1Fight1 extends BaseScene {self
             gameState.playersTurn = false;
             enemy.turnText = self.add.text(550, 300, 'Enemy turn!', { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5);               
     
-            self.time.delayedCall(1800, () => {
+            self.time.delayedCall(1600, () => {
                 fadeOutGameObject(enemy.turnText, 200);
             }) 
         }
@@ -547,7 +547,7 @@ class Level1Fight1 extends BaseScene {self
             updateStats(enemy);
         };
     
-        const delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 800 : 1800;
+        const delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 600 : 1800;
     
         self.time.delayedCall(delaytime, () => {
             enemy.poisonText.destroy();
@@ -605,7 +605,7 @@ class Level1Fight1 extends BaseScene {self
             updateStats(character);
         })
         
-        self.time.delayedCall(1500, () => {
+        self.time.delayedCall(1300, () => {
             fadeOutGameObject(gameState.actionText, 200);
             enemy.turnComplete = true;
     
@@ -728,7 +728,7 @@ class Level1Fight1 extends BaseScene {self
                         self.scene.start('Endscene');
                     });
 
-                    self.time.delayedCall(2500, () => {
+                    self.time.delayedCall(2400, () => {
                         scenetransitionstarted = true;
                         self.scene.start('Endscene');
                     });
@@ -755,20 +755,20 @@ class Level1Fight1 extends BaseScene {self
                 gameState.actionText.destroy();
                 console.log(`gameState.actionText still existed at initiateVictory and got destroyed`);
             }
-            const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' }
+            const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             const victoryText = self.add.text(550, 300, 'Victory!', victoryTextConfig).setOrigin(0.5);
             
-            self.time.delayedCall(2000, () => {
+            self.time.delayedCall(1800, () => {
                 gameState.musicTheme.play( { loop: true, volume: 0.30 } );
-                victoryText.destroy()
+                victoryText.destroy();
                 chooseReward();
             })
         }
         
         function chooseReward() {
             self.shuffleDeck(gameState.bonusCards);
-            const gameOverTextConfig = { fontSize: '40px', fill: '#000000' }
-            const rewardTextConfig = { fontSize: '25px', fill: '#000000' }
+            const gameOverTextConfig = { fontSize: '40px', fill: '#000000' };
+            const rewardTextConfig = { fontSize: '25px', fill: '#000000' };
             gameState.gameOverText = self.add.text(550, 180, 'Choose a reward', gameOverTextConfig).setOrigin(0.5).setDepth(103);
             gameState.rewardAddCardsText = self.add.text(550, 400, 'Add 1 card\nto your deck', rewardTextConfig).setOrigin(0.5).setDepth(103);
 
@@ -793,7 +793,7 @@ class Level1Fight1 extends BaseScene {self
 
          
         function rewardAddCard() {
-            console.log(`rewardAddCard called`)
+            console.log(`rewardAddCard called`);
             gameState.gameOverText.destroy();     
             
             const x = 320;
@@ -852,15 +852,15 @@ class Level1Fight1 extends BaseScene {self
                         if (!nextlevelstarting) {
                             nextlevelstarting = true;
                             startNextLevel();
-                        }    
+                        };    
                     });
         
                     self.input.on('pointerup', () => {
                         if (!nextlevelstarting) {
                             nextlevelstarting = true;
                             startNextLevel();
-                        }
-                    })
+                        };
+                    });
         
                 })
             })
