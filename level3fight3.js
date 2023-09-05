@@ -40,12 +40,14 @@ class Level3Fight3 extends BaseScene {self
         gameState.enemy1.sprite = this.add.sprite(670, 340, 'wraith2').setScale(0.26).setFlipX(false).setInteractive(), //690 / 350 / .33
         gameState.enemy1.health = 60;
         gameState.enemy1.healthMax = 60;
+        gameState.enemy1.armor = 2;
 
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Lord of Darkness';
         gameState.enemy2.sprite = this.add.sprite(890, 330, 'wraith1').setScale(0.27).setFlipX(false).setInteractive(), //910 / 310 / .25
         gameState.enemy2.health = 100;
         gameState.enemy2.healthMax = 100;
+        gameState.enemy2.armor = 2;
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
         gameState.characters = [...gameState.enemies, gameState.player];
