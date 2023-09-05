@@ -84,7 +84,8 @@ class Preload extends Phaser.Scene {
         this.load.image('scorchedSoul', 'assets/images/cards/scorchedSoul.jpg');
         this.load.image('risingWakizashi', 'assets/images/cards/risingWakizashi.jpg');
         this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
-     this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
+        this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
+        this.load.image('crowdSurfer', 'assets/images/cards/crowdSurfer.jpg');
      
         this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
         this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
@@ -225,7 +226,8 @@ class Preload extends Phaser.Scene {
             {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rawEnergy',          type: 'buff',           cost: () => gameState.player.stancePoints > 0 ? -2 : -1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'powerChord',         type: 'buff',           cost: 1, stancePoints: () => gameState.player.stancePoints <= 0 ? 1 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 3 : 0},
-            
+            {key: 'crowdSurfer',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? - 2 * gameState.player.stancePoints : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0},
+              
             {key: 'stageInvasion',      type: 'targetAll',      cost: 2, stancePoints: 0, damage: () => 2 * (gameState.currentCards.length + 1), fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'circlePit',          type: 'targetAll',      cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: () => gameState.costPlayed * 4, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'moshpitMassacre',    type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 8, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
