@@ -496,7 +496,7 @@ class Mainmenu extends Phaser.Scene {
                 sceneState.instructionsHeadline = self.add.text(270, 50, 'Instructions', headlineConfig).setOrigin(0);
                 sceneState.instructionsText = self.add.text(270, 100, 
 
-                    `The game consists of three levels, each of which consists of three fights.\n` +
+                    `The game consists of four levels, each of which consists of three fights.\n` +
                     `At the start of your turn, you gain 4 mana and draw 5 cards. You may then play any number\n` + 
                     `of cards before hitting "End Turn". Your remaining cards and mana are then depleted,\n` +
                     `and the enemy's turn begins. You win the fight by killing all enemies. Losing a fight\n` + 
@@ -531,7 +531,7 @@ class Mainmenu extends Phaser.Scene {
                     `-Positive Freedom at the end of your turn: +1 card and +1 mana next turn.\n` +
                     `-Max Freedom at the end of your turn:-2 Armor.`, 
                     
-                    textConfig
+                    textConfige
                 );
 
                 sceneState.instructionsText.setLineSpacing(1.5);
