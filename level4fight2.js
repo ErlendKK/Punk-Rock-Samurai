@@ -44,19 +44,22 @@ class Level4Fight2 extends BaseScene {self
         gameState.enemy1.name = 'Gloomhoof\nSteals Strength and Armor';
         gameState.enemy1.sprite = this.add.sprite(610, 350, 'monster3').setScale(0.34).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy1.health = 40;
-        gameState.enemy1.healthMax = 40;  
+        gameState.enemy1.healthMax = 40;
+        gameState.enemy1.armor = 0;
             
         gameState.enemy2  = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Darktuft\nSteals Strength and Armor';
         gameState.enemy2.sprite = this.add.sprite(820, 350, 'monster4').setScale(0.39).setFlipX(true).setInteractive(); //710 / 350 / .33
         gameState.enemy2.health = 40;
         gameState.enemy2.healthMax = 40;
+        gameState.enemy2.armor = 0;
 
         gameState.enemy3  = Object.create(gameState.enemy);
         gameState.enemy3.name = 'Ampward\nMaster of healing and buffing';
         gameState.enemy3.sprite = this.add.sprite(1000, 370, 'sorcerer1').setScale(0.36).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy3.health = 50;
         gameState.enemy3.healthMax = 50;
+        gameState.enemy3.armor = 0;
 
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2, gameState.enemy3];
