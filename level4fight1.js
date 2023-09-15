@@ -42,12 +42,14 @@ class Level4Fight1 extends BaseScene {self
         gameState.enemy1.sprite = this.add.sprite(600, 355, 'monster1').setScale(0.160).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy1.health = 50;
         gameState.enemy1.healthMax = 50;
+        gameState.enemy1.armor = 0;
             
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Goh\nSteals Strength and Armor';
         gameState.enemy2.sprite = this.add.sprite(790, 350, 'monster2').setScale(0.36).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy2.health = 60;
         gameState.enemy2.healthMax = 60;
+        gameState.enemy1.armor = 0;
 
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
