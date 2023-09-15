@@ -230,10 +230,10 @@ class BaseScene extends Phaser.Scene {
             gameState.cardsDealtSound.play({ volume: 0.6 });
             this.tweens.add({
                 targets: card.sprite,
-                y: 500,
+                y: 470,
                 angle: 0,
-                scaleX: 0.50, // 0.5
-                scaleY: 0.50,
+                scaleX: 0.46, // 0.5
+                scaleY: 0.46,
                 duration: 300,
                 ease: 'Cubic'
             });
