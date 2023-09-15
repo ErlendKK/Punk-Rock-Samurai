@@ -39,19 +39,22 @@ class Level4Fight3 extends BaseScene {self
         gameState.enemy1.name = 'Goh Resurrected\nSteals Strength and Armor';
         gameState.enemy1.sprite = this.add.sprite(600, 370, 'monster2').setScale(0.31).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy1.health = 50;
-        gameState.enemy1.healthMax = 50;  
+        gameState.enemy1.healthMax = 50;
+        gameState.enemy1.armor = 0;  
             
         gameState.enemy2  = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Terrorsnout\nSteals Strength and Armor';
         gameState.enemy2.sprite = this.add.sprite(770, 370, 'monster5').setScale(0.48).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy2.health = 50;
         gameState.enemy2.healthMax = 50;
+        gameState.enemy2.armor = 0;  
 
         gameState.enemy3  = Object.create(gameState.enemy);
         gameState.enemy3.name = 'Necronis\nMaster of fire and buffs';
         gameState.enemy3.sprite = this.add.sprite(950, 350, 'sorcerer2').setScale(0.29).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy3.health = 80;
         gameState.enemy3.healthMax = 80;
+        gameState.enemy3.armor = 0;  
 
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2, gameState.enemy3];
