@@ -8,11 +8,6 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 
 const gameState = {};
 
-window.addEventListener('error', function() {
-    let errorMessage = document.getElementById('error-message');
-    errorMessage.style.display = 'block';
-});
-
 class Preload extends Phaser.Scene {
     constructor() {
         super('Preload');
