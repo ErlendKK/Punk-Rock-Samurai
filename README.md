@@ -1,7 +1,7 @@
 # Punk-Rock-Samurai
 Punk Rock Samurai
 
-Demo available at https://raw.githack.com/ErlendKK/Punk-Rock-Samurai/main/index.html
+Demo available at https://erlendkk.github.io/Punk-Rock-Samurai/
 
 Game Design and Programming is copyright 2023 Erlend Kulander Kvitrud, all rights reserved.
 
