@@ -606,7 +606,10 @@ class Level4Fight1 extends BaseScene {self
             gameState.player.poison += chosenAction.poison;
             enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
             enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
+            gameState.player.armorBase -= chosenAction.reduceTargetArmor
+            gameState.player.strengthBase -= chosenAction.reduceTargetStrength
             updateStats(enemy);
+            updateStats(gameState.player);
             enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);    
     
             if (chosenAction.damage > 0 || chosenAction.fire > 0) {
@@ -714,11 +717,11 @@ class Level4Fight1 extends BaseScene {self
     
             gameState.enemy2.actions = [ 
                 {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 5 fire damage\n Steals 1 Strength', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: ' Deals 15 damage\nSteals 1 Strength', probability: 0.235 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: ' Deals 15 damage\nSteals 1 Strength', probability: 0.24 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: () => `Intends to\nDeal ${Math.round(20 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 20, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 20 damage\nSteals 1 Armor', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 1, armor: 1, reduceTargetStrength: 1, reduceTargetArmor: 0, text: ' Heals 15 HP\nSteals 1 Strength', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: '  Heals 25 HP\nSteals 1 Armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
-                {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, reduceTargetStrength: 2, reduceTargetArmor: 0, text: 'Steals 2 Strenght', probability: 0.125 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+                {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, reduceTargetStrength: 2, reduceTargetArmor: 0, text: 'Steals 2 Strenght', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, reduceTargetStrength: 0, reduceTargetArmor: 3, text: 'Steals 3 Armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
                 {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 5, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 5 poison', probability: 0.00}
             ]

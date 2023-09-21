@@ -293,7 +293,8 @@ class Mainmenu extends Phaser.Scene {
                 bonusCard.sprite.on('pointerup', function() {
                     sceneState.cardsDealtSound.play({ volume: 1.8 });
 
-                    gameState.deck.push(bonusCard);
+                    // gameState.deck.push(bonusCard);
+                    gameState.bonusCard = bonusCard;
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
         
                     // Remove all non-selected card sprites

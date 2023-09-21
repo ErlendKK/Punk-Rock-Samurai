@@ -169,8 +169,10 @@ class BaseScene extends Phaser.Scene {
         })
 
         gameState.stanceText.on('pointerout', () => {
-            gameState.stanceDescriptionBackground.destroy();
-            gameState.stanceDescriptionText.destroy();
+            this.time.delayedCall(20, () => {
+                gameState.stanceDescriptionBackground.destroy();
+                gameState.stanceDescriptionText.destroy();
+            })
         });
     };
 

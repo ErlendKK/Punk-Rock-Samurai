@@ -53,7 +53,6 @@ class Preload extends Phaser.Scene {
             percentText.destroy();
         });
 
-
         this.load.image('knuckleFist', 'assets/images/cards/knuckleFist.jpg');
         this.load.image('kabutu', 'assets/images/cards/kabutu.jpg');
         this.load.image('combatBoots', 'assets/images/cards/combatBoots.jpg');

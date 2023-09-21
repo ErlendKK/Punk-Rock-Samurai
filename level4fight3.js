@@ -543,7 +543,10 @@ class Level4Fight3 extends BaseScene {self
                 enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
                 enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
                 enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);
+                gameState.player.armorBase -= chosenAction.reduceTargetArmor
+                gameState.player.strengthBase -= chosenAction.reduceTargetStrength
                 updateStats(enemy);
+                updateStats(gameState.player);
             }
     
             if (chosenAction.damage > 0 || chosenAction.fire > 0) {
@@ -648,7 +651,7 @@ class Level4Fight3 extends BaseScene {self
             ]
         }
     
-        gameState.enemy1.actions = [ 
+        gameState.enemy2.actions = [ 
             {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
             {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.27 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
             {key: () => `Intends to\nDeal ${Math.round(17 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 17, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.18 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},

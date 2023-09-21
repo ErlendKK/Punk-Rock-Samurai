@@ -95,6 +95,7 @@ class Level1Fight1 extends BaseScene {self
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
             const startTextConfig = { fontSize: '60px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             gameState.startText = self.add.text(550, 300, `Level ${level}\nFight ${fight}!`, startTextConfig).setDepth(200).setOrigin(0.5);
+            addPermanent(gameState.bonusCard)
                                
             self.time.delayedCall(350, () => {
                 gameState.music.play( { loop: true, volume: 0.35 } );
@@ -896,14 +897,16 @@ class Level1Fight1 extends BaseScene {self
                     gameState.discardPile.push(card);
                     gameState.discardPileText.setText(gameState.discardPile.length);
 
-                } else {
+                } else if (card != gameState.bonusCard) {
                      gameState.deck = gameState.deck.filter(c => c !== card);
                 }
 
                 // The conditional avoids error if no slots are available.
                 if (slot) { 
-                    card.slot.available = true;
-                    card.sprite.destroy(); 
+                    if (card != gameState.bonusCard) {
+                        card.slot.available = true;
+                        card.sprite.destroy(); 
+                    }
                     card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(0.075).setInteractive();
                     slot.available = false;
                     card.tokenSlot = slot;
