@@ -1593,6 +1593,7 @@ class Level4Fight1 extends BaseScene {self
                 enemy.health -= ashenDamage;
                 self.updateHealthBar(enemy);
                 removeIfDead(enemy);
+                checkGameOver();
                 
                 // The conditional deals with cases where multiple cards are drawn.
                 if (typeof ashenEncoreText === "undefined" || !ashenEncoreText) { 

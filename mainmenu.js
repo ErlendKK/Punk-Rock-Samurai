@@ -105,6 +105,24 @@ class Mainmenu extends Phaser.Scene {
             button.setScale(0.8, 0.5).setInteractive().setOrigin(0.5);
         });
 
+
+        // Initiate the on-screen keyboard for mobile devices
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
+
+        if (isMobileDevice()) {
+            gameState.hiddenInput = document.createElement('input');
+            gameState.hiddenInput.style.position = 'absolute';
+            gameState.hiddenInput.style.opacity = '0';
+            gameState.hiddenInput.style.zIndex = '-1';
+            document.body.appendChild(gameState.hiddenInput);
+
+            gameState.hiddenInput.addEventListener('input', function(event) {
+                gameState.name = event.target.value;
+            });            
+        };
+
      
         // Implement New Game
         newGameButton.on('pointerdown', () => {
@@ -190,6 +208,11 @@ class Mainmenu extends Phaser.Scene {
                     // Add blinking cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.resume();
+
+                    // Activate the on-screen keyboard for mobile devices
+                    if (isMobileDevice()) {
+                        gameState.hiddenInput.focus();
+                    }
                     
                     // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
                     // event that called activateNameForm() doesn't inadvertently call it as well.
@@ -222,6 +245,11 @@ class Mainmenu extends Phaser.Scene {
                     // Remove cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.pause();
+
+                    // Deactivate the on-screen keyboard for mobile devices
+                    if (isMobileDevice()) {
+                        gameState.hiddenInput.blur();
+                    }
                 }
             });
         }
