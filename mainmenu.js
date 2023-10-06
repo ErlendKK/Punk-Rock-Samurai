@@ -559,7 +559,7 @@ class Mainmenu extends Phaser.Scene {
                     `-Positive Freedom at the end of your turn: +1 card and +1 mana next turn.\n` +
                     `-Max Freedom at the end of your turn:-2 Armor.`, 
                     
-                    textConfige
+                    textConfig
                 );
 
                 sceneState.instructionsText.setLineSpacing(1.5);
