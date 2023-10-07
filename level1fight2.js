@@ -21,7 +21,7 @@ class Level1Fight2 extends BaseScene {self
         const self = this;      
         this.baseCreate('bakgrunnCity2'); //BaseScene method  
         this.resetPlayer(gameState.player, 0.36);
-        this.addButtons();
+        this.addButtons('#000000');
         displayDrawPile();
         displayDiscardPile();
 
@@ -66,7 +66,7 @@ class Level1Fight2 extends BaseScene {self
         });
 
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#a9a9a9');
+        this.addStanceBar(gameState.player, '#2e2e2e');
         
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;
@@ -1090,7 +1090,7 @@ class Level1Fight2 extends BaseScene {self
     
                 card.tokenSprite.on('pointerover', function() {
                     gameState.cardsDealtSound.play({ volume: 1.5 });
-                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(26);
+                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(105);
                 });
     
                 card.tokenSprite.on('pointerout', function() {
@@ -1506,6 +1506,7 @@ class Level1Fight2 extends BaseScene {self
                 enemy.health -= ashenDamage;
                 self.updateHealthBar(enemy);
                 removeIfDead(enemy);
+                checkGameOver();
                 
                 // The conditional deals with cases where multiple cards are drawn.
                 if (typeof ashenEncoreText === "undefined" || !ashenEncoreText) { 

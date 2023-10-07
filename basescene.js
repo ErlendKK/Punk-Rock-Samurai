@@ -71,9 +71,11 @@ class BaseScene extends Phaser.Scene {
         character.healthBarBackground = this.add.graphics();
         character.healthBarBackground.lineStyle(3, 0x000000, 1);
         character.healthBarBackground.strokeRect(x - 40, y - height / 2 - 30, 100, 10);    
+        
         character.healthBar = this.add.graphics();
         character.healthBar.fillStyle(color, 1);
         character.healthBar.fillRect(x - 40, y - height / 2 - 30, 100 * (character.health / character.healthMax), 10);
+        
         character.healthBarText = this.add.text(x - 18, y - height / 2 - 25, `${character.health}/${character.healthMax}`, textConfig).setOrigin(0.5);      
     };
 
@@ -86,9 +88,11 @@ class BaseScene extends Phaser.Scene {
         character.manaBarBackground = this.add.graphics();
         character.manaBarBackground.lineStyle(3, 0x000000, 1);
         character.manaBarBackground.strokeRect( character.x - 40,  character.y - height / 2 - 45, 100, 10); 
+        
         character.manaBar = this.add.graphics();
         character.manaBar.fillStyle(0x0000ff, 1); 
         character.manaBar.fillRect( x - 40,  y - height / 2 - 45, 100 * (character.mana / character.manaMax), 10);
+        
         character.manaBarText = this.add.text( x - 27,  y - height / 2 - 40, `${character.mana}/${character.manaMax}`, textConfig).setOrigin(0.5);
     };
 
@@ -116,6 +120,7 @@ class BaseScene extends Phaser.Scene {
                 character.descriptionBackground = this.add.graphics({x: x - 200, y: y - 120});
                 character.descriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9).setInteractive().setDepth(30);
                 character.descriptionBackground.fillRect(0, 0, 215, 250);
+                
                 const textConfig = { fontSize: '12px', fill: '#000000' };
                 character.descriptionText = this.add.text(x + 10 , y + 5, fullText, textConfig).setDepth(35).setOrigin(1, 0.5);
             })
@@ -227,7 +232,7 @@ class BaseScene extends Phaser.Scene {
 
     animateCard(card, depth) {
         card.sprite.on('pointerover', () => {
-            gameState.cardsDealtSound.play({ volume: 0.6 });
+            gameState.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
             this.tweens.add({
                 targets: card.sprite,
                 y: 470,
@@ -258,10 +263,10 @@ class BaseScene extends Phaser.Scene {
 
     // Support functions
 
-    addButtons() {
+    addButtons(color) {
         //Add Mutebutton
         const muteButton = this.add.sprite(1050, 40, 'radioButtonRoundOff').setScale(0.5).setInteractive();
-        gameState.muteText = this.add.text(875, 30, 'Mute music', { fontSize: '25px', fill: '#000000' });    
+        gameState.muteText = this.add.text(970, 25, 'Mute', { fontSize: '25px', fill: color });    
 
         muteButton.on('pointerup', () => {
 
@@ -339,17 +344,23 @@ class BaseScene extends Phaser.Scene {
 
     updateHealthBar(character) {
         character.health = Phaser.Math.Clamp(character.health, 0, character.healthMax);
+        const textColor = character == gameState.player && character.health < 12 ? '#ff0000' : '#000000'; // Red if health < 18, otherwise Black
+        
         character.healthBar.clear();
         character.healthBar.fillStyle(character === gameState.player ? 0x00ff00 : 0xff0000, 1);
         character.healthBar.fillRect(character.x - 40, character.y - character.height / 2 - 30, 100 * (character.health / character.healthMax), 10);
+        
         character.healthBarText.setText(`${character.health}/${character.healthMax}`);
+        character.healthBarText.setColor(textColor);
     };
     
     updateManaBar(character) {
         character.mana = Phaser.Math.Clamp(character.mana, 0, character.manaMax);
+       
         character.manaBar.clear();
         character.manaBar.fillStyle(0x0000ff, 1); // Blue color for mana.
         character.manaBar.fillRect(character.x - 40, character.y - character.height / 2 - 45, 100 * (character.mana / character.manaMax), 10);
+       
         character.manaBarText.setText(`${character.mana}/${character.manaMax}`);
     };
 

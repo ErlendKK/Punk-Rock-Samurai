@@ -105,6 +105,24 @@ class Mainmenu extends Phaser.Scene {
             button.setScale(0.8, 0.5).setInteractive().setOrigin(0.5);
         });
 
+
+        // Initiate the on-screen keyboard for mobile devices
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
+
+        if (isMobileDevice()) {
+            gameState.hiddenInput = document.createElement('input');
+            gameState.hiddenInput.style.position = 'absolute';
+            gameState.hiddenInput.style.opacity = '0';
+            gameState.hiddenInput.style.zIndex = '-1';
+            document.body.appendChild(gameState.hiddenInput);
+
+            gameState.hiddenInput.addEventListener('input', function(event) {
+                gameState.name = event.target.value;
+            });            
+        };
+
      
         // Implement New Game
         newGameButton.on('pointerdown', () => {
@@ -190,6 +208,16 @@ class Mainmenu extends Phaser.Scene {
                     // Add blinking cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.resume();
+
+                    // Activate the on-screen keyboard for mobile devices
+                    if (isMobileDevice()) {
+                        gameState.hiddenInput.focus();
+                    }
+
+                    const enterKey = self.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+                    enterKey.once('down', function () {
+                        saveNameAndExitMenu();
+                    })
                     
                     // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
                     // event that called activateNameForm() doesn't inadvertently call it as well.
@@ -222,6 +250,11 @@ class Mainmenu extends Phaser.Scene {
                     // Remove cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.pause();
+
+                    // Deactivate the on-screen keyboard for mobile devices
+                    if (isMobileDevice()) {
+                        gameState.hiddenInput.blur();
+                    }
                 }
             });
         }
@@ -282,7 +315,7 @@ class Mainmenu extends Phaser.Scene {
                 console.log(`bonusCardsprite added for: ${bonusCard.key}`);
         
                 bonusCard.sprite.on('pointerover', function() {
-                    sceneState.cardsDealtSound.play({ volume: 0.8 });
+                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 0.8, seek: 0.12 });
                     cardTweens(bonusCard.sprite, 0.58, 200);
                 }, this);
                 
@@ -291,7 +324,7 @@ class Mainmenu extends Phaser.Scene {
                 }, this);
         
                 bonusCard.sprite.on('pointerup', function() {
-                    sceneState.cardsDealtSound.play({ volume: 1.8 });
+                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 1.2, seek: 0.12 });
 
                     gameState.deck.push(bonusCard);
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
@@ -531,7 +564,7 @@ class Mainmenu extends Phaser.Scene {
                     `-Positive Freedom at the end of your turn: +1 card and +1 mana next turn.\n` +
                     `-Max Freedom at the end of your turn:-2 Armor.`, 
                     
-                    textConfige
+                    textConfig
                 );
 
                 sceneState.instructionsText.setLineSpacing(1.5);
