@@ -11,6 +11,7 @@ class BaseScene extends Phaser.Scene {
     preload() {
         this.load.image('listbox1', 'assets/images/listbox1.png');
         this.load.image('listbox2', 'assets/images/listbox2.png');
+        this.load.image('goldCoin', 'assets/images/goldCoin.png');
     }
 
     create() {
@@ -22,6 +23,7 @@ class BaseScene extends Phaser.Scene {
 
     baseCreate(backgoundImage, scale = 0.75) {
         this.add.image(0,0, backgoundImage).setScale(scale).setOrigin(0.02,0); 
+        this.add.image(800, 25, 'goldCoin').setScale(0,2).setOrigin(800,25).setDepth(150); 
         this.cameras.main.fadeIn(600, 0, 0, 0);   
         this.input.keyboard.createCursorKeys();
         

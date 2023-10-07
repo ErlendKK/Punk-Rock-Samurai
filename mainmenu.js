@@ -27,10 +27,12 @@ class Mainmenu extends Phaser.Scene {
 
     preload() {
         this.load.image('rectangularFrame', 'assets/images/stoneButtonFrame.png');
+        this.load.image('goldCoin', 'assets/images/goldCoin.png');
     };
         
 
     create() {
+        this.add.image(800,25, 'goldCoin').setScale(0,2).setOrigin(800,25).setDepth(150); 
         const self = this;
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
