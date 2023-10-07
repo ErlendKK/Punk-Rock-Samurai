@@ -21,7 +21,7 @@ class Level1Fight3 extends BaseScene {self
         const self = this;      
         this.baseCreate('bakgrunnCity3', 0.70); //BaseScene method  
         this.resetPlayer(gameState.player, 0.35);
-        this.addButtons();
+        this.addButtons('#000000');
         displayDrawPile();
         displayDiscardPile();
         let turnsTillPoliceArrive = 7; // NB! LEVEL SPECIFIC! DO NOT COPY ELSEWHERE!
@@ -1219,7 +1219,7 @@ class Level1Fight3 extends BaseScene {self
     
                 card.tokenSprite.on('pointerover', function() {
                     gameState.cardsDealtSound.play({ volume: 1.5 });
-                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(26);
+                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(105);
                 });
     
                 card.tokenSprite.on('pointerout', function() {

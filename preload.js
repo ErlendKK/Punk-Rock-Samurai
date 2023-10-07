@@ -53,7 +53,6 @@ class Preload extends Phaser.Scene {
             percentText.destroy();
         });
 
-
         this.load.image('knuckleFist', 'assets/images/cards/knuckleFist.jpg');
         this.load.image('kabutu', 'assets/images/cards/kabutu.jpg');
         this.load.image('combatBoots', 'assets/images/cards/combatBoots.jpg');
@@ -81,6 +80,7 @@ class Preload extends Phaser.Scene {
         this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
         this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
         this.load.image('crowdSurfer', 'assets/images/cards/crowdSurfer.jpg');
+        this.load.image('shikoroStrike', 'assets/images/cards/shikoroStrike.jpg');
      
         this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
         this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
@@ -200,7 +200,7 @@ class Preload extends Phaser.Scene {
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             
-            {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
 
@@ -221,14 +221,14 @@ class Preload extends Phaser.Scene {
             {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rawEnergy',          type: 'buff',           cost: () => gameState.player.stancePoints > 0 ? -2 : -1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'powerChord',         type: 'buff',           cost: 1, stancePoints: () => gameState.player.stancePoints <= 0 ? 1 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 3 : 0},
-            {key: 'crowdSurfer',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? - 2 * gameState.player.stancePoints : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0},
+            {key: 'crowdSurfer',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? 2 * gameState.player.stancePoints : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0},
               
             {key: 'stageInvasion',      type: 'targetAll',      cost: 2, stancePoints: 0, damage: () => 2 * (gameState.currentCards.length + 1), fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'circlePit',          type: 'targetAll',      cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: () => gameState.costPlayed * 4, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'moshpitMassacre',    type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 8, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'blackFumes',         type: () => gameState.player.stancePoints >= 0 ? 'targetAll' : 'targetSelected', cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 3 : gameState.player.stancePoints < 0 ? 5 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             
-            {key: 'boneShredder',       type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 1, drawCard: 1},
+            {key: 'boneShredder',       type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 1, drawCard: () => (gameState.player.stancePoints > 0) ? 1 : 0},
             {key: 'masakari',           type: 'targetSelected', cost: 2, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 9 * (1 - gameState.player.stancePoints * gameState.player.strength / 10) : 9, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'pyromania',          type: 'targetSelected', cost: 2, stancePoints: 0, damage: 0, fire: 16, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'roninsRot',          type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 1 : 0},
@@ -240,6 +240,7 @@ class Preload extends Phaser.Scene {
             {key: 'risingWakizashi',    type: 'targetSelected', cost: 1, stancePoints: -1, damage: 9, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'deadCities',         type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'nastyNihonto',       type: 'targetSelected', cost: 2, stancePoints: 0, damage: 10, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'shikoroStrike',      type: 'targetSelected', cost: 1, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 7 : 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 2 : 0, reduceTargetStrength: 0, drawCard: 0},
            
         ];
 

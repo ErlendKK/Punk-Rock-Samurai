@@ -76,7 +76,7 @@ class Level4Fight2 extends BaseScene {self
         });
 
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#a9a9a9');
+        this.addStanceBar(gameState.player, '#2e2e2e');
         
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;
@@ -635,9 +635,9 @@ class Level4Fight2 extends BaseScene {self
         } else {
 
             gameState.enemy1.actions = [ 
-                {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: `Deals 5 fire damage`, probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.25 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
-                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
+                {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.22 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
+                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.13 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Heals 15 HP\nSteals 1 Armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
                 {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Heals 25 HP\nSteals 1 Strength', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.06},
                 {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 1, reduceTargetStrength: 2, reduceTargetArmor: 1, text: 'Steals 2 Strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
@@ -645,29 +645,29 @@ class Level4Fight2 extends BaseScene {self
                 {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 5, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 5 poison', probability: 0.00}
             ]
         }
-    
-        gameState.enemy1.actions = [ 
-            {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: `Deals 5 fire damage`, probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
-            {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.25 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.23 : 0) / 5},
-            {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.23 : 0) / 5},
-            {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Heals 15 HP\nSteals 1 Armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
+        
+        gameState.enemy2.actions = [ 
+            {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+            {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 12 damage\nSteals 1 Armor', probability: 0.23 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+            {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Deals 17 damage\nSteals 1 Strength', probability: 0.13 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+            {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Heals 15 HP\nSteals 1 Armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.16},
             {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Heals 25 HP\nSteals 1 Strength', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.06},
-            {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 1, reduceTargetStrength: 2, reduceTargetArmor: 1, text: 'Steals 2 Strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
-            {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 3, text: 'Steals 3 Armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.23 : 0) / 5},
+            {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 1, reduceTargetStrength: 2, reduceTargetArmor: 1, text: 'Steals 2 Strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+            {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 3, text: 'Steals 3 Armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
             {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 5, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Deals 5 poison', probability: 0.00}
         ]
 
-    };
+        if (gameState.turn % 2 === 1) {
+            gameState.enemy3.actions = [
+                {key: `Intends to\nHeal his team`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 0, text: 'All enemies heals 15 HP', probability: 1},
+            ] 
+        } else {
+            gameState.enemy3.actions = [
+                {key: () => `Intends to\nBuff his team`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 3, text: 'All enemies Gain 2 strength and 3 armor', probability: 1},
+            ]
+        }
 
-    if (gameState.turn % 2 === 1) {
-        gameState.enemy3.actions = [
-            {key: `Intends to\nHeal his team`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 0, text: 'All enemies heals 15 HP', probability: 1},
-        ] 
-    } else {
-        gameState.enemy3.actions = [
-            {key: () => `Intends to\nBuff his team`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 3, text: 'All enemies Gain 2 strength and 3 armor', probability: 1},
-        ]
-    }
+    };
 
     function normalizeProbabilities(enemy) {
         const totalProbability = enemy.actions.reduce((sum, action) => sum + action.probability, 0);
@@ -1118,7 +1118,7 @@ class Level4Fight2 extends BaseScene {self
     
                 card.tokenSprite.on('pointerover', function() {
                     gameState.cardsDealtSound.play({ volume: 1.5 });
-                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(26);
+                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(105);
                 });
     
                 card.tokenSprite.on('pointerout', function() {

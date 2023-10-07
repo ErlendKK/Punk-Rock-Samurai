@@ -21,7 +21,7 @@ class Level1Fight1 extends BaseScene {self
         const self = this;      
         this.baseCreate('bakgrunnCity1'); //BaseScene method  
         this.resetPlayer(gameState.player, 0.37);
-        this.addButtons();
+        this.addButtons('#000000');
         displayDrawPile();
         displayDiscardPile();
 
@@ -211,7 +211,7 @@ class Level1Fight1 extends BaseScene {self
                         card.slot = slot;
                     }
                     
-                    gameState.cardsDealtSound.play({ volume: 2.2 });
+                    gameState.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
                     gameState.drawPileText.setText(gameState.drawPile.length);
                     self.animateCard(card, cardDepth); // Basescene Method
 
@@ -812,7 +812,7 @@ class Level1Fight1 extends BaseScene {self
                 console.log(`bonusCardsprite added for: ${bonusCard.key}`);
         
                 bonusCard.sprite.on('pointerover', () => {
-                    gameState.cardsDealtSound.play({ volume: 0.6 });
+                    gameState.cardsDealtSound.play({ volume: 0.6, seek: 0.10 });
                     self.cardTweens(bonusCard.sprite, 0.58, 200);
                 }, self);
                 
@@ -1119,8 +1119,8 @@ class Level1Fight1 extends BaseScene {self
             function displayTokenCard(card) {
     
                 card.tokenSprite.on('pointerover', function() {
-                    gameState.cardsDealtSound.play({ volume: 1.5 });
-                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(26);
+                    gameState.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
+                    card.permanentCardSprite = self.add.sprite(550, 300, card.key).setScale(0.55).setDepth(105);
                 });
     
                 card.tokenSprite.on('pointerout', function() {
@@ -1509,7 +1509,7 @@ class Level1Fight1 extends BaseScene {self
                                 self.animateCard(card, cardDepth);
                             };
 
-                            gameState.cardsDealtSound.play({ volume: 2.2 });
+                            gameState.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
                             gameState.drawPileText.setText(gameState.drawPile.length);
 
                             if (gameState.ashenEncore) {

@@ -49,7 +49,7 @@ class Level4Fight1 extends BaseScene {self
         gameState.enemy2.sprite = this.add.sprite(790, 350, 'monster2').setScale(0.36).setFlipX(false).setInteractive(); //710 / 350 / .33
         gameState.enemy2.health = 60;
         gameState.enemy2.healthMax = 60;
-        gameState.enemy1.armor = 0;
+        gameState.enemy2.armor = 0;
 
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2];
@@ -66,7 +66,7 @@ class Level4Fight1 extends BaseScene {self
         });
 
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#a9a9a9'); // GREY
+        this.addStanceBar(gameState.player, '#2e2e2e'); // GREY
 
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;

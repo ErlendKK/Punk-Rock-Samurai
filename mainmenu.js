@@ -213,6 +213,11 @@ class Mainmenu extends Phaser.Scene {
                     if (isMobileDevice()) {
                         gameState.hiddenInput.focus();
                     }
+
+                    const enterKey = self.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+                    enterKey.once('down', function () {
+                        saveNameAndExitMenu();
+                    })
                     
                     // deactivateNameForm() must be called after a short delay to ensure that the pointerup  
                     // event that called activateNameForm() doesn't inadvertently call it as well.
@@ -310,7 +315,7 @@ class Mainmenu extends Phaser.Scene {
                 console.log(`bonusCardsprite added for: ${bonusCard.key}`);
         
                 bonusCard.sprite.on('pointerover', function() {
-                    sceneState.cardsDealtSound.play({ volume: 0.8 });
+                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 0.8, seek: 0.12 });
                     cardTweens(bonusCard.sprite, 0.58, 200);
                 }, this);
                 
@@ -319,7 +324,7 @@ class Mainmenu extends Phaser.Scene {
                 }, this);
         
                 bonusCard.sprite.on('pointerup', function() {
-                    sceneState.cardsDealtSound.play({ volume: 1.8 });
+                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 1.2, seek: 0.12 });
 
                     gameState.deck.push(bonusCard);
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
