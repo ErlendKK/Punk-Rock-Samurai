@@ -86,26 +86,25 @@ class Level1Fight1 extends BaseScene {self
         const leveltextBottom = this.add.text(550, 430, 'On City Streets', levelTextConfig).setDepth(301).setOrigin(0.5); 
         let levelStarting = false;
 
-        // self.time.delayedCall(4000, () => { //timer: 4000
-        //     if (!levelStarting) {
-        //         levelStarting = true
-        //         fadeOutGameObject(levelimage, 2000); 
-        //         fadeOutGameObject(leveltextTop, 2000);
-        //         fadeOutGameObject(leveltextBottom, 2000);
-        //         self.time.delayedCall( 2200, startFight() );
-        //     }
-        // })
+        self.time.delayedCall(4000, () => { //timer: 4000
+            if (!levelStarting) {
+                levelStarting = true
+                fadeOutGameObject(levelimage, 2000); 
+                fadeOutGameObject(leveltextTop, 2000);
+                fadeOutGameObject(leveltextBottom, 2000);
+                self.time.delayedCall( 2200, startFight() );
+            }
+        })
 
-        // self.input.on('pointerup', () => {
-        //     if (!levelStarting) {
-        //         levelStarting = true;
-        //         fadeOutGameObject(levelimage, 2000);
-        //         fadeOutGameObject(leveltextTop, 2000);
-        //         fadeOutGameObject(leveltextBottom, 2000);
-        //         self.time.delayedCall( 2200, startFight() );
-        //     }
-        // })
-        self.scene.start('Level2Fight1');
+        self.input.on('pointerup', () => {
+            if (!levelStarting) {
+                levelStarting = true;
+                fadeOutGameObject(levelimage, 2000);
+                fadeOutGameObject(leveltextTop, 2000);
+                fadeOutGameObject(leveltextBottom, 2000);
+                self.time.delayedCall( 2200, startFight() );
+            }
+        })
 
         function startFight() {
             gameState.turn = 0;

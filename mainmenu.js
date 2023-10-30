@@ -47,7 +47,7 @@ class Mainmenu extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,480, 'bgLoadingScreen').setScale(1.40);
-        this.add.text(15, 5, `Punk Rock Samurai Beta v1.01`, { fontSize: '12px', fill: '#ff0000'});
+        this.add.text(15, 5, `Punk Rock Samurai Beta v1.30`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         gameState.isEnteringName = false;
         sceneState.name = '';
@@ -639,12 +639,13 @@ class Mainmenu extends Phaser.Scene {
             })
         };
 
-    gameState.playerName = 'Punk Rock Samurai';
-    const bonusCard = gameState.extraCards[0];
-    gameState.deck.push(bonusCard);
-    gameState.freePermanent = bonusCard;
-    gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
-    self.scene.start('Level1Fight1');
+    // ----   USED TO SKIP MENU WHEN TESTING ----
+    // gameState.playerName = 'Punk Rock Samurai';
+    // const bonusCard = gameState.extraCards[0];
+    // gameState.deck.push(bonusCard);
+    // gameState.freePermanent = bonusCard;
+    // gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+    // self.scene.start('Level1Fight1');
 
     } // end of create()
 
