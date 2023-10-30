@@ -115,7 +115,7 @@ class Level2Fight2 extends BaseScene {self
                 gameState.music.play( { loop: true, volume: 0.35 } );
             })
         
-            self.time.delayedCall(100, () => { //timer: 2300
+            self.time.delayedCall(2300, () => { //timer: 2300
                 fadeOutGameObject(gameState.startText, 200);
                 self.time.delayedCall(300, startPlayerTurn());
             });
