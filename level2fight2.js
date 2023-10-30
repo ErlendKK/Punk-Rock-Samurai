@@ -28,7 +28,7 @@ class Level2Fight2 extends BaseScene {self
         displayDrawPile();
         displayDiscardPile();
 
-        let countdownTimer = 3; // NB! LEVEL SPECIFIC! DO NOT COPY ELSEWHERE!
+        let countdownTimer = 7; // NB! LEVEL SPECIFIC! DO NOT COPY ELSEWHERE!
 
         gameState.redrawPrice = 1
         gameState.kamishimoUberAlles = 0; 
