@@ -50,7 +50,7 @@ class Level2Fight1 extends BaseScene {self
         gameState.enemy1.name = 'Timbermaw\nLoses Armor when attacked\nTakes +50% damage from Fire';
         gameState.enemy1.cardKey = 'rooted'
         gameState.enemy1.sprite = this.add.sprite(680, 315, 'tree1').setScale(0.32).setFlipX(false).setInteractive(); //690 / 350 / .33
-        gameState.enemy1.health = 1;
+        gameState.enemy1.health = 60;
         gameState.enemy1.healthMax = 60;
         gameState.enemy.armor = 15;
             
@@ -58,7 +58,7 @@ class Level2Fight1 extends BaseScene {self
         gameState.enemy2.name = 'Mossbite\nLoses Armor when attacked\nTakes +50% damage from Fire';
         gameState.enemy2.cardKey = 'rooted'
         gameState.enemy2.sprite = this.add.sprite(920, 315, 'tree2').setScale(0.32).setFlipX(false).setInteractive(), //910 / 310 / .25
-        gameState.enemy2.health = 1;
+        gameState.enemy2.health = 60;
         gameState.enemy2.healthMax = 60;
         gameState.enemy2.armor = 15;
 

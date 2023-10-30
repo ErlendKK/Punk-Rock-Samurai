@@ -50,21 +50,21 @@ class Level2Fight2 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Junior Goblin\nApprentice of poison';
         gameState.enemy1.sprite = this.add.sprite(670, 380, 'goblin1').setScale(0.20).setFlipX(true).setInteractive(), //690 / 350 / .33
-        gameState.enemy1.health = 1;
+        gameState.enemy1.health = 30;
         gameState.enemy1.healthMax = 30;
         gameState.enemy1.armor = 0;
         
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Junior Goblin\nApprentice of poison';
         gameState.enemy2.sprite = this.add.sprite(800, 380, 'goblin3').setScale(0.18).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy2.health = 1;
+        gameState.enemy2.health = 30;
         gameState.enemy2.healthMax = 30; 
         gameState.enemy2.armor = 0;
             
         gameState.enemy3  = Object.create(gameState.enemy);
         gameState.enemy3.name = 'Senior Goblin\nMaster of poison';
         gameState.enemy3.sprite = this.add.sprite(930, 380, 'goblin2').setScale(0.25).setFlipX(false).setInteractive(), //910 / 310 / .25
-        gameState.enemy3.health = 1;
+        gameState.enemy3.health = 45;
         gameState.enemy3.healthMax = 45;
         gameState.enemy3.armor = 0;
 

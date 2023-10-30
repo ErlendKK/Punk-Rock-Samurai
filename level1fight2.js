@@ -48,13 +48,13 @@ class Level1Fight2 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Mutant City Rat';
         gameState.enemy1.sprite = this.add.image(630, 332, 'rat1').setScale(0.40).setFlipX(true).setInteractive(); //740 / 360 / .42
-        gameState.enemy1.health = 1;
+        gameState.enemy1.health = 40;
         gameState.enemy1.healthMax = 40;
 
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Mutant City Rat';
         gameState.enemy2.sprite = this.add.image(790, 355, 'rat2').setScale(0.42).setFlipX(true).setInteractive(); //740 / 360 / .42
-        gameState.enemy2.health = 1;
+        gameState.enemy2.health = 50;
         gameState.enemy2.healthMax = 50;
 
         gameState.enemies = [gameState.enemy1, gameState.enemy2]; //NB! Add all enemies!

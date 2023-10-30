@@ -46,6 +46,7 @@ class Level2Fight3 extends BaseScene {self
 
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Lord of the Trees\nLose Armor when attacked\nTakes +50% damage from Fire';
+        gameState.enemy1.cardKey = 'rooted'
         gameState.enemy1.sprite = this.add.sprite(780, 300, 'tree3').setScale(0.36).setFlipX(false).setInteractive(), //690 / 350 / .33
         gameState.enemy1.health = 110;
         gameState.enemy1.healthMax = 110;

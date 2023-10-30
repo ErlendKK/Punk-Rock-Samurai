@@ -59,7 +59,7 @@ class Level1Fight1 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Nazi Punk';
         gameState.enemy1.sprite = this.add.image(740, 355, 'nazi').setScale(0.42).setFlipX(false).setInteractive(); //740 / 360 / .42
-        gameState.enemy1.health = 5;
+        gameState.enemy1.health = 50;
         gameState.enemy1.healthMax = 50;
 
         gameState.enemies = [gameState.enemy1]; //NB! Add all enemies!
