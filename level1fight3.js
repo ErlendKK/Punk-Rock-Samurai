@@ -49,13 +49,13 @@ class Level1Fight3 extends BaseScene {self
 
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Sgt. Pig';
-        gameState.enemy1.sprite = this.add.image(680, 335, 'police1').setScale(0.25).setFlipX(true).setInteractive(); //740 / 360 / .42
+        gameState.enemy1.sprite = this.add.image(680, 340, 'police1').setScale(0.26).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy1.health = 45;
         gameState.enemy1.healthMax = 45;
 
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Lt. Pig';
-        gameState.enemy2.sprite = this.add.image(840, 335, 'police2').setScale(0.38).setFlipX(true).setInteractive(); //740 / 360 / .42
+        gameState.enemy2.sprite = this.add.image(840, 340, 'police2').setScale(0.40).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy2.health = 60;
         gameState.enemy2.healthMax = 60;
 

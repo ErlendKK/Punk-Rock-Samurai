@@ -942,7 +942,7 @@ class Level1Fight2 extends BaseScene {self
             
             if (gameState.turn === 1) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 4, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 4 poison', probability: 1},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 1},
                 ] 
 
             } else if (gameState.turn === 2) {
@@ -952,12 +952,12 @@ class Level1Fight2 extends BaseScene {self
 
             } else if (gameState.turn === 3) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 4, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 4 Poison', probability: 1},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 Poison', probability: 1},
                 ]
                 
             } else if (gameState.turn === 4) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 4, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 4 Poison', probability: 1},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 Poison', probability: 1},
                 ]      
 
             } else {
