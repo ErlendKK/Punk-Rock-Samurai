@@ -40,6 +40,7 @@ class BaseScene extends Phaser.Scene {
         gameState.keyboardSound = this.sound.add('keyboardSound');
 
         gameState.canibalizeCondition = false
+        gameState.endGameMenyExited = false;
     }
 
     resetPlayer(player, scale, x=360, y=350) {

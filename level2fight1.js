@@ -46,6 +46,8 @@ class Level2Fight1 extends BaseScene {self
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
 
+        gameState.player.health = gameState.player.healthMax;
+
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Timbermaw\nLoses Armor when attacked\nTakes +50% damage from Fire';
         gameState.enemy1.cardKey = 'rooted'
