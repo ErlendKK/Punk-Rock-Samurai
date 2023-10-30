@@ -26,8 +26,20 @@ class Mainmenu extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('player', 'assets/images/sprites/punkrock.png');
+        this.load.image('deck', 'assets/images/cardback.jpg');
+        this.load.image('strengthAndArmor', 'assets/images/strengthAndArmor.png');
+        this.load.image('targetingCursor', 'assets/images/targetingCursor.png');
+        this.load.image('targetingCursorReady', 'assets/images/targetingCursorReady.png');
+        
+        this.load.image('rectangularButton', 'assets/images/stoneButtonInsetReady.png');
+        this.load.image('rectangularButtonHovered', 'assets/images/stoneButtonInsetHovered.png');
+        this.load.image('rectangularButtonPressed', 'assets/images/stoneButtonInsetPressed.png');
         this.load.image('rectangularFrame', 'assets/images/stoneButtonFrame.png');
-    };
+
+        this.load.audio('cardsDealtSound', 'assets/sounds/cardsdealt.wav');
+        this.load.audio('buttonPressedSound', 'assets/sounds/buttonpressed.wav');
+     };
         
 
     create() {
@@ -35,7 +47,7 @@ class Mainmenu extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,480, 'bgLoadingScreen').setScale(1.40);
-        this.add.text(15, 5, `Punk Rock Samurai Beta v1.00`, { fontSize: '12px', fill: '#ff0000'});
+        this.add.text(15, 5, `Punk Rock Samurai Beta v1.01`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         gameState.isEnteringName = false;
         sceneState.name = '';
@@ -210,12 +222,19 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.resume();
 
                     // Activate the on-screen keyboard for mobile devices
-                    if (isMobileDevice()) {
-                        gameState.hiddenInput.focus();
+                    try {
+                        if (isMobileDevice()) {
+                            gameState.hiddenInput.focus();
+                        }
+                    } catch (error) {
+                        console.error("Onscreen keyboard failed to open", error);
+                        gameState.isEnteringName = false;
+                        saveNameAndExitMenu();
                     }
 
                     const enterKey = self.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
                     enterKey.once('down', function () {
+                        gameState.isEnteringName = false;
                         saveNameAndExitMenu();
                     })
                     
@@ -252,20 +271,23 @@ class Mainmenu extends Phaser.Scene {
                     sceneState.cursorTween.pause();
 
                     // Deactivate the on-screen keyboard for mobile devices
-                    if (isMobileDevice()) {
-                        gameState.hiddenInput.blur();
+                    try {
+                        if (isMobileDevice()) {
+                            gameState.hiddenInput.blur();
+                        }
+                    } catch (error) {
+                        console.error("Onscreen keyboard failed to close", error);
+                        gameState.isEnteringName = false;
+                        saveNameAndExitMenu();
                     }
                 }
             });
         }
         
-        // Log key strokes if isEnteringName === true
-        this.input.keyboard.on('keydown', (event) => {
+        this.input.keyboard.on('keydown', (event) => { // Log key strokes if isEnteringName === true
             if (gameState.isEnteringName) {
 
-                // Cap the name length to keep the text from overflowing the form
-                const maxNameLength = 16
-                
+                const maxNameLength = 18 //  keep the text from overflowing the form
                 // Implement backspace
                 if (event.keyCode === 8 && gameState.name.length > 0) {
                     gameState.name = gameState.name.slice(0, -1);
@@ -274,7 +296,6 @@ class Mainmenu extends Phaser.Scene {
                 } else if (event.key.length === 1 && event.key.match(/[a-zA-Z0-9\s\-_]/) && gameState.name.length < maxNameLength) {
                     gameState.name += event.key;
 
-                // Gently informs the player that its time to stop typing
                 } else if (gameState.name.length === maxNameLength) {
                     self.cameras.main.shake(30, .0010, false);
                 }
@@ -308,14 +329,17 @@ class Mainmenu extends Phaser.Scene {
         
             const bonusCards = gameState.extraCards.slice(0, 3);
             const bonusCardTextConfig = { fontSize: '50px', fill: '#ff0000' };
-            const bonusCardText = self.add.text(550, 170, 'Choose 1 Free Permanent', bonusCardTextConfig).setOrigin(0.5);
-        
+            const bonusCardText = self.add.text(550, 170, 'Choose 1 Free Permanent', bonusCardTextConfig).setOrigin(0.5).setDepth(21);
+
+            const bonusCardTextBackground = self.add.graphics();
+            updateTextAndBackground(bonusCardText, bonusCardTextBackground, 'Choose 1 Free Permanent');
+    
             bonusCards.forEach( (bonusCard, index) => {
                 bonusCard.sprite = self.add.sprite(x + index * spacing, y, bonusCard.key).setScale(0.45).setInteractive();
                 console.log(`bonusCardsprite added for: ${bonusCard.key}`);
         
                 bonusCard.sprite.on('pointerover', function() {
-                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 0.8, seek: 0.12 });
+                    sceneState.cardsDealtSound.play({ volume: 0.8, seek: 0.12 });
                     cardTweens(bonusCard.sprite, 0.58, 200);
                 }, this);
                 
@@ -324,9 +348,10 @@ class Mainmenu extends Phaser.Scene {
                 }, this);
         
                 bonusCard.sprite.on('pointerup', function() {
-                    const soundInstance = sceneState.cardsDealtSound.play({ volume: 1.2, seek: 0.12 });
+                    sceneState.cardsDealtSound.play({ volume: 1.2, seek: 0.12 });
 
                     gameState.deck.push(bonusCard);
+                    gameState.freePermanent = bonusCard
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
         
                     // Remove all non-selected card sprites
@@ -348,7 +373,8 @@ class Mainmenu extends Phaser.Scene {
                     });
                      
                     bonusCardText.setText(`Permanent Selected`);
-                            
+                    updateTextAndBackground(bonusCardText, bonusCardTextBackground, 'Permanent Selected');
+
                     self.time.delayedCall(2500, () => {
                         if (!nextlevelstarting) {
                             nextlevelstarting = true;
@@ -366,6 +392,20 @@ class Mainmenu extends Phaser.Scene {
                 })
             })
         };
+
+        function updateTextAndBackground(textObj, backgroundObj, newText, cornerRadius = 7) {
+            textObj.setText(newText);
+            
+            const bounds = textObj.getBounds();
+            const backgroundWidth = bounds.width + 10; // 5px padding on each side
+            const backgroundHeight = bounds.height + 10; // 5px padding on each side
+            const backgroundX = bounds.x - 5; // 5px padding on the left
+            const backgroundY = bounds.y - 5; // 5px padding on the top
+            
+            backgroundObj.clear();
+            backgroundObj.fillStyle(0xFFFFFF, 1).setAlpha(0.4).setDepth(20);
+            backgroundObj.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, cornerRadius);
+        }
 
         function startNextLevel() {
             self.cameras.main.fadeOut(1000);
@@ -489,7 +529,7 @@ class Mainmenu extends Phaser.Scene {
                     `Button Sprites by Ian Eborn (http://thaumaturge-art.com/)\n` +
                     `Armor and Strength symbols by Josepzin (https://opengameart.org/users/josepzin)\n` +
                     `Card sprites by Avery Ross (https://opengameart.org/users/averyre)\n` +
-                    `Character sprites and backgrounds were generated with MidJourney`,
+                    `Coin sound by ProjectsU012 (https://freesound.org/people/ProjectsU012/)\n`,
                     
                     textConfig
                 );
@@ -523,20 +563,26 @@ class Mainmenu extends Phaser.Scene {
                 clearElements();
 
                 sceneState.instructionsBackground = self.add.graphics();
-                sceneState.instructionsBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9);
+                sceneState.instructionsBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9).setDepth(20);
                 sceneState.instructionsBackground.fillRect(250, 20, 810, 650);
 
-                sceneState.instructionsHeadline = self.add.text(270, 50, 'Instructions', headlineConfig).setOrigin(0);
+                sceneState.instructionsHeadline = self.add.text(270, 50, 'Instructions', headlineConfig).setOrigin(0).setDepth(21);
                 sceneState.instructionsText = self.add.text(270, 100, 
 
                     `The game consists of four levels, each of which consists of three fights.\n` +
-                    `At the start of your turn, you gain 4 mana and draw 5 cards. You may then play any number\n` + 
+                    `At the start of each turn, you gain 3 mana and draw 5 cards. You may then play any number\n` + 
                     `of cards before hitting "End Turn". Your remaining cards and mana are then depleted,\n` +
                     `and the enemy's turn begins. You win the fight by killing all enemies. Losing a fight\n` + 
-                    `results in permadeath. Missing health carries over from fight to fight, but is reset at\n` +
-                    `the beginning of each new level\n\n` +
+                    `results in permadeath. Missing health carries over from fight to fight\n\n` +
+
+                    `Stance represents the balance between Discipline and Freedom.\n` +
+                    `-Positive Discipline during your turn: +3 Strength.\n` +
+                    `-Positive Discipline at the end of your turn: +3 Armor.\n` +
+                    `-Max Discipline at the end of your turn: -1 card next turn.\n\n` +
                     
-                    `There are three different kinds of attack: physical damage, fire damage and poison.\n\n` +
+                    `-Positive Freedom during your turn: +1 mana.\n` +
+                    `-Positive Freedom at the end of your turn: 50/50 chance of +1 card or +1 mana next turn.\n` +
+                    `-Max Freedom at the end of your turn:-2 Armor.\n\n` +
                     
                     `Physical damage is affected by the Strength of the attacker and the Armor of the defender\n` +
                     `-Each unit of Strength increases outgoing physical damage by 10 %.\n` +
@@ -545,29 +591,22 @@ class Mainmenu extends Phaser.Scene {
                     
                     `Fire damage is unaffected by Strength and Armor, but otherwise acts like physical damage.\n\n` +
                     
-                    `Poison is unaffected by Strength and Armor. A poisoned character suffers damage each\n` +
-                    `round equal to his poison counter. At the end of his turn, this counter is reduced by 1. \n` +
-                    `Unlike physical and fire damage, poison cannot reduce a characters health below 1 HP.\n\n` +
-                    
+                    `Poison is unaffected by Strength and Armor. A poisoned character suffers damage at the start\n` +
+                    `of their turn equal to their poison counter. At the end of the turn, this counter is reduced\n` +
+                    `by 1. Unlike physical and fire damage, poison cannot reduce a characters health below 1 HP.\n\n` +
+                
                     `Permanents are cards that can only be played once, and are then removed from your deck.\n` +
                     `After use, they remain active and provide passive bonuses. A maximum of 4 permanents may be\n` +
                     `active at any given time. Permanents can be depleted, which unleases powerful one-off\n` +
                     `effects and then removes them from the game. If there are no empty slots for new permanents,\n` +
                     `permanent cards may be played directly from hand for their depletion effects.\n\n` +
-                    
-                    `Stance represents the balance between Discipline and Freedom.\n` +
-                    `-Positive Discipline during your turn: +3 Strength.\n` +
-                    `-Positive Discipline at the end of your turn: +3 Armor.\n` +
-                    `-Max Discipline at the end of your turn: -1 card next turn.\n\n` +
-                    
-                    `-Positive Freedom during your turn: +1 mana.\n` +
-                    `-Positive Freedom at the end of your turn: +1 card and +1 mana next turn.\n` +
-                    `-Max Freedom at the end of your turn:-2 Armor.`, 
+
+                    `Gold is earned by defeating enemies, and may be spent in the shop, or on in-fight bonuses.\n`,                    
                     
                     textConfig
                 );
 
-                sceneState.instructionsText.setLineSpacing(1.5);
+                sceneState.instructionsText.setLineSpacing(1.5).setDepth(21);
 
                 sceneState.instructionsElements = [
                     sceneState.instructionsBackground, 
@@ -600,10 +639,18 @@ class Mainmenu extends Phaser.Scene {
             })
         };
 
+    gameState.playerName = 'Punk Rock Samurai';
+    const bonusCard = gameState.extraCards[0];
+    gameState.deck.push(bonusCard);
+    gameState.freePermanent = bonusCard;
+    gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+    self.scene.start('Level1Fight1');
+
     } // end of create()
 
     update() {
         let textWidth = 0;
+        const offset = 7 
 
         if (gameState.isEnteringName && sceneState.newGameButtonClicked) {
             // Dynamically updates the displayed input text as it is being typed
@@ -611,7 +658,7 @@ class Mainmenu extends Phaser.Scene {
             textWidth = sceneState.nameText.width;
 
             // Dynamically positions the cursor at the end of the typed text
-            sceneState.formCursor.x = sceneState.nameText.x + textWidth - 7;
+            sceneState.formCursor.x = sceneState.nameText.x + textWidth - offset;
         }
     };
 
