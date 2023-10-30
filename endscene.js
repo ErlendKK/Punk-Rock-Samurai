@@ -117,6 +117,7 @@ class Endscene extends Phaser.Scene {
         function returnToMenu() {
             console.log(`returnto meny called`);
             gameState.name = '';
+            gameState.playerName = '';
             
             self.cameras.main.shake(1500, .0015, false);
             self.cameras.main.flash(500);
@@ -127,7 +128,7 @@ class Endscene extends Phaser.Scene {
             })
         }
         
-        if (gameState.playerName != 'admin') {
+        if (gameState.playerName != 'admin' && gameState.playerName != "Cheater") {
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 
@@ -136,7 +137,7 @@ class Endscene extends Phaser.Scene {
             displayLeaderBoard();
          })
 
-         self.time.delayedCall(7000, () => {
+         self.time.delayedCall(8000, () => {
             console.log(`timeout`);
             returnToMenu();
         }) 

@@ -10,13 +10,11 @@ class BaseScene extends Phaser.Scene {
 
     preload() {
         this.load.image('listbox1', 'assets/images/listbox1.png');
-        this.load.image('listbox2', 'assets/images/listbox2.png');
     }
 
     create() {
         this.scene.start('Preload');
     }
-
 
     // Initiaiate level
 
@@ -25,10 +23,10 @@ class BaseScene extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);   
         this.input.keyboard.createCursorKeys();
         
-        gameState.targetingCursor = this.add.sprite(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameState.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
         gameState.playingCard = false;
-        gameState.drawPile = [...gameState.deck];
         gameState.discardPile = [];
+        gameState.drawPile = [];
         
         gameState.cardsDealtSound = this.sound.add('cardsDealtSound');
         gameState.victorySound = this.sound.add('victorySound');
@@ -37,22 +35,25 @@ class BaseScene extends Phaser.Scene {
         gameState.powerUpSound = this.sound.add('powerUpSound');
         gameState.healSound = this.sound.add('healSound');
         gameState.thunder = this.sound.add('thundersound');
-        gameState.gunShotSound = this.sound.add('gunShotSound');
         gameState.music = this.sound.add('bossTune');
+        gameState.coinSound = this.sound.add('coinSound');
+        gameState.keyboardSound = this.sound.add('keyboardSound');
+
+        gameState.canibalizeCondition = false
     }
 
-    resetPlayer(player, scale) {
-        player.sprite = this.add.sprite(320, 350, 'player').setScale(scale).setFlipX(true).setInteractive(); //320 / 330 / 0.41
+    resetPlayer(player, scale, x=360, y=350) {
+        player.sprite = this.add.image(x, y, 'player').setScale(scale).setFlipX(false).setInteractive(); // change to sprite when implementing sprite sheet
         player.stance = 'Neutral'; 
         player.poison = 0;
         player.stancePoints = 0;
         player.numCardsBase = 5;
         player.numCardsStance = 0;
-        player.manaBase = 4;
+        player.manaBase = 3;
         player.manaStance = 0;
         player.manaCard = 0;
-        player.mana = 4;
-        player.manaMax = 4;
+        player.mana = 3;
+        player.manaMax = 3;
         player.strengthBase = 0;
         player.strengthStance = 0;
         player.strengthCard = 0;
@@ -60,17 +61,35 @@ class BaseScene extends Phaser.Scene {
         player.armorBase = 0;
         player.armorStance = 0;
         player.armorCard = 0;
+        player.lifeSteal = 0;
     };
+
+    definePermanentSlots() {
+        const permanentX = 50;
+        const permanentY = 50;
+        const permanentSpacing = 75;
+
+        gameState.permanentSlots = [
+            { available: true, x: permanentX + 0 * permanentSpacing, y: permanentY, index: 0 },
+            { available: true, x: permanentX + 1 * permanentSpacing, y: permanentY, index: 1 },
+            { available: true, x: permanentX + 2 * permanentSpacing, y: permanentY, index: 2 },
+            { available: true, x: permanentX + 3 * permanentSpacing, y: permanentY, index: 3 },
+        ];
+    }
 
     addHealthBar(character, color) {
         const textConfig = { fontSize: '11px', fill: '#000000' };
         const x = character.x;
         const y = character.y;
         const height = character.height;
-
+       
         character.healthBarBackground = this.add.graphics();
-        character.healthBarBackground.lineStyle(3, 0x000000, 1);
-        character.healthBarBackground.strokeRect(x - 40, y - height / 2 - 30, 100, 10);    
+        character.healthBarBackground.fillStyle(0xFFFFFF, 0.5);
+        character.healthBarBackground.fillRect(x - 40, y - height / 2 - 30, 100, 10);
+
+        character.healthBarFrame = this.add.graphics();
+        character.healthBarFrame.lineStyle(3, 0x000000, 1);
+        character.healthBarFrame.strokeRect(x - 40, y - height / 2 - 30, 100, 10);
         
         character.healthBar = this.add.graphics();
         character.healthBar.fillStyle(color, 1);
@@ -87,7 +106,11 @@ class BaseScene extends Phaser.Scene {
 
         character.manaBarBackground = this.add.graphics();
         character.manaBarBackground.lineStyle(3, 0x000000, 1);
-        character.manaBarBackground.strokeRect( character.x - 40,  character.y - height / 2 - 45, 100, 10); 
+        character.manaBarBackground.strokeRect(x - 40, y - height / 2 - 45, 100, 10);
+
+        character.manaBarFrame = this.add.graphics();
+        character.manaBarFrame.lineStyle(3, 0x000000, 1);
+        character.manaBarFrame.strokeRect( character.x - 40,  character.y - height / 2 - 45, 100, 10); 
         
         character.manaBar = this.add.graphics();
         character.manaBar.fillStyle(0x0000ff, 1); 
@@ -96,12 +119,49 @@ class BaseScene extends Phaser.Scene {
         character.manaBarText = this.add.text( x - 27,  y - height / 2 - 40, `${character.mana}/${character.manaMax}`, textConfig).setOrigin(0.5);
     };
 
-    addStatsDisplay(character) {
-        let textConfig = { fontSize: '11px', fill: '#FFFFFF' };
-        character.strengthAndArmorImage = this.add.sprite(character.sprite.x - 20, 460, 'strengthAndArmor').setScale(0.4).setInteractive().setDepth(20);
-        character.armorText = this.add.text(character.sprite.x + 13, 462, `${character.armor}/${character.armorMax}`, textConfig).setDepth(25);
-        character.strengthText = this.add.text(character.sprite.x - 40, 462, `${character.strength}/${character.strengthMax}`, textConfig).setDepth(25);
+    addStatsDisplay(character, y=420) {
+        const textConfig = { fontSize: '11px', fill: '#FFFFFF' };
+        const x = character.sprite.x;
+
+        character.strengthAndArmorImage = this.add.image(x-20, y, 'strengthAndArmor').setScale(0.4).setInteractive().setDepth(20);
+        character.armorText = this.add.text(x+13, y, `${character.armor}/${character.armorMax}`, textConfig).setDepth(25);
+        character.strengthText = this.add.text(x-40, y, `${character.strength}/${character.strengthMax}`, textConfig).setDepth(25);
     };
+
+    addGoldCoin() {
+        const goldCoin = this.add.image(1040, 50, 'goldCoin').setScale(0.10).setDepth(220).setOrigin(0.5).setInteractive();
+        gameState.goldCounter = this.add.text(1040, 50, gameState.player.gold, { fontSize: '60px', fill: '#000000'}).setDepth(221).setOrigin(0.5);
+        let currentInput = "";
+
+        goldCoin.on('pointerover', () => {
+            gameState.goldCard = this.add.image(550, 300, 'goldCard').setScale(0.55).setDepth(220);
+            
+            this.input.keyboard.on('keydown', function (event) {
+                currentInput += event.key; // appends the latest key pressed to currentInput
+
+                if (currentInput === "showmethemoney") {
+                    const goldAmount = 99;
+                    console.log("showmethemoney");
+                    gameState.player.gold += goldAmount;
+                    gameState.goldCounter.setText(gameState.player.gold);
+                    if (gameState.playerName !== 'admin') gameState.playerName = "Cheater";
+                    currentInput = "";
+                }
+
+                // Limit the length of currentInput to avoid unnecessary memory usage
+                if (currentInput.length > 30) {
+                    currentInput = currentInput.substring(currentInput.length - 30);
+                }
+            });
+        });
+
+        goldCoin.on('pointerout', () => {
+            gameState.goldCard.destroy();
+            currentInput = "";
+            this.input.keyboard.removeAllListeners('keydown');
+        });
+    }
+    
 
     describeCharacter(character) {
         if (!gameState.targetingCursor.visible && character.alive === true) {
@@ -119,7 +179,7 @@ class BaseScene extends Phaser.Scene {
         
                 character.descriptionBackground = this.add.graphics({x: x - 200, y: y - 120});
                 character.descriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9).setInteractive().setDepth(30);
-                character.descriptionBackground.fillRect(0, 0, 215, 250);
+                character.descriptionBackground.fillRoundedRect(0, 0, 215, 250, 10);
                 
                 const textConfig = { fontSize: '12px', fill: '#000000' };
                 character.descriptionText = this.add.text(x + 10 , y + 5, fullText, textConfig).setDepth(35).setOrigin(1, 0.5);
@@ -155,7 +215,7 @@ class BaseScene extends Phaser.Scene {
         gameState.stanceBar = this.add.graphics();
         gameState.stanceBar.fillStyle(0x00ff00, 1);
         
-        let stanceTextConfig = { fontSize: '30px', fill: textColor }; // GREY FOR LEVEL 1-1     
+        let stanceTextConfig = { fontSize: '28px', fill: textColor }; 
         gameState.stanceText = this.add.text(550, gameState.stanceBarMargin - 25, `Stance: ${gameState.player.stance}`, stanceTextConfig).setOrigin(0.5).setInteractive();      
         
         gameState.stanceText.on('pointerover', () => {
@@ -164,17 +224,24 @@ class BaseScene extends Phaser.Scene {
                 `punk rock samurai: Discipline and Freedom.\n\nPositive Discipline during your turn:\n+3 Strength\n\n` +
                 `Positive Discipline at the end of your turn:\n+3 Armor\n\nMax Discipline at the end of your turn:\n` +
                 `-1 card next turn\n\nPositive Freedom during your turn:\n+1 mana\n\nPositive Freedom at the end of your turn:\n` + 
-                `+1 card next turn\n+1 mana next turn\n\nMax Freedom at the end of your turn:\n-2 Armor`;
+                `50% chance of +1 card next turn\n50% chance of +1 mana next turn\n\nMax Freedom at the end of your turn:\n-2 Armor`;
             
-            const stanceTextConfig = { fontSize: '14px', fill: '#000000' }
-
-            gameState.stanceDescriptionBackground = this.add.sprite(550, gameState.stanceBarBackground.y + 50, 'listbox2').setScale(2.9, 7.3)
-            gameState.stanceDescriptionBackground.setInteractive().setDepth(20).setOrigin(0.5, 0).setAlpha(0.85);
+            const stanceTextConfig = { fontSize: '14px', fill: '#000000' };
             gameState.stanceDescriptionText = this.add.text(550, gameState.stanceBarBackground.y + 105, stanceText, stanceTextConfig).setDepth(25).setOrigin(0.5, 0);
+        
+            const bounds = gameState.stanceDescriptionText.getBounds();
+            const backgroundWidth = bounds.width + 10; // 5px padding on each side
+            const backgroundHeight = bounds.height + 10; // 5px padding on each side
+            const backgroundX = bounds.x - 5; // 5px padding on the left
+            const backgroundY = bounds.y - 5; // 5px padding on the top
+
+            gameState.stanceTextBackground = this.add.graphics();
+            gameState.stanceTextBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.90).setDepth(24);
+            gameState.stanceTextBackground.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, 7);
         })
 
         gameState.stanceText.on('pointerout', () => {
-            gameState.stanceDescriptionBackground.destroy();
+            gameState.stanceTextBackground.destroy();
             gameState.stanceDescriptionText.destroy();
         });
     };
@@ -188,7 +255,7 @@ class BaseScene extends Phaser.Scene {
             };
         }
         return { level: null, fight: null };
-    }
+    };
 
     // Tweens Animations
 
@@ -217,8 +284,6 @@ class BaseScene extends Phaser.Scene {
             }, this);
         }
     };
-
-    
 
     cardTweens(target, scale, duration) {
         this.tweens.add({
@@ -263,26 +328,9 @@ class BaseScene extends Phaser.Scene {
 
     // Support functions
 
-    addButtons(color) {
-        //Add Mutebutton
-        const muteButton = this.add.sprite(1050, 40, 'radioButtonRoundOff').setScale(0.5).setInteractive();
-        gameState.muteText = this.add.text(970, 25, 'Mute', { fontSize: '25px', fill: color });    
-
-        muteButton.on('pointerup', () => {
-
-            if (gameState.music.mute) {
-                gameState.music.mute = false;
-                muteButton.setTexture('radioButtonRoundOff');
-
-            } else {
-                gameState.music.mute = true;
-                muteButton.setTexture('radioButtonRoundOn');
-            }
-        });
-
-        //Add End-of-turn Button
-        gameState.endOfTurnButton = this.add.sprite(870, 510, 'rectangularButton').setScale(0.45).setOrigin(0.5);
-        gameState.endOfTurnText = this.add.text(870, 510, 'End Turn', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5);
+    addEndOfTurnButton(y=500) {
+        gameState.endOfTurnButton = this.add.image(900, y, 'rectangularButton').setScale(0.45).setOrigin(0.5);
+        gameState.endOfTurnText = this.add.text(900, y, 'End Turn', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
         
         gameState.endOfTurnButton.on('pointerover', function () {
             if (!gameState.endOfTurnButtonPressed) {
@@ -297,6 +345,30 @@ class BaseScene extends Phaser.Scene {
         });
     };
 
+    addRedrawButton() {
+        const x = 900;
+        const y = 52;
+        gameState.redrawButton = this.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();;
+        gameState.redrawText = this.add.text(x, y, 'Redraw', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
+
+        gameState.redrawButton.on('pointerover', () => {
+            gameState.redrawButton.setTexture('rectangularButtonHovered');
+            gameState.redrawButtonDescriptionBackground = this.add.graphics();
+            gameState.redrawButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
+            gameState.redrawButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
+
+            const textConfig = { fontSize: '12px', fill: '#000000' };
+            const fullText = `Redraw your hand\n Cost: ${gameState.redrawPrice} gold`;
+            gameState.redrawButtonDescriptionText = this.add.text(x, y+50, fullText, textConfig).setDepth(123).setOrigin(0.5, 0.5);
+        });
+        
+        gameState.redrawButton.on('pointerout', () => {
+            gameState.redrawButton.setTexture('rectangularButton');
+            if (gameState.redrawButtonDescriptionBackground) gameState.redrawButtonDescriptionBackground.destroy();
+            if (gameState.redrawButtonDescriptionText) gameState.redrawButtonDescriptionText.destroy();
+        });
+    }
+
     clearBoard() {
         gameState.characters.forEach( (character) => {
             character.sprite.destroy();
@@ -305,26 +377,35 @@ class BaseScene extends Phaser.Scene {
             character.strengthText.destroy();
             character.strengthAndArmorImage.destroy();
             character.healthBarBackground.destroy();
+            character.healthBarFrame.destroy();
             character.healthBar.destroy();
             character.healthBarText.destroy();
         });
 
-        gameState.player.manaBarBackground.destroy();
-        gameState.player.manaBar.destroy();
-        gameState.player.manaBarText.destroy();
-        gameState.endOfTurnButton.destroy();
-        gameState.endOfTurnText.destroy();
-        gameState.drawPileImage.destroy();
-        gameState.discardPileImage.destroy();
-        gameState.drawPileText.destroy();
-        gameState.discardPileText.destroy();
-        gameState.stanceBar.destroy();
-        gameState.stanceText.destroy();
-        gameState.stanceBarBackground.destroy();
-
-        if (gameState.actionText) {
-            gameState.actionText.destroy();
-        };
+        const gameObjectsToDestroy = [
+            gameState.player.manaBarBackground,
+            gameState.player.manaBarFrame,
+            gameState.player.manaBar,
+            gameState.player.manaBarText,
+            gameState.endOfTurnButton,
+            gameState.endOfTurnText,
+            gameState.drawPileImage,
+            gameState.discardPileImage,
+            gameState.drawPileText,
+            gameState.discardPileText,
+            gameState.stanceBar,
+            gameState.stanceText,
+            gameState.stanceBarBackground,
+            gameState.redrawButton,
+            gameState.redrawText,
+            gameState.healButton,
+            gameState.healText,
+            gameState.actionText
+        ];
+        
+        gameObjectsToDestroy.forEach(object => {
+            if (object) object.destroy();
+        });
 
         console.log('board cleared');
     };
@@ -344,8 +425,9 @@ class BaseScene extends Phaser.Scene {
 
     updateHealthBar(character) {
         character.health = Phaser.Math.Clamp(character.health, 0, character.healthMax);
-        const textColor = character == gameState.player && character.health < 12 ? '#ff0000' : '#000000'; // Red if health < 18, otherwise Black
-        
+        // const textColor = character == gameState.player && character.health < 10 ? '#ff0000' : '#000000'; // Red if health < 10, otherwise Black
+        const textColor = '#000000';
+
         character.healthBar.clear();
         character.healthBar.fillStyle(character === gameState.player ? 0x00ff00 : 0xff0000, 1);
         character.healthBar.fillRect(character.x - 40, character.y - character.height / 2 - 30, 100 * (character.health / character.healthMax), 10);
@@ -364,27 +446,26 @@ class BaseScene extends Phaser.Scene {
         character.manaBarText.setText(`${character.mana}/${character.manaMax}`);
     };
 
-    updatePoison(character) {
-        if (character.poison > 0) {
-            console.log(`character.poison > 0`)
-            character.health = Math.max(1, character.health - character.poison);
-            if (character.poisonText) {
-                console.log(`character.poisonText exists`)
-                character.poisonText.setText(`Poison: -${character.poison} HP`); // NB! Must be called before the poison counter is reduced.
-            }
-            character.poison -= 1;
-        }
-    };
-
     updateStanceBar(character) {       
         const points = gameState.player.stancePoints;
+        if (gameState.player.stancePoints > 0) {
+            const rand = Math.random();
+            if (rand > 0.5) {
+                character.manaStance = 1;
+                character.numCardsStance = 0;
+            } else {
+                character.manaStance = 0;
+                character.numCardsStance = 1;
+            }
+        } else {
+            character.manaStance = 0;
+        }
         
         // Update stance and associated stats
         switch (points) {
             case -3:
                 character.armorStance = 3;
                 character.strengthStance = 3;
-                character.manaStance = 0;
                 character.numCardsStance = -1;
                 character.stance = 'Discipline';
                 break;
@@ -392,14 +473,12 @@ class BaseScene extends Phaser.Scene {
             case -1:
                 character.armorStance = 3;
                 character.strengthStance = 3;
-                character.manaStance = 0;
                 character.numCardsStance = 0;
                 character.stance = 'Discipline';
                 break;
             case 0:
                 character.armorStance = 0;
                 character.strengthStance = 0;
-                character.manaStance = 0;
                 character.numCardsStance = 0;
                 character.stance = 'Neutral';
                 break;
@@ -407,15 +486,11 @@ class BaseScene extends Phaser.Scene {
             case 2:
                 character.armorStance = 0;
                 character.strengthStance = 0;
-                character.manaStance = 1;
-                character.numCardsStance = 1;
                 character.stance = 'Freedom';
                 break;
             case 3:
                 character.armorStance = -2;
                 character.strengthStance = 0;
-                character.manaStance = 1;
-                character.numCardsStance = 1;
                 character.stance = 'Freedom';
                 break;
             default:
@@ -445,5 +520,21 @@ class BaseScene extends Phaser.Scene {
     
         gameState.stanceText.setText(`Stance: ${character.stance}`);
     }
+
+    updateTextAndBackground(textObj, backgroundObj, newText, cornerRadius = 7, depth=20, alpha=0.60) {
+        textObj.setText(newText);
+        textObj.setDepth(depth+1);
+        
+        const bounds = textObj.getBounds();
+        const backgroundWidth = bounds.width + 10; // 5px padding on each side
+        const backgroundHeight = bounds.height + 10; // 5px padding on each side
+        const backgroundX = bounds.x - 5; // 5px padding on the left
+        const backgroundY = bounds.y - 5; // 5px padding on the top
+        
+        backgroundObj.clear();
+        backgroundObj.fillStyle(0xFFFFFF, 1).setAlpha(alpha).setDepth(depth);
+        backgroundObj.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, cornerRadius);
+    }
+    
 
 } // End of scene
