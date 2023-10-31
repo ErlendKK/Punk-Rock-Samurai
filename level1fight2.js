@@ -47,12 +47,14 @@ class Level1Fight2 extends BaseScene {self
 
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Mutant City Rat';
+        gameState.enemy1.cardKey = 'ratCard';
         gameState.enemy1.sprite = this.add.image(630, 332, 'rat1').setScale(0.40).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy1.health = 40;
         gameState.enemy1.healthMax = 40;
 
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Mutant City Rat';
+        gameState.enemy2.cardKey = 'ratCard';
         gameState.enemy2.sprite = this.add.image(790, 355, 'rat2').setScale(0.42).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy2.health = 50;
         gameState.enemy2.healthMax = 50;
@@ -106,7 +108,7 @@ class Level1Fight2 extends BaseScene {self
                 gameState.music.play( { loop: true, volume: 0.35 } );
             })
         
-            self.time.delayedCall(2300, () => { //timer: 2300
+            self.time.delayedCall(100, () => { //timer: 2300
                 fadeOutGameObject(gameState.startText, 200);
                 self.time.delayedCall(300, startPlayerTurn());
             });
@@ -225,6 +227,7 @@ class Level1Fight2 extends BaseScene {self
                 self.time.delayedCall(2500, () => {
                     fadeOutGameObject(ratsText, 200);
                     fadeOutGameObject(ratsTextBackground, 200);
+
                     gameState.characters.forEach(character => {
                         self.describeCharacter(character, character.sprite);
                     }); 
@@ -541,8 +544,8 @@ class Level1Fight2 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -567,9 +570,9 @@ class Level1Fight2 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -952,12 +955,12 @@ class Level1Fight2 extends BaseScene {self
 
             } else if (gameState.turn === 3) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 Poison', probability: 1},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 4, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 4 Poison', probability: 1},
                 ]
                 
             } else if (gameState.turn === 4) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 Poison', probability: 1},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 4, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 4 Poison', probability: 1},
                 ]      
 
             } else {
@@ -1193,9 +1196,9 @@ class Level1Fight2 extends BaseScene {self
             const redrawCost = 1;
 
             self.shuffleDeck(gameState.bonusCards);   
-            let bonusCards = gameState.bonusCards.slice(0, 3);
+            let bonusCards = gameState.bonusCards.splice(0, 3);
 
-            if (gameState.latestDraw) {
+            if (gameState.latestDraw) { // Ensures that the same card doesn't get drawn twice in a row.
                 gameState.latestDraw.forEach(card => {
                     gameState.bonusCards.push(card);
                 });
@@ -1220,10 +1223,6 @@ class Level1Fight2 extends BaseScene {self
                     gameState.nextlevelstarting = false;
                     const bonusCardCopy = Object.assign({}, bonusCard); // make a shallow copy to avoid multiple copies on hand refering to the same object
                     gameState.deck.push(bonusCardCopy);
-
-                    if (bonusCard.type === 'permanent') {
-                        gameState.bonusCards.splice(gameState.bonusCards.indexOf(bonusCard), 1);
-                    };
         
                     // Remove all non-selected card sprites
                     bonusCards.forEach( card => {
@@ -1358,7 +1357,6 @@ class Level1Fight2 extends BaseScene {self
 
             redrawCardsButton.on('pointerup', function() {
                 if (gameState.player.gold >= redrawCost) {
-                    console.log(`rewardAddCardsButton activated`);
                     spendGold(redrawCost);
                     gameState.redrawButtonObjects.forEach(object => {
                         object.destroy();

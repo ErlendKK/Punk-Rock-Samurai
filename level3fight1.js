@@ -46,8 +46,6 @@ class Level3Fight1 extends BaseScene {self
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
 
-        gameState.player.health = gameState.player.healthMax;
-
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Voidling';
         gameState.enemy1.cardKey = 'hellFire'
@@ -580,8 +578,8 @@ class Level3Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -606,9 +604,9 @@ class Level3Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -907,7 +905,7 @@ class Level3Fight1 extends BaseScene {self
                 updateStats(character);
             });
 
-            const delaytime = gameState.debuffCardPlayed ? 2200 : 1300
+            const delaytime = gameState.debuffCardPlayed ? 2200 : 1300;
             
             self.time.delayedCall(delaytime, () => {
                 if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
@@ -991,7 +989,7 @@ class Level3Fight1 extends BaseScene {self
                 });
 
             });
-          }  
+        }  
 
         function updateEnemyActions() {
 
@@ -1043,7 +1041,7 @@ class Level3Fight1 extends BaseScene {self
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 Strenght', probability: 0.09 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 Armor', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.1}
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.10}
                 ];
     
             }

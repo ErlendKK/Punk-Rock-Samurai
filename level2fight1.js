@@ -585,8 +585,8 @@ class Level2Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -611,9 +611,9 @@ class Level2Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -733,7 +733,7 @@ class Level2Fight1 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            gameState.discardPile.push(randomCard);
+            if (card.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {

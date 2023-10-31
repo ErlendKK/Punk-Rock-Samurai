@@ -564,8 +564,8 @@ class Level2Fight2 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -590,9 +590,9 @@ class Level2Fight2 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -707,7 +707,7 @@ class Level2Fight2 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            gameState.discardPile.push(randomCard);
+            if (card.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {
@@ -930,38 +930,52 @@ class Level2Fight2 extends BaseScene {self
 
         function updateEnemyActions() {
 
-            gameState.enemy1.actions = [ 
-                {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.00 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 8 damage\nAnd 1 Poison', probability: 0.23 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6}
-            ]
-    
-            gameState.enemy2.actions = [ 
-                {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.00 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 8 damage\nAnd 1 Poison', probability: 0.23 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6}
-            ]
+            if (gameState.turn === 1) {
+                gameState.enemy1.actions = [
+                    {key: `Intends to\nEvacuate Gold`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Evacuates Gold', probability: 1},
+                ];
+                gameState.enemy2.actions = [
+                    {key: `Intends to\nEvacuate Gold`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Evacuates Gold', probability: 1},
+                ];
+                gameState.enemy3.actions = [
+                    {key: `Intends to\nEvacuate Gold`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Evacuates Gold', probability: 1},
+                ];
+
+            } else {
+
+                gameState.enemy1.actions = [ 
+                    {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.00 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 8 damage\nAnd 1 Poison', probability: 0.23 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6}
+                ]
         
-            gameState.enemy3.actions = [ 
-                {key: `Intends to\nDeal 7 fire damage`, damage: 0, fire: 7, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 7 fire damage', probability: 0.0 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(11 * (1 + 0.10 * gameState.enemy3.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 11, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage\nAnd 1 Poison', probability: 0.17 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
-                {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy3.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0 : 0.17},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0 : 0.05},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 0.18 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
-                {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 0.19 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6}
-            ]
+                gameState.enemy2.actions = [ 
+                    {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.00 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 8 damage\nAnd 1 Poison', probability: 0.23 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6}
+                ]
+            
+                gameState.enemy3.actions = [ 
+                    {key: `Intends to\nDeal 7 fire damage`, damage: 0, fire: 7, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 7 fire damage', probability: 0.0 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(11 * (1 + 0.10 * gameState.enemy3.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 11, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage\nAnd 1 Poison', probability: 0.17 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy3.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0 : 0.17},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 0.18 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 0.19 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6}
+                ]
+            }
         
         }  
 

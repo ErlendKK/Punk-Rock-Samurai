@@ -72,7 +72,7 @@ class Level1Fight3 extends BaseScene {self
         });
 
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#696969'); // light:#a9a9a9 - medium:#808080 - dark:#696969
+        this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969  - vdark:#303030
 
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;
@@ -335,8 +335,13 @@ class Level1Fight3 extends BaseScene {self
             }
 
             const goldCostCondition = !card.goldCost || card.goldCost < gameState.player.gold;
-            const manaCostCondition = gameState.player.mana >= gameState.costPlayed
-            const otherConditions = gameState.playingCard === false && !card.usedOneShot
+            const manaCostCondition = gameState.player.mana >= gameState.costPlayed;
+            const otherConditions = gameState.playingCard === false && !card.usedOneShot;
+
+            if (!gameState.playingCard) console.log('not gameState.playingCard')
+            if (!manaCostCondition) console.log('not manaCostCondition')
+            if (!goldCostCondition) console.log('not goldCostConditions')
+            if (card.usedOneShot) console.log('card.usedOneShot')
 
             if (goldCostCondition && manaCostCondition && otherConditions) {
                 gameState.player.mana -= gameState.costPlayed;
@@ -534,8 +539,8 @@ class Level1Fight3 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -560,9 +565,9 @@ class Level1Fight3 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -677,7 +682,7 @@ class Level1Fight3 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            gameState.discardPile.push(randomCard);
+            if (card.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {
@@ -1126,7 +1131,7 @@ class Level1Fight3 extends BaseScene {self
             gameState.latestDraw = [...bonusCards];
        
             bonusCards.forEach( (bonusCard, index) => {
-                console.log(`bonusCard.key: ${bonusCard.key}`)
+                console.log(`bonusCard.key: ${bonusCard.key}`);
                 bonusCard.sprite = self.add.image(x + index * spacing, y, bonusCard.key);
                 bonusCard.sprite.setScale(0.45).setInteractive().setDepth(depth);
 
@@ -1143,6 +1148,10 @@ class Level1Fight3 extends BaseScene {self
                     gameState.nextlevelstarting = false;
                     const bonusCardCopy = Object.assign({}, bonusCard); // make a shallow copy to avoid multiple copies on hand refering to the same object
                     gameState.deck.push(bonusCardCopy);
+
+                    if (bonusCard.type === 'permanent') {
+                        gameState.bonusCards.splice(gameState.bonusCards.indexOf(bonusCard), 1);
+                    };
         
                     // Remove all non-selected card sprites
                     bonusCards.forEach( card => {

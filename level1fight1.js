@@ -78,7 +78,7 @@ class Level1Fight1 extends BaseScene {self
         gameState.drawPile = [...gameState.deck];
 
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#696969'); // light:#a9a9a9 - medium:#808080 - dark:#696969
+        this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         
         const levelTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };   
         const levelimage = this.add.image(0,0, 'theCity').setScale(0.87).setOrigin(0.02,0).setDepth(300);
@@ -527,8 +527,8 @@ class Level1Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
-                gameState.player.healthMax += costPlayed;
-                gameState.player.health += costPlayed;
+                gameState.player.healthMax += 2 * costPlayed;
+                gameState.player.health += 2 * costPlayed;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -553,9 +553,9 @@ class Level1Fight1 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'noFuture') {
-                gameState.noFutureCondition = true
-                gameState.player.healthMax += 4;
-                gameState.player.health += 4;
+                gameState.noFutureCondition = true;
+                gameState.player.healthMax += 5;
+                gameState.player.health += 5;
                 gameState.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -601,7 +601,7 @@ class Level1Fight1 extends BaseScene {self
         }
         
         function normalizeCard(card, target, isLastEnemy = false) {
-            const stancePoints = gameState.player.stancePoints
+            const stancePoints = gameState.player.stancePoints;
 
             const moshpitMassacreCondition = (card.key === 'moshpitMassacre' && stancePoints > 0 && target.poison > 0);
             const scorchedSoulCondition = (card.key === 'scorchedSoul' && target.poison > 0);
@@ -670,7 +670,7 @@ class Level1Fight1 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            gameState.discardPile.push(randomCard);
+            if (card.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {
@@ -978,7 +978,10 @@ class Level1Fight1 extends BaseScene {self
             gameState.deck.forEach(card => {
                 if (card.usedOneShot) {
                     card.usedOneShot = false;
-                }    
+                }
+                if (card.type === 'debuff') {
+                    gameState.deck = gameState.deck.filter(c => c != card);
+                }      
             })
             
             self.time.delayedCall(600, () => {
@@ -1074,7 +1077,7 @@ class Level1Fight1 extends BaseScene {self
             self.shuffleDeck(gameState.bonusCards);
             let bonusCards = gameState.bonusCards.splice(0, 3);
 
-            if (gameState.latestDraw) { // Ensures that the same card doesn't get drawn twice in a row.
+            if (gameState.latestDraw) { 
                 gameState.latestDraw.forEach(card => {
                     gameState.bonusCards.push(card);
                 });
@@ -1233,7 +1236,6 @@ class Level1Fight1 extends BaseScene {self
 
             redrawCardsButton.on('pointerup', function() {
                 if (gameState.player.gold >= redrawCost) {
-                    console.log(`rewardAddCardsButton activated`);
                     spendGold(redrawCost)
                     gameState.redrawButtonObjects.forEach(object => {
                         object.destroy();
