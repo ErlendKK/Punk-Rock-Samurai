@@ -8,10 +8,6 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 
 class BaseScene extends Phaser.Scene {
 
-    preload() {
-        this.load.image('listbox1', 'assets/images/listbox1.png');
-    }
-
     create() {
         this.scene.start('Preload');
     }

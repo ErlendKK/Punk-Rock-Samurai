@@ -31,7 +31,8 @@ class Mainmenu extends Phaser.Scene {
         this.load.image('strengthAndArmor', 'assets/images/strengthAndArmor.png');
         this.load.image('targetingCursor', 'assets/images/targetingCursor.png');
         this.load.image('targetingCursorReady', 'assets/images/targetingCursorReady.png');
-        
+        this.load.image('listbox1', 'assets/images/listbox1.png');
+
         this.load.image('rectangularButton', 'assets/images/stoneButtonInsetReady.png');
         this.load.image('rectangularButtonHovered', 'assets/images/stoneButtonInsetHovered.png');
         this.load.image('rectangularButtonPressed', 'assets/images/stoneButtonInsetPressed.png');
@@ -327,6 +328,7 @@ class Mainmenu extends Phaser.Scene {
             const y = 430;
             const spacing = 220;
         
+            shuffleDeck(gameState.extraCards);
             const bonusCards = gameState.extraCards.slice(0, 3);
             const bonusCardTextConfig = { fontSize: '50px', fill: '#ff0000' };
             const bonusCardText = self.add.text(550, 170, 'Choose 1 Free Permanent', bonusCardTextConfig).setOrigin(0.5).setDepth(21);
@@ -353,6 +355,7 @@ class Mainmenu extends Phaser.Scene {
                     gameState.deck.push(bonusCard);
                     gameState.freePermanent = bonusCard
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+                    shuffleDeck(gameState.extraCards);
         
                     // Remove all non-selected card sprites
                     bonusCards.forEach( card => {
@@ -564,7 +567,7 @@ class Mainmenu extends Phaser.Scene {
 
                 sceneState.instructionsBackground = self.add.graphics();
                 sceneState.instructionsBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9).setDepth(20);
-                sceneState.instructionsBackground.fillRect(250, 20, 810, 650);
+                sceneState.instructionsBackground.fillRect(250, 20, 810, 640);
 
                 sceneState.instructionsHeadline = self.add.text(270, 50, 'Instructions', headlineConfig).setOrigin(0).setDepth(21);
                 sceneState.instructionsText = self.add.text(270, 100, 
@@ -637,6 +640,14 @@ class Mainmenu extends Phaser.Scene {
                 console.log(`${element} not phaser object`)
                 }
             })
+        };
+
+        function shuffleDeck(deck) {
+            for(let i = deck.length - 1; i > 0; i--){
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
         };
 
     // ----   USED TO SKIP MENU WHEN TESTING ----

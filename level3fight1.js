@@ -46,6 +46,8 @@ class Level3Fight1 extends BaseScene {self
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
 
+        gameState.player.health = gameState.player.healthMax; // NB! Only for the first fight in each level
+
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Voidling';
         gameState.enemy1.cardKey = 'hellFire'
@@ -388,6 +390,7 @@ class Level3Fight1 extends BaseScene {self
 
                 // Select mode of activation based on card type
                 if (gameState.typePlayed === 'targetSelected') {
+                    card.sprite.removeInteractive();
                     targetEnemy(card, gameState.currentCards);
 
                 } else if (gameState.typePlayed === 'targetAll') {
@@ -406,7 +409,7 @@ class Level3Fight1 extends BaseScene {self
                     }) 
 
                 } else if (gameState.typePlayed === 'permanent') {
-                    addPermanent(card)
+                    addPermanent(card);
                     
                 } else if (gameState.typePlayed === 'debuff') {
                     playCard(card, gameState.player);
@@ -627,7 +630,7 @@ class Level3Fight1 extends BaseScene {self
                 gameState.attackSound.play({ volume: 0.8 });
                 const actionTextAttack = (damageTotal > 0) ?  `Deals ${damageTotal} damage`  : '';
                 const actionTextPoison = (poisonPlayed > 0) ? `Deals ${poisonPlayed} Poison` : ''; 
-                const actionTextTarget = (poisonPlayed > 0) ? `${actionTextAttack}\n\n${actionTextPoison}` : actionTextAttack;
+                const actionTextTarget = (poisonPlayed && damageTotal) ? `${actionTextAttack}\n\n${actionTextPoison}` : poisonPlayed ? actionTextPoison : actionTextAttack;
                 self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextTarget);
                 self.attackTweens(gameState.player, 60);
                 
@@ -726,7 +729,7 @@ class Level3Fight1 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            gameState.discardPile.push(randomCard);
+            if (randomCard.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {
@@ -824,7 +827,7 @@ class Level3Fight1 extends BaseScene {self
 
         function performEnemyAction(enemy) {
 
-            enemy.poisonText = self.add.text(570, 320, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
+            enemy.poisonText = self.add.text(550, 380, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
             enemy.poisonTextBackground = self.add.graphics();
             updatePoison(enemy);
 
@@ -1103,7 +1106,7 @@ class Level3Fight1 extends BaseScene {self
 
             gameState.score.numberOfTurns += gameState.turn;
 
-            gameState.gameOverText = self.add.text(550, 300, ' Defeat!', { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
+            gameState.gameOverText = self.add.text(550, 300, 'Defeat!', { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
             gameState.gameOverText.setInteractive();
             let scenetransitionstarted = false;
 
@@ -1171,7 +1174,7 @@ class Level3Fight1 extends BaseScene {self
             const spacing = 100;
             gameState.goldCollected = false;
 
-            const gameOverTextContent = '  Collect loot and get\nready for your next fight!';
+            const gameOverTextContent = 'Collect loot and get\n ready for Level 3!';
             const gameOverTextConfig = { fontSize: '40px', fill: '#ff0000' };
             const gameOverText = self.add.text(550, 130, gameOverTextContent, gameOverTextConfig).setOrigin(0.5).setDepth(103);
             const gameOverTextBackground = self.add.graphics();
@@ -1470,7 +1473,7 @@ class Level3Fight1 extends BaseScene {self
             self.cameras.main.flash(350);
         
             self.time.delayedCall(150, () => {
-                gameState.shopBackground = self.add.image(0, 0, 'shop1').setScale(0.80).setOrigin(0.02, 0).setDepth(200);
+                gameState.shopBackground = self.add.image(0, 0, 'shop1').setScale(0.85).setOrigin(0.02, 0).setDepth(200);
                 enterShop();
             });
         }
@@ -1521,8 +1524,28 @@ class Level3Fight1 extends BaseScene {self
             shopObjects.push(gameState.shopWelcomeText, gameState.shopTextBackground)
 
             // Buy HP
+            const levelComplete = (self.scene.key.slice(-1) === '3');
+            const shopHealConditions = gameState.player.gold >= healCost && gameState.player.health < gameState.player.healthMax && !levelComplete;
+            const { level, fight } = self.extractLevelFightFromName(self.scene.key);
+
+            if (levelComplete) { // Informs the player that health was reset at level completion => no need to buy health!
+                shopHealButton.on('pointerover', function() {
+                    const textConfig = {fontSize: '25px', fill: '#000000'};
+                    const textContent = `Health was reset to Max Health\n  Upon completion of Level ${level}`;
+                    gameState.healthResetText = self.add.text(x+400, y, '', textConfig).setOrigin(0.5, 0.5);
+                    gameState.healthResetTextBackground = self.add.graphics();
+                    self.updateTextAndBackground(gameState.healthResetText, gameState.healthResetTextBackground, textContent, 7, 205);
+                });
+
+                shopHealButton.on('pointerout', () => {
+                    shopHealButton.setTexture('rectangularButton');
+                    if (gameState.healthResetText) gameState.healthResetText.destroy();
+                    if (gameState.healthResetTextBackground) gameState.healthResetTextBackground.destroy();
+                });
+            }
+
             shopHealButton.on('pointerup', function() {
-                if (gameState.player.gold >= healCost && !gameState.shopButtonPressed && gameState.player.health < gameState.player.healthMax) {
+                if (shopHealConditions && !gameState.shopButtonPressed) {
                     gameState.shopButtonPressed = true
                     shopButtons.forEach(button => button.removeInteractive());
                     shopHealButton.setTexture('rectangularButtonPressed');
@@ -1558,7 +1581,7 @@ class Level3Fight1 extends BaseScene {self
                 } else {
                     self.cameras.main.shake(50, .0015, false);
                 };
-            })            
+            });              
 
             // Buy New Card
             shopAddCardButton.on('pointerup', function() {
@@ -1847,7 +1870,7 @@ class Level3Fight1 extends BaseScene {self
                 let healCost = 1;
                 const healAmount = 6
                 const x = 900;
-                const y = 150;
+                const y = 130;
                 const textConfig = { fontSize: '12px', fill: '#000000' };
 
                 gameState.healButton = self.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();
@@ -1855,7 +1878,9 @@ class Level3Fight1 extends BaseScene {self
 
                 gameState.healButton.on('pointerover', () => {
                     const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                    gameState.healButton.setTexture('rectangularButtonHovered');
+                    gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
+                    gameState.healText.setDepth(123)
+
                     gameState.healButtonDescriptionBackground = self.add.graphics();
                     gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
                     gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
@@ -1863,7 +1888,8 @@ class Level3Fight1 extends BaseScene {self
                 });
                 
                 gameState.healButton.on('pointerout', () => {
-                    gameState.healButton.setTexture('rectangularButton');
+                    gameState.healButton.setTexture('rectangularButton').setDepth(10);
+                    gameState.healText.setDepth(11)
                     if (gameState.healButtonDescriptionBackground) gameState.healButtonDescriptionBackground.destroy();
                     if (gameState.healButtonDescriptionText) gameState.healButtonDescriptionText.destroy();
                 });

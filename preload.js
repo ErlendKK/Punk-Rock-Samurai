@@ -59,91 +59,92 @@ class Preload extends Phaser.Scene {
             loadingText.destroy();
             percentText.destroy();
         });
+        if (!gameState.restartGame) {
+            this.load.image('knuckleFist', 'assets/images/cards/knuckleFist.jpg');
+            this.load.image('kabutu', 'assets/images/cards/kabutu.jpg');
+            this.load.image('combatBoots', 'assets/images/cards/combatBoots.jpg');
+            this.load.image('tantoBlade', 'assets/images/cards/tantoBlade.jpg');
+            this.load.image('circlePit', 'assets/images/cards/circlePit.jpg');
+            this.load.image('seppuku', 'assets/images/cards/seppuku.jpg');
+            this.load.image('katana', 'assets/images/cards/katana.jpg');
+            this.load.image('rocknRonin', 'assets/images/cards/rocknRonin.jpg');
+            this.load.image('powerChord', 'assets/images/cards/powerChord.jpg');
+            this.load.image('rawEnergy', 'assets/images/cards/rawEnergy.jpg');
+            this.load.image('pyromania', 'assets/images/cards/pyromania.jpg');
+            this.load.image('stageInvasion', 'assets/images/cards/stageInvasion.jpg');
+            this.load.image('studdedLeather', 'assets/images/cards/studdedLeather.jpg'); 
+            this.load.image('boneShredder', 'assets/images/cards/boneShredder.jpg');
+            this.load.image('blackFumes', 'assets/images/cards/blackFumes.jpg');
+            this.load.image('masakari', 'assets/images/cards/masakari.jpg');
+            this.load.image('discontent', 'assets/images/cards/discontent.jpg');
+            this.load.image('dogsOfWar', 'assets/images/cards/dogsOfWar.jpg');
+            this.load.image('roninsRot', 'assets/images/cards/roninsRot.jpg');
+            this.load.image('libertySpikes', 'assets/images/cards/libertySpikes.jpg');
+            this.load.image('moshpitMassacre', 'assets/images/cards/moshpitMassacre.jpg');
+            this.load.image('bladesBlight', 'assets/images/cards/bladesBlight.jpg');
+            this.load.image('scorchedSoul', 'assets/images/cards/scorchedSoul.jpg');
+            this.load.image('risingWakizashi', 'assets/images/cards/risingWakizashi.jpg');
+            this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
+            this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
+            this.load.image('crowdSurfer', 'assets/images/cards/crowdSurfer.jpg');
+            this.load.image('shogunShred', 'assets/images/cards/shogunShred.jpg');  
+            this.load.image('rocknRejuvinate', 'assets/images/cards/rocknRejuvinate.jpg');
+            this.load.image('detox', 'assets/images/cards/detox.jpg');
+            this.load.image('laidoSoho', 'assets/images/cards/laidoSoho.jpg');
+            this.load.image('dBeat', 'assets/images/cards/dBeat.jpg');
+            this.load.image('shikoroStrike', 'assets/images/cards/shikoroStrike.jpg');
+            this.load.image('rottenResonance', 'assets/images/cards/rottenResonance.jpg');
+            this.load.image('troopsOfTakamori', 'assets/images/cards/troopsOfTakamori.jpg');
+            this.load.image('bassSolo', 'assets/images/cards/bassSolo.jpg');
+            this.load.image('zenZine', 'assets/images/cards/zenZine.jpg'); 
+            this.load.image('kabutuOverdrive', 'assets/images/cards/kabutuOverdrive.jpg');
+            this.load.image('nenguStyle', 'assets/images/cards/nenguStyle.jpg');
+            this.load.image('canibalize', 'assets/images/cards/canibalize.jpg');
+            this.load.image('bloodOath', 'assets/images/cards/bloodOath.jpg');
+            this.load.image('roninMerc', 'assets/images/cards/roninMerc.jpg');
+            this.load.image('pyroPunk', 'assets/images/cards/pyroPunk.jpg');
+            this.load.image('pissDrunkBastards', 'assets/images/cards/pissDrunkBastards.jpg');
+            this.load.image('gutterGeisha', 'assets/images/cards/gutterGeisha.jpg');
+            this.load.image('noFuture', 'assets/images/cards/noFuture.jpg');
+            this.load.image('coverCharge', 'assets/images/cards/coverCharge.jpg');
 
-        this.load.image('knuckleFist', 'assets/images/cards/knuckleFist.jpg');
-        this.load.image('kabutu', 'assets/images/cards/kabutu.jpg');
-        this.load.image('combatBoots', 'assets/images/cards/combatBoots.jpg');
-        this.load.image('tantoBlade', 'assets/images/cards/tantoBlade.jpg');
-        this.load.image('circlePit', 'assets/images/cards/circlePit.jpg');
-        this.load.image('seppuku', 'assets/images/cards/seppuku.jpg');
-        this.load.image('katana', 'assets/images/cards/katana.jpg');
-        this.load.image('rocknRonin', 'assets/images/cards/rocknRonin.jpg');
-        this.load.image('powerChord', 'assets/images/cards/powerChord.jpg');
-        this.load.image('rawEnergy', 'assets/images/cards/rawEnergy.jpg');
-        this.load.image('pyromania', 'assets/images/cards/pyromania.jpg');
-        this.load.image('stageInvasion', 'assets/images/cards/stageInvasion.jpg');
-        this.load.image('studdedLeather', 'assets/images/cards/studdedLeather.jpg'); 
-        this.load.image('boneShredder', 'assets/images/cards/boneShredder.jpg');
-        this.load.image('blackFumes', 'assets/images/cards/blackFumes.jpg');
-        this.load.image('masakari', 'assets/images/cards/masakari.jpg');
-        this.load.image('discontent', 'assets/images/cards/discontent.jpg');
-        this.load.image('dogsOfWar', 'assets/images/cards/dogsOfWar.jpg');
-        this.load.image('roninsRot', 'assets/images/cards/roninsRot.jpg');
-        this.load.image('libertySpikes', 'assets/images/cards/libertySpikes.jpg');
-        this.load.image('moshpitMassacre', 'assets/images/cards/moshpitMassacre.jpg');
-        this.load.image('bladesBlight', 'assets/images/cards/bladesBlight.jpg');
-        this.load.image('scorchedSoul', 'assets/images/cards/scorchedSoul.jpg');
-        this.load.image('risingWakizashi', 'assets/images/cards/risingWakizashi.jpg');
-        this.load.image('deadCities', 'assets/images/cards/deadCities.jpg');
-        this.load.image('nastyNihonto', 'assets/images/cards/nastyNihonto.jpg');
-        this.load.image('crowdSurfer', 'assets/images/cards/crowdSurfer.jpg');
-        this.load.image('shogunShred', 'assets/images/cards/shogunShred.jpg');  
-        this.load.image('rocknRejuvinate', 'assets/images/cards/rocknRejuvinate.jpg');
-        this.load.image('detox', 'assets/images/cards/detox.jpg');
-        this.load.image('laidoSoho', 'assets/images/cards/laidoSoho.jpg');
-        this.load.image('dBeat', 'assets/images/cards/dBeat.jpg');
-        this.load.image('shikoroStrike', 'assets/images/cards/shikoroStrike.jpg');
-        this.load.image('rottenResonance', 'assets/images/cards/rottenResonance.jpg');
-        this.load.image('troopsOfTakamori', 'assets/images/cards/troopsOfTakamori.jpg');
-        this.load.image('bassSolo', 'assets/images/cards/bassSolo.jpg');
-        this.load.image('zenZine', 'assets/images/cards/zenZine.jpg'); 
-        this.load.image('kabutuOverdrive', 'assets/images/cards/kabutuOverdrive.jpg');
-        this.load.image('nenguStyle', 'assets/images/cards/nenguStyle.jpg');
-        this.load.image('canibalize', 'assets/images/cards/canibalize.jpg');
-        this.load.image('bloodOath', 'assets/images/cards/bloodOath.jpg');
-        this.load.image('roninMerc', 'assets/images/cards/roninMerc.jpg');
-        this.load.image('pyroPunk', 'assets/images/cards/pyroPunk.jpg');
-        this.load.image('pissDrunkBastards', 'assets/images/cards/pissDrunkBastards.jpg');
-        this.load.image('gutterGeisha', 'assets/images/cards/gutterGeisha.jpg');
-        this.load.image('noFuture', 'assets/images/cards/noFuture.jpg');
-        this.load.image('coverCharge', 'assets/images/cards/coverCharge.jpg');
+            this.load.image('punksNotDead', 'assets/images/cards/punksNotDead.jpg');
+            this.load.image('punksNotDeadToken', 'assets/images/cards/punksNotDeadToken.png');
+            this.load.image('lustForLifeToken', 'assets/images/cards/lustForLifeToken.png');
+            this.load.image('lustForLife', 'assets/images/cards/lustForLife.jpg');
+            this.load.image('gundanSeizaiToken', 'assets/images/cards/gundanSeizaiToken.png');
+            this.load.image('gundanSeizai', 'assets/images/cards/gundanSeizai.jpg');
+            this.load.image('deadTokugawasToken', 'assets/images/cards/deadTokugawasToken.png');
+            this.load.image('deadTokugawas', 'assets/images/cards/deadTokugawas.jpg');
+            this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
+            this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
+            this.load.image('ashenEncore', 'assets/images/cards/ashenEncore.jpg');
+            this.load.image('ashenEncoreToken', 'assets/images/cards/ashenEncoreToken.png');
+            this.load.image('edoEruption', 'assets/images/cards/edoEruption.jpg');
+            this.load.image('edoEruptionToken', 'assets/images/cards/edoEruptionToken.png');  
+            this.load.image('steelToe', 'assets/images/cards/steelToe.jpg');
+            this.load.image('steelToeToken', 'assets/images/cards/steelToeToken.png');
+            this.load.image('foreverTrueToken', 'assets/images/cards/foreverTrueToken.png'); 
+            this.load.image('foreverTrue', 'assets/images/cards/foreverTrue.jpg');
+            this.load.image('rebelSpiritToken', 'assets/images/cards/rebelSpiritToken.png');
+            this.load.image('rebelSpirit', 'assets/images/cards/rebelSpirit.jpg');
+            this.load.image('rebelHeartToken', 'assets/images/cards/rebelHeartToken.png');
+            this.load.image('rebelHeart', 'assets/images/cards/rebelHeart.jpg');
+            this.load.image('bushidoToken', 'assets/images/cards/bushidoToken.png');
+            this.load.image('bushido', 'assets/images/cards/bushido.jpg');
+            this.load.image('toxicAvengerToken', 'assets/images/cards/toxicAvengerToken.png');
+            this.load.image('toxicAvenger', 'assets/images/cards/toxicAvenger.jpg');
+            this.load.image('kirisuteGomenToken', 'assets/images/cards/kirisuteGomenToken.png');
+            this.load.image('kirisuteGomen', 'assets/images/cards/kirisuteGomen.jpg');
+            this.load.image('hollidayInKamakuraToken', 'assets/images/cards/hollidayInKamakuraToken.png');
+            this.load.image('hollidayInKamakura', 'assets/images/cards/hollidayInKamakura.jpg');
+            this.load.image('kamishimoUberAllesToken', 'assets/images/cards/kamishimoUberAllesToken.png');
+            this.load.image('kamishimoUberAlles', 'assets/images/cards/kamishimoUberAlles.jpg');
 
-        this.load.image('punksNotDead', 'assets/images/cards/punksNotDead.jpg');
-        this.load.image('punksNotDeadToken', 'assets/images/cards/punksNotDeadToken.png');
-        this.load.image('lustForLifeToken', 'assets/images/cards/lustForLifeToken.png');
-        this.load.image('lustForLife', 'assets/images/cards/lustForLife.jpg');
-        this.load.image('gundanSeizaiToken', 'assets/images/cards/gundanSeizaiToken.png');
-        this.load.image('gundanSeizai', 'assets/images/cards/gundanSeizai.jpg');
-        this.load.image('deadTokugawasToken', 'assets/images/cards/deadTokugawasToken.png');
-        this.load.image('deadTokugawas', 'assets/images/cards/deadTokugawas.jpg');
-        this.load.image('toxicFrets', 'assets/images/cards/toxicFrets.jpg');
-        this.load.image('toxicFretsToken', 'assets/images/cards/toxicFretsToken.png');
-        this.load.image('ashenEncore', 'assets/images/cards/ashenEncore.jpg');
-        this.load.image('ashenEncoreToken', 'assets/images/cards/ashenEncoreToken.png');
-        this.load.image('edoEruption', 'assets/images/cards/edoEruption.jpg');
-        this.load.image('edoEruptionToken', 'assets/images/cards/edoEruptionToken.png');  
-        this.load.image('steelToe', 'assets/images/cards/steelToe.jpg');
-        this.load.image('steelToeToken', 'assets/images/cards/steelToeToken.png');
-        this.load.image('foreverTrueToken', 'assets/images/cards/foreverTrueToken.png'); 
-        this.load.image('foreverTrue', 'assets/images/cards/foreverTrue.jpg');
-        this.load.image('rebelSpiritToken', 'assets/images/cards/rebelSpiritToken.png');
-        this.load.image('rebelSpirit', 'assets/images/cards/rebelSpirit.jpg');
-        this.load.image('rebelHeartToken', 'assets/images/cards/rebelHeartToken.png');
-        this.load.image('rebelHeart', 'assets/images/cards/rebelHeart.jpg');
-        this.load.image('bushidoToken', 'assets/images/cards/bushidoToken.png');
-        this.load.image('bushido', 'assets/images/cards/bushido.jpg');
-        this.load.image('toxicAvengerToken', 'assets/images/cards/toxicAvengerToken.png');
-        this.load.image('toxicAvenger', 'assets/images/cards/toxicAvenger.jpg');
-        this.load.image('kirisuteGomenToken', 'assets/images/cards/kirisuteGomenToken.png');
-        this.load.image('kirisuteGomen', 'assets/images/cards/kirisuteGomen.jpg');
-        this.load.image('hollidayInKamakuraToken', 'assets/images/cards/hollidayInKamakuraToken.png');
-        this.load.image('hollidayInKamakura', 'assets/images/cards/hollidayInKamakura.jpg');
-        this.load.image('kamishimoUberAllesToken', 'assets/images/cards/kamishimoUberAllesToken.png');
-        this.load.image('kamishimoUberAlles', 'assets/images/cards/kamishimoUberAlles.jpg');
-
-        this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
-        this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
-        this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
+            this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
+            this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
+            this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
+        }
     };
 
     create() {
@@ -222,7 +223,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            
+           
         ]; 
             
         gameState.bonusCards = [
@@ -235,13 +236,11 @@ class Preload extends Phaser.Scene {
             {key: 'ashenEncore',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'ashenEncoreToken'},
             {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
             {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},
-            {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
-            {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'punksNotDead',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'punksNotDeadToken'},
-           
+            {key: 'toxicAvenger',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicAvengerToken'},
+
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rawEnergy',          type: 'buff',           cost: () => gameState.player.stancePoints > 0 ? -2 : -1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'powerChord',         type: 'buff',           cost: 1, stancePoints: () => gameState.player.stancePoints <= 0 ? 1 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 3 : 0},
             {key: 'crowdSurfer',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? 2 * gameState.player.stancePoints : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0},
@@ -257,7 +256,8 @@ class Preload extends Phaser.Scene {
             {key: 'gutterGeisha',       type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.2), reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'noFuture',           type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'coverCharge',        type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
-            
+            {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+           
             {key: 'bassSolo',           type: 'targetAll',      cost: 1, stancePoints: 0, damage: 6, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rottenResonance',    type: 'targetAll',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'pissDrunkBastards',  type: 'targetAll',      cost: 2, stancePoints: 1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -291,13 +291,15 @@ class Preload extends Phaser.Scene {
             {key: 'kirisuteGomen',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'kirisuteGomenToken'},
             {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
             {key: 'bushido',            type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bushidoToken'},
-            {key: 'toxicAvenger',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicAvengerToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
-           
+            {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
+            {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
+            
         ];
 
         gameState.minDeckSize = 8
         gameState.latestDraw = [];
+        if (gameState.restartGame) self.scene.start('Mainmenu');
              
         let bgLoadingScreen = this.add.image(550,480, 'bgLoadingScreen').setScale(1.40).setInteractive();
         this.add.text(550, 170, 'Punk Rock Samurai', { fontSize: '100px', fill: '#000000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);

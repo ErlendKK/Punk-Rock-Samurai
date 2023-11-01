@@ -31,3 +31,4 @@ const game = new Phaser.Game(config);
 
 
 //https://raw.githack.com/ErlendKK/Punk-Rock-Samurai/main/index.html
+// C:\Spill\Punk Rock Samurai\github\Punk-Rock-Samurai>terser preload.js basescene.js mainmenu.js level*.js endscene.js config.js -c -m -o game.min.js

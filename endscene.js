@@ -51,7 +51,7 @@ class Endscene extends Phaser.Scene {
         this.cameras.main.fadeIn(800, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,320, 'endscene').setScale(0.95).setOrigin(0.5, 0.5).on('pointerup', () => returnToMenu() );
-        this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai alpha v1.1', mainTextConfig).setOrigin(0.5, 0.5);
+        this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai Beta v1.3', mainTextConfig).setOrigin(0.5, 0.5);
         
         gameState.score.totalScore = (
            gameState.score.levelsCompleted > 0 ? 
@@ -67,7 +67,7 @@ class Endscene extends Phaser.Scene {
             totalScore: 'Your score'
         };
         
-        let x = 280;
+        let x = 250;
         let y = 200;
         let spacing = 20;
         
@@ -77,8 +77,8 @@ class Endscene extends Phaser.Scene {
                 let topScores = await self.getTopScores();
             
                 const leaderboardBackground = self.add.graphics();
-                leaderboardBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.80); 
-                leaderboardBackground.fillRect(x, y, 540, 420);
+                leaderboardBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.70); 
+                leaderboardBackground.fillRect(x, y, 600, 420);
 
                 self.add.text(x + 50, y + 50, 'Your Results', { fontSize: '25px', fill: '#000000' }).setOrigin(0);
 
@@ -124,7 +124,13 @@ class Endscene extends Phaser.Scene {
 
             self.time.delayedCall(500, () => {
                 self.cameras.main.fadeOut(1000);
-                location.reload();
+                // location.reload();
+                gameState.restartGame = true;
+                gameState.levels.forEach(level => self.scene.stop(level));
+                self.scene.stop('Preload');
+                self.scene.stop('Mainmenu');
+                self.scene.start('Preload');
+
             })
         }
         
@@ -132,15 +138,26 @@ class Endscene extends Phaser.Scene {
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 
+        let returnToMenuCalled = false;
+
         // Give time for leaderboard to update with players score 
         self.time.delayedCall(600, () => {   
             displayLeaderBoard();
          })
 
-         self.time.delayedCall(8000, () => {
-            console.log(`timeout`);
-            returnToMenu();
+        self.time.delayedCall(8000, () => {
+            if (!returnToMenuCalled) {
+                returnToMenuCalled = true;
+                returnToMenu();
+            }
         }) 
+
+        self.input.on('pointerup', () => {
+            if (!returnToMenuCalled) {
+                returnToMenuCalled = true;
+                returnToMenu();
+            }
+        })
    
     }; // End of create()
     
