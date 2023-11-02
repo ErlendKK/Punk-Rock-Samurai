@@ -26,8 +26,6 @@ class Level2Fight1 extends BaseScene {self
         this.addEndOfTurnButton() 
         this.addRedrawButton()
         this.addGoldCoin(); //must be called after resetPlayer()
-        displayDrawPile();
-        displayDiscardPile();
 
         gameState.redrawPrice = 1
         gameState.kamishimoUberAlles = 0; 
@@ -41,7 +39,10 @@ class Level2Fight1 extends BaseScene {self
        
         gameState.currentCards = [];
         gameState.cardImages = [];
-        gameState.drawPile = [...gameState.deck];
+        gameState.drawPile = [...gameState.deck];        
+        displayDrawPile();
+        displayDiscardPile();
+
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
@@ -300,7 +301,7 @@ class Level2Fight1 extends BaseScene {self
             const startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
             
             for (let i = 0; i < numCards; i++) {
-                self.time.delayedCall(i * 75, () => {
+                self.time.delayedCall(i * 80, () => {
         
                     // Check and reshuffle the deck if necessary
                     if (gameState.drawPile.length === 0) {
