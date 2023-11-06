@@ -107,7 +107,11 @@ class Preload extends Phaser.Scene {
             this.load.image('gutterGeisha', 'assets/images/cards/gutterGeisha.jpg');
             this.load.image('noFuture', 'assets/images/cards/noFuture.jpg');
             this.load.image('coverCharge', 'assets/images/cards/coverCharge.jpg');
-
+            this.load.image('wrathOfMoen', 'assets/images/cards/wrathOfMoen.jpg');
+            this.load.image('saisenBlaster', 'assets/images/cards/saisenBlaster.jpg');
+            
+            this.load.image('soulSquatter', 'assets/images/cards/soulSquatter.jpg');
+            this.load.image('soulSquatterToken', 'assets/images/cards/soulSquatterToken.png');
             this.load.image('punksNotDead', 'assets/images/cards/punksNotDead.jpg');
             this.load.image('punksNotDeadToken', 'assets/images/cards/punksNotDeadToken.png');
             this.load.image('lustForLifeToken', 'assets/images/cards/lustForLifeToken.png');
@@ -149,6 +153,7 @@ class Preload extends Phaser.Scene {
 
     create() {
         self = this;
+        this.input.keyboard.createCursorKeys();
 
         gameState.score = {
             numberOfTurns: 0,
@@ -187,7 +192,8 @@ class Preload extends Phaser.Scene {
             armorBase: 0,
             armorStance: 0,
             armorCard: 0,
-            lifeSteal: 0               
+            lifeStealBase: 0,
+            lifeStealThisTurn: 0               
         };
 
         gameState.enemy = {
@@ -239,17 +245,18 @@ class Preload extends Phaser.Scene {
             {key: 'punksNotDead',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'punksNotDeadToken'},
             {key: 'toxicAvenger',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicAvengerToken'},
 
+            {key: 'bushido',            type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bushidoToken'},
+           
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rawEnergy',          type: 'buff',           cost: () => gameState.player.stancePoints > 0 ? -2 : -1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'powerChord',         type: 'buff',           cost: 1, stancePoints: () => gameState.player.stancePoints <= 0 ? 1 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 3 : 0},
             {key: 'crowdSurfer',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? 2 * gameState.player.stancePoints : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0},
-            {key: 'rocknRejuvinate',    type: 'buff',           cost: 3, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 5, poisonRemove: () => gameState.player.stancePoints > 0 ? 3 : 0, strength: 0, armor: () => gameState.player.stancePoints < 0 ? 3 : 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'rocknRejuvinate',    type: 'buff',           cost: 3, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: () => gameState.player.stancePoints > 0 ? 3 : 0, strength: 0, armor: () => gameState.player.stancePoints < 0 ? 3 : 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'detox',              type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 4, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'dBeat',              type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'shogunShred',        type: 'buff',           cost: 0, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: () => (gameState.player.stancePoints > 0) ? 1 : 0},
             {key: 'bloodOath',          type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
-            {key: 'canibalize',         type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'kabutuOverdrive',    type: 'buff',           cost: 1, stancePoints: -3, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 15, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'nenguStyle',         type: 'buff',           cost: 3, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'zenZine',            type: 'buff',           cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
@@ -257,12 +264,14 @@ class Preload extends Phaser.Scene {
             {key: 'noFuture',           type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'coverCharge',        type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'canibalize',         type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'saisenBlaster',      type: 'buff',           cost: 1, goldCost: 1, stancePoints: 1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 10, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
             {key: 'bassSolo',           type: 'targetAll',      cost: 1, stancePoints: 0, damage: 6, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rottenResonance',    type: 'targetAll',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'pissDrunkBastards',  type: 'targetAll',      cost: 2, stancePoints: 1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'stageInvasion',      type: 'targetAll',      cost: 2, stancePoints: 0, damage: () => 3 * (gameState.currentCards.length + 1), fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'circlePit',          type: 'targetAll',      cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: () => gameState.costPlayed * 4, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'stageInvasion',      type: 'targetAll',      cost: 2, stancePoints: 0, damage: () => 4 * (gameState.currentCards.length + 1), fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'circlePit',          type: 'targetAll',      cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: () => gameState.costPlayed * 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'moshpitMassacre',    type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 8, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'blackFumes',         type: () => gameState.player.stancePoints >= 0 ? 'targetAll' : 'targetSelected', cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 3 : gameState.player.stancePoints < 0 ? 5 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             
@@ -283,6 +292,7 @@ class Preload extends Phaser.Scene {
             {key: 'roninMerc',          type: 'targetSelected', cost: 0, goldCost: 1, stancePoints: 0,  damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'pyroPunk',           type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 0, fire: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.2), poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'troopsOfTakamori',   type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 6, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'wrathOfMoen',        type: 'targetSelected', cost: 2, stancePoints: 0,  damage: 25, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
            
         ];
 
@@ -290,15 +300,53 @@ class Preload extends Phaser.Scene {
 
             {key: 'kirisuteGomen',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'kirisuteGomenToken'},
             {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
-            {key: 'bushido',            type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bushidoToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
             {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
             {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
-            
+            {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
+          
         ];
 
         gameState.minDeckSize = 8
         gameState.latestDraw = [];
+
+        gameState.taunts = [
+            {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},
+            {key: 3, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nto survive!` },
+            {key: 5, enemy: `Got lost on your way\nto a cosplay,\nSamurai boy?`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
+            {key: 6, enemy: `You look like a kid who\nfound his granddad's armor.`, player: `And you'll look like\nyour granddad's corpse\nwhen I'm done with you!` },
+            {key: 8, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis nyour own funeral!` },
+            {key: 9, enemy: `A Samurai punk rocker?\nHow's that midlife crisis going?`, player: `The only crisis happening today\nis the one your about to experience!` }, 
+            {key: 12, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
+            {key: 13, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
+            {key: 14, enemy: `Nice costume, boy.\nDo you do birthdays\nand bar mitzvahs too?`, player: `Just funerals.\nYours is next\non the list.` },
+        ];
+
+        
+        
+         
+        gameState.ratTaunts = [
+            {key: 11, enemy: `Hsss..\nYou’ll make a fine\nmeal for my pups!`, player: `Tell them not to wait up.\nDaddy's not comming home tonight!` },
+            {key: 11, enemy: `Hsss..\nYou come here to fight\nor to display your\nHalloween costume?`, player: `The only thing on\ndisplay today\nwill be your entrails!` },
+        ]
+        
+        
+        gameState.extraTaunts = [
+            {key: 4, enemy: `You really believe\nyou're a samurai, huh?`, player: `You believe in ghosts?\nBecause you're about to become one!` },
+            {key: 11, enemy: `A Samurai in the 21st century?\nAre you on drugs?`, player: `The only thing I'm high on\nis the hunt.!` },
+            {key: 12, enemy: `Childish music\nand childish fantasies.\nGrow up!`, player: `I'll make sure you\nnever grow old.` },
+            {key: 13, enemy: `Must be hard, living\na deluded fantasy.`, player: `Not as hard as what's\ncoming for you.` },
+            {key: 10, enemy: `Punk and Samurai?\nHa! Ha! Ha!\nTwo failures in one!`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
+            {key: 2, enemy: `Chasing fantasies while\nthe world laughs at you`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
+            {key: 11, enemy: `You're a relic in a world that's moved on.`, player: `You won't be moving much soon.!` },
+            {key: 11, enemy: `You take this Samurai gig\nseriously, huh?`, player: `Serious as the grave\nI'm about to dig for you!` },
+            {key: 11, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the blood\nit will draw from your corpse!` },
+            {key: 11, enemy: `Hey, Samurai punk,\nthe circus called,\nthey want their clown back`, player: `Sorry, I'm booked up\nmopping your entrails\noff the floor` },   
+            // {key: 11, enemy: `Look what's dragging\nthrough my sewers...\na samurai in studded leather.?`, player: `The only thing dragging here\nwill be your dead cold body.` },
+            {key: 7, enemy: `Still holding onto\npunk's corpse, I see`, player: `The only corpse here\nwill be the one I leave behind!` },
+            {key: 10, enemy: `Your delusions of grandeur\nare quite entertaining.`, player: `The only entertainment tonight\nwill be your cries of agony!` },
+        ];
+
         if (gameState.restartGame) self.scene.start('Mainmenu');
              
         let bgLoadingScreen = this.add.image(550,480, 'bgLoadingScreen').setScale(1.40).setInteractive();
@@ -311,23 +359,35 @@ class Preload extends Phaser.Scene {
         bgLoadingScreen.on('pointerup', () => {
             if (!screenClicked) {
                 screenClicked = true;
-                gameState.thunder.play( {volume: 0.9, seek: 0.25 } ); 
-                this.cameras.main.shake(200, .002, false); 
-                this.cameras.main.flash(100);
+                openMainMenu();
+            }
+        })
 
-                this.time.delayedCall(100, () => {
-                    this.cameras.main.fadeOut(100);
-                }, [], this);
+        this.input.keyboard.on('keydown', () => {
+            if (!screenClicked) {
+                screenClicked = true;
+                openMainMenu();
+            }
+        })
 
-                this.time.delayedCall(200, () => { //1000
-                    gameState.musicTheme.play( { loop: true, volume: 0.30 } );
-                    self.time.delayedCall(100, () => { //500
-                        self.scene.start('Mainmenu');
-                        console.log(`Mainmenu called`);
-                    })
-                }, [], this);
-            };
-        });
+        function openMainMenu() {
+            gameState.thunder.play( {volume: 0.9, seek: 0.25 } ); 
+            self.cameras.main.shake(200, .002, false); 
+            self.cameras.main.flash(100);
+
+            self.time.delayedCall(100, () => {
+                self.cameras.main.fadeOut(100);
+            }, [], this);
+
+            self.time.delayedCall(200, () => { //1000
+                gameState.musicTheme.play( { loop: true, volume: 0.30 } );
+                self.time.delayedCall(100, () => { //500
+                    self.scene.start('Mainmenu');
+                    console.log(`Mainmenu called`);
+                })
+            }, [], this);
+        };
+
 
     } // End of create
 } // End of scene

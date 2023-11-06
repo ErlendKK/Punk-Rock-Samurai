@@ -20,10 +20,29 @@ class BaseScene extends Phaser.Scene {
         this.input.keyboard.createCursorKeys();
         
         gameState.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameState.endGameMenyExited = false;
         gameState.playingCard = false;
         gameState.discardPile = [];
         gameState.drawPile = [];
+        gameState.currentCards = [];
+        gameState.cardImages = [];
+        gameState.summonedEnemies = []; 
+
+        gameState.redrawPrice = 1;
+        gameState.skipIntro = false;
+        gameState.fightStarted = false;
+
+        // Reset Permanent effects
+        gameState.kamishimoUberAlles = 0; 
+        gameState.kirisuteGomen = false; 
+        gameState.toxicFrets = false;
+        gameState.ashenEncore = false;
+        gameState.edoEruption = false;
+        gameState.steelToe = false;
+        gameState.gundanSeizai = false;
+        gameState.noFutureCondition = false;
         
+        // Initiate sounds
         gameState.cardsDealtSound = this.sound.add('cardsDealtSound');
         gameState.victorySound = this.sound.add('victorySound');
         gameState.buttonPressedSound = this.sound.add('buttonPressedSound');
@@ -35,8 +54,9 @@ class BaseScene extends Phaser.Scene {
         gameState.coinSound = this.sound.add('coinSound');
         gameState.keyboardSound = this.sound.add('keyboardSound');
 
-        gameState.canibalizeCondition = false
-        gameState.endGameMenyExited = false;
+        if (gameState.extraCards.length) {
+            gameState.bonusCards.push(gameState.extraCards.pop());
+        };
     }
 
     resetPlayer(player, scale, x=360, y=350) {
@@ -58,7 +78,9 @@ class BaseScene extends Phaser.Scene {
         player.armorBase = 0;
         player.armorStance = 0;
         player.armorCard = 0;
-        player.lifeSteal = 0;
+        player.lifeStealBase = 0;
+        player.lifeStealThisTurn = 0;
+        player.lifeStealCounter = 0;
     };
 
     definePermanentSlots() {
@@ -137,11 +159,12 @@ class BaseScene extends Phaser.Scene {
                 currentInput += event.key; // appends the latest key pressed to currentInput
 
                 if (currentInput === "showmethemoney") {
-                    const goldAmount = 99;
                     console.log("showmethemoney");
-                    gameState.player.gold += goldAmount;
+                    gameState.player.gold = 99;
+                    gameState.player.goldMax = 99;
                     gameState.goldCounter.setText(gameState.player.gold);
                     if (gameState.playerName !== 'admin') gameState.playerName = "Cheater";
+                    if (gameState.player.name !== 'admin') gameState.player.name = "Cheater";
                     currentInput = "";
                 }
 
@@ -531,6 +554,11 @@ class BaseScene extends Phaser.Scene {
         backgroundObj.clear();
         backgroundObj.fillStyle(0xFFFFFF, 1).setAlpha(alpha).setDepth(depth);
         backgroundObj.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, cornerRadius);
+    }
+
+    // Helper function to create a delay using a Promise
+    delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
     }
     
 

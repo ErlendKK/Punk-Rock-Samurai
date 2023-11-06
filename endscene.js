@@ -134,7 +134,7 @@ class Endscene extends Phaser.Scene {
             })
         }
         
-        if (gameState.playerName != 'admin' && gameState.playerName != "Cheater") {
+        if (gameState.playerName != 'admin' && gameState.playerName != 'Cheater') {
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 

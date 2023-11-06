@@ -48,7 +48,7 @@ class Mainmenu extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,480, 'bgLoadingScreen').setScale(1.40);
-        this.add.text(15, 5, `Punk Rock Samurai Beta v1.30`, { fontSize: '12px', fill: '#ff0000'});
+        this.add.text(15, 5, `Punk Rock Samurai Beta v1.301`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         gameState.isEnteringName = false;
         sceneState.name = '';
@@ -386,6 +386,13 @@ class Mainmenu extends Phaser.Scene {
                     });
         
                     self.input.on('pointerup', () => { // IMPLEMENT: Or pressed enter!
+                        if (!nextlevelstarting) {
+                            nextlevelstarting = true;
+                            startNextLevel();
+                        }
+                    })
+
+                    self.input.keyboard.on('keydown', () => {
                         if (!nextlevelstarting) {
                             nextlevelstarting = true;
                             startNextLevel();
