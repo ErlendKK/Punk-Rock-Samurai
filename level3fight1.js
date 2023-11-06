@@ -1178,7 +1178,7 @@ class Level3Fight1 extends BaseScene {self
             } else {
 
                 gameState.enemy1.actions = [ 
-                    {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 Fire damage`, probability: 0.20 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
+                    {key: `Intends to\nDeal 7 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 7 Fire damage`, probability: 0.20 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
                     {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
                     {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.15},

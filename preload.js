@@ -315,7 +315,7 @@ class Preload extends Phaser.Scene {
             {key: 3, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nto survive!` },
             {key: 5, enemy: `Got lost on your way\nto a cosplay,\nSamurai boy?`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
             {key: 6, enemy: `You look like a kid who\nfound his granddad's armor.`, player: `And you'll look like\nyour granddad's corpse\nwhen I'm done with you!` },
-            {key: 8, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis nyour own funeral!` },
+            {key: 8, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
             {key: 9, enemy: `A Samurai punk rocker?\nHow's that midlife crisis going?`, player: `The only crisis happening today\nis the one your about to experience!` }, 
             {key: 12, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
             {key: 13, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
