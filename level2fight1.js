@@ -233,7 +233,7 @@ class Level2Fight1 extends BaseScene {self
             return new Promise((resolve) => {
                 let index = 0;
                 let currentText = "";
-                const delay = 34;
+                const delay = 33.3;
         
                 const addNextLetter = () => {
                     if (gameState.skipIntro) {
@@ -929,10 +929,10 @@ class Level2Fight1 extends BaseScene {self
 
                     if (stolenHealthRealized) {
                         const lifeStealTextContent = `You stole ${stolenHealthRealized} HP`
-                        const lifeStealText = self.add.text(550, 380, lifeStealTextContent, { fontSize: '30px', fill: '#ff0000' }).setOrigin(0.5);
-                        const lifeStealTextBackground = self.add.graphics();
-                        self.updateTextAndBackground(lifeStealText, lifeStealTextBackground, lifeStealTextContent);       
-                        enemyTurnTexts.push(lifeStealText, lifeStealTextBackground);
+                        enemy.lifeStealText = self.add.text(550, 380, lifeStealTextContent, { fontSize: '30px', fill: '#ff0000' }).setOrigin(0.5);
+                        enemy.lifeStealTextBackground = self.add.graphics();
+                        self.updateTextAndBackground(enemy.lifeStealText, enemy.lifeStealTextBackground, lifeStealTextContent);       
+                        enemyTurnTexts.push(enemy.lifeStealText, enemy.lifeStealTextBackground);
                     }
                 }
 
@@ -949,7 +949,8 @@ class Level2Fight1 extends BaseScene {self
 
         function performEnemyAction(enemy) {
 
-            enemy.poisonText = self.add.text(550, 380, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
+            const poisonTextY = enemy.lifeStealText ? 450 : 380
+            enemy.poisonText = self.add.text(550, poisonTextY, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
             enemy.poisonTextBackground = self.add.graphics();
             updatePoison(enemy);
 
@@ -1129,26 +1130,26 @@ class Level2Fight1 extends BaseScene {self
                 
             } else if (gameState.turn === 2) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nRest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
                 ]
                 gameState.enemy2.actions = [
-                    {key: `Intends to\nRest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
                 ]
                 
             } else if (gameState.turn === 3) {
                 gameState.enemy1.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 13 damage', probability: 1},
+                    {key: () => `Intends to\nDeal ${Math.round(13 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 13 damage', probability: 1},
                 ]
                 gameState.enemy2.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 13, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 13 damage', probability: 1},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 1},
                 ]
     
             } else if (gameState.turn === 4) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nRest`, damage: 0, fire: 0, poison: 0, heal: 5, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
                 ]
                 gameState.enemy2.actions = [
-                    {key: `Intends to\nRest`, damage: 0, fire: 0, poison: 0, heal: 5, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: 1},
                 ]
     
             } else if (gameState.turn === 5) {
@@ -1162,25 +1163,23 @@ class Level2Fight1 extends BaseScene {self
             } else {
     
                 gameState.enemy1.actions = [ 
-                    {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0},
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.24 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.15},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.120 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.26 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.13},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 15 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                 ]
             
                 gameState.enemy2.actions = [ 
-                    {key: `Intends to\nDeal 10 fire damage`, damage: 0, fire: 10, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 fire damage', probability: 0},
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.23 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.28 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.15},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
                 ]
             }
         
@@ -1452,10 +1451,10 @@ class Level2Fight1 extends BaseScene {self
                     else {
                         gainedCardText.destroy();
                         gainedCardTextBackground.destroy();
-                        self.time.delayedCall(350, () => {
-                            fadeOutGameObject(bonusCard.sprite, 200);
+                        self.time.delayedCall(1000, () => {
+                            fadeOutGameObject(bonusCard.sprite, 500);
 
-                            self.time.delayedCall(200, () => { //Enable shop buttons after fadeOut animation is completed
+                            self.time.delayedCall(500, () => { //Enable shop buttons after fadeOut animation is completed
                                 if (gameState.shopButtonPressed) {
                                     gameState.shopButtonPressed = false;
                                 }

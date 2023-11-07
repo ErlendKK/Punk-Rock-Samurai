@@ -194,7 +194,7 @@ class Level1Fight2 extends BaseScene {self
             return new Promise((resolve) => {
                 let index = 0;
                 let currentText = "";
-                const delay = 34;
+                const delay = 33.3;
         
                 const addNextLetter = () => {
                     if (gameState.skipIntro) {
@@ -860,7 +860,7 @@ class Level1Fight2 extends BaseScene {self
             if (gameState.playersTurn) { 
                 gameState.playersTurn = false;
                 const enemyTurnTextContent = "Enemy's turn!"
-                enemy.turnText = self.add.text(550, 280, enemyTurnTextContent, { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
+                enemy.turnText = self.add.text(550, 300, enemyTurnTextContent, { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
                 const enemyTurnTextBackground = self.add.graphics();
                 self.updateTextAndBackground(enemy.turnText, enemyTurnTextBackground, enemyTurnTextContent);               
                 const enemyTurnTexts = [enemy.turnText, enemyTurnTextBackground]
@@ -875,10 +875,10 @@ class Level1Fight2 extends BaseScene {self
 
                     if (stolenHealthRealized) {
                         const lifeStealTextContent = `You stole ${stolenHealthRealized} HP`
-                        const lifeStealText = self.add.text(550, 380, lifeStealTextContent, { fontSize: '30px', fill: '#ff0000' }).setOrigin(0.5);
-                        const lifeStealTextBackground = self.add.graphics();
-                        self.updateTextAndBackground(lifeStealText, lifeStealTextBackground, lifeStealTextContent);       
-                        enemyTurnTexts.push(lifeStealText, lifeStealTextBackground);
+                        enemy.lifeStealText = self.add.text(550, 380, lifeStealTextContent, { fontSize: '30px', fill: '#ff0000' }).setOrigin(0.5);
+                        enemy.lifeStealTextBackground = self.add.graphics();
+                        self.updateTextAndBackground(enemy.lifeStealText, enemy.lifeStealTextBackground, lifeStealTextContent);       
+                        enemyTurnTexts.push(enemy.lifeStealText, enemy.lifeStealTextBackground);
                     }
                 }
 
@@ -886,7 +886,7 @@ class Level1Fight2 extends BaseScene {self
                     enemyTurnTexts.forEach( text => {
                         fadeOutGameObject(text, 100);
                     })
-                }) 
+                });
             }
             
             enemy.turnComplete = false;
@@ -895,7 +895,8 @@ class Level1Fight2 extends BaseScene {self
 
         function performEnemyAction(enemy) {
 
-            enemy.poisonText = self.add.text(550, 380, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
+            const poisonTextY = enemy.lifeStealText ? 450 : 380;
+            enemy.poisonText = self.add.text(550, poisonTextY, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
             enemy.poisonTextBackground = self.add.graphics();
             updatePoison(enemy);
 
@@ -1388,10 +1389,10 @@ class Level1Fight2 extends BaseScene {self
                     else {
                         gainedCardText.destroy();
                         gainedCardTextBackground.destroy();
-                        self.time.delayedCall(350, () => {
-                            fadeOutGameObject(bonusCard.sprite, 200);
+                        self.time.delayedCall(1000, () => {
+                            fadeOutGameObject(bonusCard.sprite, 500);
 
-                            self.time.delayedCall(200, () => { //Enable shop buttons after fadeOut animation is completed
+                            self.time.delayedCall(500, () => { //Enable shop buttons after fadeOut animation is completed
                                 if (gameState.shopButtonPressed) {
                                     gameState.shopButtonPressed = false;
                                 }
