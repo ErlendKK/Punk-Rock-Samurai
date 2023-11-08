@@ -114,7 +114,7 @@ class BaseScene extends Phaser.Scene {
                 permanents: gameState.permanents,
                 enemy: gameState.enemy,
                 playerName: gameState.playerName,
-                freePermanent: gameState.freePermanent,
+                version: gameState.version,
 
                 savedScene: currentScene,
                 loadedGame: true,

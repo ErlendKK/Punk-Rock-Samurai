@@ -20,7 +20,6 @@ class Level1Fight1 extends BaseScene {self
 
     create() {
         const self = this;
-        this.saveGameState(self.scene.key);
         this.baseCreate('bakgrunnCity1');
         this.resetPlayer(gameState.player, 0.45, 370, 350); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton();
@@ -48,8 +47,10 @@ class Level1Fight1 extends BaseScene {self
         // ------------- NB! Only for Level1Fight1 ---------------
         gameState.player.name = gameState.playerName ? gameState.playerName : "Punk Rock Samurai";      
         gameState.permanents = [];
-        this.definePermanentSlots() 
-        addPermanent(gameState.freePermanent);
+        this.definePermanentSlots()
+        gameState.deck.forEach(card => {
+            if (card.freePermanent) addPermanent(card);
+        }) 
         gameState.drawPile = [...gameState.deck];
         displayDrawPile();
         displayDiscardPile();
@@ -668,6 +669,11 @@ class Level1Fight1 extends BaseScene {self
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
+            }
+            if (card.key === 'riotRonin') {
+                card.goldCost += 1;
+                target.chosenAction = {key: `Intends to\nSkip a Turn`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Skips a Turn', probability: 1};
+                target.intentionText.setText(`Intends to\nSkip a Turn`);
             }
             if (card.key === 'hellFire') { 
                 gameState.player.health -= 2;
@@ -1685,7 +1691,7 @@ class Level1Fight1 extends BaseScene {self
             // The conditional avoids error if no slots are available.
             if (slot) { 
 
-                if (card != gameState.freePermanent) { // Only relevant for Level1Fight1
+                if (!card.freePermanent) { // Only relevant for Level1Fight1
                     card.slot.available = true;
                     card.sprite.destroy();
                 }
@@ -1843,7 +1849,7 @@ class Level1Fight1 extends BaseScene {self
                 
             } else if (card.key === 'lustForLife') {
                 let healCost = 1;
-                const healAmount = 6
+                const healAmount = 7
                 const x = 900;
                 const y = 130;
                 const textConfig = { fontSize: '12px', fill: '#000000' };
@@ -1873,7 +1879,6 @@ class Level1Fight1 extends BaseScene {self
                 gameState.healButton.on('pointerup', () => {
                     if (gameState.player.gold >= healCost && gameState.playersTurn) {
                         spendGold(healCost) ;
-                        healCost += 1;
                         gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                         self.updateHealthBar(gameState.player);
     
@@ -1914,6 +1919,32 @@ class Level1Fight1 extends BaseScene {self
                         self.cameras.main.shake(70, .002, false);
                     }
                 })
+
+            } else if (card.key === 'bouncingSoles') {
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteBouncingSoles(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
+            } else if (card.key === 'enduringSpirit') {
+                if (!gameState.turn) {
+                    gameState.player.healthMax += 5;
+                    updateHealthBar(gameState.player);
+                }
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteEnduringSpirit(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
+                
             
             // -------------- NON-DEPLETED TOKEN-CARDS -----------------------------------
             // For non-depleted cards, store current references to tokenSprite and tokenSlot in local variables. 
@@ -2006,7 +2037,13 @@ class Level1Fight1 extends BaseScene {self
                     break;
                 case 'soulSquatter':
                     depleteSoulSquatter(card);
-                    break;   
+                    break;
+                case 'bouncingSoles':
+                    depleteBouncingSoles(card);
+                    break;
+                case 'enduringSpirit':
+                    depleteEnduringSpirit(card);
+                    break;                     
                 
                 // NB! Add any card that is not allowed to deplete from hand
                 case 'kamishimoUberAlles': 
@@ -2240,6 +2277,17 @@ class Level1Fight1 extends BaseScene {self
         function depleteSoulSquatter(card) {
             gameState.player.lifeStealBase -= 0.1;
             gameState.player.lifeStealThisTurn += 0.3;
+            destroyToken(card);
+        }
+
+        function depleteBouncingSoles(card) {
+            gameState.permanentSlots.push(            
+                { available: true, x: 50, y: 130, index: 4 },
+            );
+            destroyToken(card);
+        }
+
+        function depleteEnduringSpirit(card) {
             destroyToken(card);
         }
         
@@ -2508,7 +2556,7 @@ class Level1Fight1 extends BaseScene {self
     
                     const cardsPerRow = gameState.drawPile.length < 12 ? 4 : 6;
                     const cardSpacing = 105;
-                    const startX = gameState.drawPile.length < 12 ? 400 : 250;
+                    const startX = gameState.drawPile.length < 12 ? 400 : 270;
                     const startY = 150;
 
                     const drawPileText = self.add.text(550, startY-110, "", { fontSize: '60px', fill: '#000000' }).setOrigin(0.5).setDepth(201);

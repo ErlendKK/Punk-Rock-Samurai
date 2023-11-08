@@ -653,6 +653,11 @@ class Level3Fight2 extends BaseScene {self
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
             }
+            if (card.key === 'riotRonin') {
+                card.goldCost += 1;
+                target.chosenAction = {key: `Intends to\nSkip a Turn`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Skips a Turn', probability: 1};
+                target.intentionText.setText(`Intends to\nSkip a Turn`);
+            }
             if (card.key === 'hellFire') { 
                 gameState.player.health -= 2;
                 self.updateHealthBar(gameState.player);
@@ -1992,7 +1997,7 @@ class Level3Fight2 extends BaseScene {self
                 
             } else if (card.key === 'lustForLife') {
                 let healCost = 1;
-                const healAmount = 6
+                const healAmount = 7;
                 const x = 900;
                 const y = 130;
                 const textConfig = { fontSize: '12px', fill: '#000000' };
@@ -2020,8 +2025,7 @@ class Level3Fight2 extends BaseScene {self
                 
                 gameState.healButton.on('pointerup', () => {
                     if (gameState.player.gold >= healCost && gameState.playersTurn) {
-                        spendGold(healCost) ;
-                        healCost += 1;
+                        spendGold(healCost);
                         gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                         self.updateHealthBar(gameState.player);
     
@@ -2058,6 +2062,30 @@ class Level3Fight2 extends BaseScene {self
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
                         depleteSoulSquatter(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
+            } else if (card.key === 'bouncingSoles') {
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteBouncingSoles(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
+            } else if (card.key === 'enduringSpirit') {
+                if (!gameState.turn) {
+                    gameState.player.healthMax += 5;
+                    updateHealthBar(gameState.player);
+                }
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteEnduringSpirit(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2154,7 +2182,14 @@ class Level3Fight2 extends BaseScene {self
                     break;
                 case 'soulSquatter':
                     depleteSoulSquatter(card);
-                    break;              
+                    break;
+                case 'bouncingSoles':
+                    depleteBouncingSoles(card);
+                    break;
+                case 'enduringSpirit':
+                    depleteEnduringSpirit(card);
+                    break;
+
                 // NB! Add any card that is not allowed to deplete from hand
                 case 'kamishimoUberAlles': 
                 case 'hollidayInKamakura':
@@ -2387,6 +2422,17 @@ class Level3Fight2 extends BaseScene {self
         function depleteSoulSquatter(card) {
             gameState.player.lifeStealBase -= 0.1;
             gameState.player.lifeStealThisTurn += 0.3;
+            destroyToken(card);
+        }
+
+        function depleteBouncingSoles(card) {
+            gameState.permanentSlots.push(            
+                { available: true, x: 50, y: 130, index: 4 },
+            );
+            destroyToken(card);
+        }
+
+        function depleteEnduringSpirit(card) {
             destroyToken(card);
         }
         

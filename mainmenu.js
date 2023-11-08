@@ -48,7 +48,7 @@ class Mainmenu extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
         this.add.image(550,480, 'bgLoadingScreen').setScale(1.40);
-        this.add.text(15, 5, `Punk Rock Samurai Beta v1.301`, { fontSize: '12px', fill: '#ff0000'});
+        this.add.text(15, 5, `Punk Rock Samurai Beta v${gameState.version}`, { fontSize: '12px', fill: '#ff0000'});
         let nextlevelstarting = false;
         gameState.isEnteringName = false;
         sceneState.name = '';
@@ -61,6 +61,7 @@ class Mainmenu extends Phaser.Scene {
         sceneState.creditsElements = [];
         sceneState.instructionsElements = [];
         sceneState.displayedScoreArray = [];
+        sceneState.loadGameElements = [];
 
         const headlineConfig = { fontSize: '25px', fill: '#000000' }
         const textConfig = { fontSize: '14px', fill: '#000000' }
@@ -353,8 +354,8 @@ class Mainmenu extends Phaser.Scene {
                 bonusCard.sprite.on('pointerup', function() {
                     sceneState.cardsDealtSound.play({ volume: 1.2, seek: 0.12 });
 
+                    bonusCard.freePermanent = true;
                     gameState.deck.push(bonusCard);
-                    gameState.freePermanent = bonusCard
                     gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
                     shuffleDeck(gameState.extraCards);
         
@@ -461,25 +462,83 @@ class Mainmenu extends Phaser.Scene {
 
         // implement load game
         loadGameButton.on('pointerup', function () {
-            try {
-                const serializedState = localStorage.getItem('gameState');
-                if (serializedState === null) {
-                    console.log('No saved game state found.');
-                    self.cameras.main.shake(70, .002, false);
-                    // TO DO: Handle the case when there is no saved state, e.g., display a message.
-                } else {
-                    const loadedState = JSON.parse(serializedState);
-                    gameState = loadedState;
-                    console.log('Game state loaded successfully.');
-                    self.scene.start(gameState.savedScene);
+            if (!loadGameButtonClicked) {
+                sceneState.buttonPressedSound.play({ volume: 0.7 });
+
+                sceneState.newGameButtonClicked = false;
+                loadGameButtonClicked = true;
+                leaderBoardButtonClicked = false;
+                creditsButtonClicked = false;
+                instructionsButtonClicked = false;
+
+                clearElements();
+
+                try {
+                    const serializedState = localStorage.getItem('gameState');
+                    if (serializedState === null) {
+                        const textContent = 'No saved game state found.'
+                        const textConfig = { fontSize: '40px', fill: '#000000' }
+                        const noSaveText = self.add.text(620, 350, textContent, textConfig).setOrigin(0.5).setDepth(21);
+                        
+                        const bounds = noSaveText.getBounds();
+                        const backgroundWidth = bounds.width + 10; // 5px padding on each side
+                        const backgroundHeight = bounds.height + 10; // 5px padding on each side
+                        const backgroundX = bounds.x - 10; // 5px padding on the left
+                        const backgroundY = bounds.y - 5; // 5px padding on the top
+                        
+                        const textBackground = self.add.graphics();
+                        textBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(20);
+                        textBackground.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, 10);
+                        sceneState.loadGameElements.push(noSaveText, textBackground);
+
+                        console.log(textContent);
+                        self.cameras.main.shake(70, .002, false);
                     
+                    } else {
+                        const loadedState = JSON.parse(serializedState);
+            
+                        // Check if the game has been updated since the last save
+                        if (loadedState.version !== gameState.version) {
+                            const confirmLoad = confirm(`The game has been updated since this save was made (saved version: ${loadedState.version}, current version: ${gameState.version}). Loading this file might cause issues. Do you still want to load?`);
+                            if (!confirmLoad) {
+                                return;
+                            }
+                        }
+                        
+                        gameState = loadedState;
+                        console.log('Game state loaded successfully.');
+                        self.scene.start(gameState.savedScene);
+                    }
+                } catch (e) {
+                    console.error('Failed to load the game state.', e);
+                    // TO DO: handle the error case
                 }
-            } catch (e) {
-                console.error('Failed to load the game state.', e);
-                self.cameras.main.shake(70, .002, false);
-                // Handle the error case, e.g., display an error message.
+            } else {
+                loadGameButtonClicked = false;
+                clearElements();
             }
         });
+
+        // loadGameButton.on('pointerup', function () {
+        //     try {
+        //         const serializedState = localStorage.getItem('gameState');
+        //         if (serializedState === null) {
+        //             console.log('No saved game state found.');
+        //             self.cameras.main.shake(70, .002, false);
+        //             // TO DO: Handle the case when there is no saved state, e.g., display a message.
+        //         } else {
+        //             const loadedState = JSON.parse(serializedState);
+        //             gameState = loadedState;
+        //             console.log('Game state loaded successfully.');
+        //             self.scene.start(gameState.savedScene);
+                    
+        //         }
+        //     } catch (e) {
+        //         console.error('Failed to load the game state.', e);
+        //         self.cameras.main.shake(70, .002, false);
+        //         // Handle the error case, e.g., display an error message.
+        //     }
+        // });
 
         
         // implement leaderboard    
@@ -653,6 +712,7 @@ class Mainmenu extends Phaser.Scene {
         function clearElements() {
             let sceneElements = [
                 ...sceneState.newGameElements,
+                ...sceneState.loadGameElements,
                 ...sceneState.leaderboardElements,
                 ...sceneState.creditsElements,
                 ...sceneState.instructionsElements,
@@ -679,8 +739,8 @@ class Mainmenu extends Phaser.Scene {
     // ----   USED TO SKIP MENU WHEN TESTING ----
     // gameState.playerName = 'Punk Rock Samurai';
     // const bonusCard = gameState.extraCards[0];
+    // bonusCard.freePermanent = true;
     // gameState.deck.push(bonusCard);
-    // gameState.freePermanent = bonusCard;
     // gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
     // self.scene.start('Level1Fight1');
 
