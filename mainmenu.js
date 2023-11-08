@@ -77,7 +77,8 @@ class Mainmenu extends Phaser.Scene {
         sceneState.newGameButtonClicked = false;
 
         const loadGameButton = self.add.image(x, y + offset * 1, 'rectangularButton');
-        const loadGameText = self.add.text(x, y + offset * 1, 'Load Game', { fontSize: '16px', fill: '#a9a9a9' }).setOrigin(0.5);
+        const loadGameTextColor = localStorage.getItem('gameState') ? '#000000' : '#a9a9a9'; 
+        const loadGameText = self.add.text(x, y + offset * 1, 'Load Game', { fontSize: '16px', fill: loadGameTextColor }).setOrigin(0.5);
         let loadGameButtonClicked = false;
 
         const leaderBoardButton = self.add.image(x, y + offset * 2, 'rectangularButton');
@@ -460,8 +461,26 @@ class Mainmenu extends Phaser.Scene {
 
         // implement load game
         loadGameButton.on('pointerup', function () {
-            self.cameras.main.shake(70, .002, false);
+            try {
+                const serializedState = localStorage.getItem('gameState');
+                if (serializedState === null) {
+                    console.log('No saved game state found.');
+                    self.cameras.main.shake(70, .002, false);
+                    // TO DO: Handle the case when there is no saved state, e.g., display a message.
+                } else {
+                    const loadedState = JSON.parse(serializedState);
+                    gameState = loadedState;
+                    console.log('Game state loaded successfully.');
+                    self.scene.start(gameState.savedScene);
+                    
+                }
+            } catch (e) {
+                console.error('Failed to load the game state.', e);
+                self.cameras.main.shake(70, .002, false);
+                // Handle the error case, e.g., display an error message.
+            }
         });
+
         
         // implement leaderboard    
         leaderBoardButton.on('pointerup', async () => {

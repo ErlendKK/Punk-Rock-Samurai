@@ -126,7 +126,7 @@ class Endscene extends Phaser.Scene {
                 self.cameras.main.fadeOut(1000);
                 // location.reload();
                 gameState.restartGame = true;
-                gameState.levels.forEach(level => self.scene.stop(level));
+                gameConfig.levels.forEach(level => self.scene.stop(level));
                 self.scene.stop('Preload');
                 self.scene.stop('Mainmenu');
                 self.scene.start('Preload');

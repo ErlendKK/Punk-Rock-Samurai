@@ -19,7 +19,7 @@ class BaseScene extends Phaser.Scene {
         this.cameras.main.fadeIn(600, 0, 0, 0);   
         this.input.keyboard.createCursorKeys();
         
-        gameState.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameConfig.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
         gameState.endGameMenyExited = false;
         gameState.playingCard = false;
         gameState.discardPile = [];
@@ -43,16 +43,16 @@ class BaseScene extends Phaser.Scene {
         gameState.noFutureCondition = false;
         
         // Initiate sounds
-        gameState.cardsDealtSound = this.sound.add('cardsDealtSound');
-        gameState.victorySound = this.sound.add('victorySound');
-        gameState.buttonPressedSound = this.sound.add('buttonPressedSound');
-        gameState.attackSound = this.sound.add('attackSound');
-        gameState.powerUpSound = this.sound.add('powerUpSound');
-        gameState.healSound = this.sound.add('healSound');
-        gameState.thunder = this.sound.add('thundersound');
-        gameState.music = this.sound.add('bossTune');
-        gameState.coinSound = this.sound.add('coinSound');
-        gameState.keyboardSound = this.sound.add('keyboardSound');
+        gameConfig.cardsDealtSound = this.sound.add('cardsDealtSound');
+        gameConfig.victorySound = this.sound.add('victorySound');
+        gameConfig.buttonPressedSound = this.sound.add('buttonPressedSound');
+        gameConfig.attackSound = this.sound.add('attackSound');
+        gameConfig.powerUpSound = this.sound.add('powerUpSound');
+        gameConfig.healSound = this.sound.add('healSound');
+        gameConfig.thunder = this.sound.add('thundersound');
+        gameConfig.music = this.sound.add('bossTune');
+        gameConfig.coinSound = this.sound.add('coinSound');
+        gameConfig.keyboardSound = this.sound.add('keyboardSound');
 
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
@@ -64,17 +64,21 @@ class BaseScene extends Phaser.Scene {
         player.stance = 'Neutral'; 
         player.poison = 0;
         player.stancePoints = 0;
+        player.numCards = 5,
         player.numCardsBase = 5;
         player.numCardsStance = 0;
         player.manaBase = 3;
         player.manaStance = 0;
         player.manaCard = 0;
         player.mana = 3;
-        player.manaMax = 3;
+        player.strengthMax = 3;
+        player.strength = 0;
         player.strengthBase = 0;
         player.strengthStance = 0;
         player.strengthCard = 0;
         player.strengthMax = 15;
+        player.armor = 0;
+        player.armorMax = 15;
         player.armorBase = 0;
         player.armorStance = 0;
         player.armorCard = 0;
@@ -82,6 +86,49 @@ class BaseScene extends Phaser.Scene {
         player.lifeStealThisTurn = 0;
         player.lifeStealCounter = 0;
     };
+
+    saveGameState(currentScene) {
+        try {
+            const saveData = {
+                player: {
+                    health: gameState.player.health,
+                    healthMax: gameState.player.healthMax,
+                    mana: gameState.player.mana,
+                    manaMax: gameState.player.manaMax,
+                    gold: gameState.player.gold,
+                    goldMax: gameState.player.goldMax,
+                    name: gameState.player.name,
+                    alive: gameState.player.alive
+                },
+
+                deck: gameState.deck,
+                bonusCards: gameState.bonusCards,
+                score: gameState.score,
+                bonusCards: gameState.bonusCards,
+                extraCards: gameState.extraCards,
+                minDeckSize: gameState.minDeckSize,
+                latestDraw: gameState.latestDraw,
+                taunts: gameState.taunts,
+                ratTaunts: gameState.ratTaunts,
+                extraTaunts: gameState.extraTaunts,
+                permanents: gameState.permanents,
+                enemy: gameState.enemy,
+                playerName: gameState.playerName,
+                freePermanent: gameState.freePermanent,
+
+                savedScene: currentScene,
+                loadedGame: true,
+                
+            };
+
+            const serializedState = JSON.stringify(saveData);
+            localStorage.setItem('gameState', serializedState);
+            console.log('Game state saved successfully.');
+        } catch (e) {
+            console.error('Failed to save the game state.', e);
+        }
+    }
+    
 
     definePermanentSlots() {
         const permanentX = 50;
@@ -184,7 +231,7 @@ class BaseScene extends Phaser.Scene {
     
 
     describeCharacter(character) {
-        if (!gameState.targetingCursor.visible && character.alive === true) {
+        if (!gameConfig.targetingCursor.visible && character.alive === true) {
             character.sprite.on('pointerover', () => {
                 const armorText = character.armor < 0 ? 'more' : 'less';
                 const strengthText = character.strength < 0 ? 'less' : 'more';
@@ -317,7 +364,7 @@ class BaseScene extends Phaser.Scene {
 
     animateCard(card, depth) {
         card.sprite.on('pointerover', () => {
-            gameState.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
+            gameConfig.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
             this.tweens.add({
                 targets: card.sprite,
                 y: 470,

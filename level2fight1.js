@@ -20,7 +20,8 @@ class Level2Fight1 extends BaseScene {self
     }; 
 
     create() {
-        const self = this;      
+        const self = this; 
+        this.saveGameState(self.scene.key);     
         this.baseCreate('bakgrunnForest1');
         this.resetPlayer(gameState.player, 0.37, 360, 360); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton() 
@@ -63,6 +64,8 @@ class Level2Fight1 extends BaseScene {self
 
         this.addManaBar(gameState.player);
         this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
+        this.updateManaBar(gameState.player);
+        this.updateHealthBar(gameState.player);
 
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;
@@ -119,7 +122,7 @@ class Level2Fight1 extends BaseScene {self
 
         function startFight() {
             gameState.turn = 0;
-            gameState.musicTheme.stop();
+            gameConfig.musicTheme.stop();
             self.shuffleDeck(gameState.drawPile);
             activateRedrawButton();
             gameState.redrawButton.removeInteractive();
@@ -132,7 +135,7 @@ class Level2Fight1 extends BaseScene {self
             gameState.startFightObjects.push(gameState.startText);
                
             self.time.delayedCall(350, () => {
-                gameState.music.play( { loop: true, volume: 0.35 } );
+                gameConfig.music.play( { loop: true, volume: 0.35 } );
             })
         
             self.time.delayedCall(2300, () => { //timer: 2300
@@ -233,7 +236,7 @@ class Level2Fight1 extends BaseScene {self
             return new Promise((resolve) => {
                 let index = 0;
                 let currentText = "";
-                const delay = 33.3;
+                const delay = 33.4;
         
                 const addNextLetter = () => {
                     if (gameState.skipIntro) {
@@ -448,7 +451,7 @@ class Level2Fight1 extends BaseScene {self
                         card.slot = slot;
                     }
                     
-                    gameState.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
+                    gameConfig.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
                     gameState.drawPileText.setText(gameState.drawPile.length);
                     self.animateCard(card, cardDepth);
 
@@ -542,7 +545,7 @@ class Level2Fight1 extends BaseScene {self
         }
                                     
         function targetEnemy(card, handOfCards) {        
-            gameState.targetingCursor.setVisible(true);
+            gameConfig.targetingCursor.setVisible(true);
             gameState.thisTurn = gameState.turn; 
 
             // Turn the other cards non-interactive while targeting an enemy
@@ -554,11 +557,11 @@ class Level2Fight1 extends BaseScene {self
             
             for (let enemy of gameState.enemies) {
                 enemy.sprite.on('pointerover', function() {
-                    gameState.targetingCursor.setTexture('targetingCursorReady');
+                    gameConfig.targetingCursor.setTexture('targetingCursorReady');
                 });
         
                 enemy.sprite.on('pointerout', function() {
-                    gameState.targetingCursor.setTexture('targetingCursor');
+                    gameConfig.targetingCursor.setTexture('targetingCursor');
                 });
         
                 enemy.sprite.on('pointerup', function() {
@@ -582,7 +585,7 @@ class Level2Fight1 extends BaseScene {self
         function playCard(card, target, isLastEnemy = false) {
 
             gameState.playingCard = true;
-            gameState.targetingCursor.setVisible(false);
+            gameConfig.targetingCursor.setVisible(false);
 
             fadeOutGameObject(card.sprite, 200);
             if (gameState.actionText) gameState.actionText.destroy();
@@ -694,13 +697,13 @@ class Level2Fight1 extends BaseScene {self
             }
             if (card.key === 'canibalize') {
                 gameState.player.lifeStealThisTurn += 0.2;
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
             }
             if (card.key === 'zenZine') {
                 gameState.player.healthMax += 2 * costPlayed;
                 gameState.player.health += 2 * costPlayed;
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
             }
@@ -711,14 +714,14 @@ class Level2Fight1 extends BaseScene {self
                 self.updateManaBar(gameState.player);
 
                 if (gameState.player.alive) {
-                    gameState.powerUpSound.play({ volume: 0.15 });
+                    gameConfig.powerUpSound.play({ volume: 0.15 });
                     self.powerUpTweens(gameState.player);
                 }
             }
             if (card.key === 'libertySpikes' && gameState.player.stancePoints > 0) {
                 gameState.player.mana += 1;
                 gameState.player.manaMax += 1;
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.updateManaBar(gameState.player);
                 self.powerUpTweens(gameState.player);
             }
@@ -726,7 +729,7 @@ class Level2Fight1 extends BaseScene {self
                 gameState.noFutureCondition = true;
                 gameState.player.healthMax += 5;
                 gameState.player.health += 5;
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
             }
@@ -743,7 +746,7 @@ class Level2Fight1 extends BaseScene {self
 
             if (gameState.typePlayed === 'targetSelected' || gameState.typePlayed === 'targetAll') {                
                 self.cameras.main.shake(100, .003, false);
-                gameState.attackSound.play({ volume: 0.8 });
+                gameConfig.attackSound.play({ volume: 0.8 });
                 const actionTextAttack = (damageTotal > 0) ?  `Deals ${damageTotal} damage`  : '';
                 const actionTextPoison = (poisonPlayed > 0) ? `Deals ${poisonPlayed} Poison` : ''; 
                 const actionTextTarget = (poisonPlayed && damageTotal) ? `${actionTextAttack}\n\n${actionTextPoison}` : poisonPlayed ? actionTextPoison : actionTextAttack;
@@ -751,19 +754,19 @@ class Level2Fight1 extends BaseScene {self
                 self.attackTweens(gameState.player, 60);
                 
             } else if (strengthPlayed > 0) {
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Gains ${strengthPlayed} Strength`;
                 self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
 
             } else if (armorPlayed > 0) {
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Gains ${armorPlayed} Armor`;
                 self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
 
             } else if (poisonRemovePlayed > 0) {
-                gameState.powerUpSound.play({ volume: 0.15 });
+                gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Heals ${poisonRemovePlayed} Poison`;
                 self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
@@ -853,13 +856,13 @@ class Level2Fight1 extends BaseScene {self
         
         gameState.endOfTurnButton.on('pointerup', function () {
             gameState.currentEnemyIndex = 0; 
-            if (gameState.targetingCursor.visible || !gameState.playersTurn) {
+            if (gameConfig.targetingCursor.visible || !gameState.playersTurn) {
                 self.cameras.main.shake(70, .002, false);
 
             } else {    
                 this.setTexture('rectangularButtonPressed');
                 this.removeInteractive();
-                gameState.buttonPressedSound.play();
+                gameConfig.buttonPressedSound.play();
                 gameState.endOfTurnButtonPressed = true;
                 gameState.redrawEnabled = false;
                 if (gameState.bassSoloPlayed) gameState.bassSoloPlayed = false;
@@ -989,7 +992,7 @@ class Level2Fight1 extends BaseScene {self
                 if (chosenAction.damage > 0 || chosenAction.fire > 0 || chosenAction.poison > 0) {
                     const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
                     self.cameras.main.shake(120, .005, false);
-                    gameState.attackSound.play({ volume: 0.8 });
+                    gameConfig.attackSound.play({ volume: 0.8 });
                     console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
 
                     enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
@@ -1007,13 +1010,13 @@ class Level2Fight1 extends BaseScene {self
                     })
         
                 } else if (chosenAction.heal > 0) {
-                    gameState.healSound.play({ volume: 0.5 });
+                    gameConfig.healSound.play({ volume: 0.5 });
                     self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
                     self.powerUpTweens(enemy);
                     
         
                 } else if (chosenAction.strength > 0 || chosenAction.armor > 0)  {
-                    gameState.powerUpSound.play({ volume: 0.2 });
+                    gameConfig.powerUpSound.play({ volume: 0.2 });
                     self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
                     self.powerUpTweens(enemy);
                 }
@@ -1074,7 +1077,7 @@ class Level2Fight1 extends BaseScene {self
                 };
 
                 self.attackTweens(enemy, 60);
-                gameState.attackSound.play({ volume: 0.8 });
+                gameConfig.attackSound.play({ volume: 0.8 });
                 console.log(enemy.actions.debuffCard)
 
                 const debuffCards = [ 
@@ -1236,7 +1239,7 @@ class Level2Fight1 extends BaseScene {self
             addHandtoDeck();
             fadeOutGameObject(gameState.actionText, 200);
             fadeOutGameObject(gameState.actionTextBackground, 200); 
-            gameState.music.stop();
+            gameConfig.music.stop();
             gameState.endOfTurnButton.destroy();
 
             gameState.score.numberOfTurns += gameState.turn;
@@ -1246,7 +1249,7 @@ class Level2Fight1 extends BaseScene {self
             let scenetransitionstarted = false;
 
             self.time.delayedCall(400, () => {
-                gameState.musicTheme.play( { loop: true, volume: 0.30 } );
+                gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
 
                 if (!scenetransitionstarted) {
                     gameState.gameOverText.on('pointerup', () => {
@@ -1265,7 +1268,7 @@ class Level2Fight1 extends BaseScene {self
         function initiateVictory() {
             gameState.score.numberOfTurns += gameState.turn;
             gameState.score.levelsCompleted += 1;
-            gameState.music.stop();
+            gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
 
@@ -1279,13 +1282,13 @@ class Level2Fight1 extends BaseScene {self
             })
             
             self.time.delayedCall(600, () => {
-                if (gameState.attackSound.isPlaying) {
-                    gameState.attackSound.stop();
+                if (gameConfig.attackSound.isPlaying) {
+                    gameConfig.attackSound.stop();
                 }
                 if (gameState.gundanSeizai && gameState.player.gold < gameState.player.goldMax) {
                     earnGold(1);
                 }
-                gameState.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
+                gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
                 self.clearBoard();
             })
         
@@ -1299,7 +1302,7 @@ class Level2Fight1 extends BaseScene {self
             const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to Health Max` : "";
             
             self.time.delayedCall(1600, () => {
-                gameState.musicTheme.play( { loop: true, volume: 0.30 } );
+                gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);
                 victoryText.setStyle({
                     fontSize: '60px',
@@ -1395,7 +1398,7 @@ class Level2Fight1 extends BaseScene {self
                 bonusCard.sprite.setScale(0.45).setInteractive().setDepth(depth);
 
                 bonusCard.sprite.on('pointerover', () => {
-                    gameState.cardsDealtSound.play({ volume: 0.6, seek: 0.10 });
+                    gameConfig.cardsDealtSound.play({ volume: 0.6, seek: 0.10 });
                     self.cardTweens(bonusCard.sprite, 0.58, 200);
                 }, self);
                 
@@ -1483,7 +1486,7 @@ class Level2Fight1 extends BaseScene {self
                 deckCard.sprite = self.add.image(xPos, yPos, deckCard.key).setScale(0.27).setInteractive().setDepth(cardDepth);
         
                 deckCard.sprite.on('pointerover', function() {
-                    gameState.cardsDealtSound.play({ volume: 0.6 });
+                    gameConfig.cardsDealtSound.play({ volume: 0.6 });
                     self.cardTweens(deckCard.sprite, 0.40, 200);
                     deckCard.sprite.setDepth(250);
                 }, this);
@@ -1576,10 +1579,10 @@ class Level2Fight1 extends BaseScene {self
 
         function startNextLevel() {
             let nextLevel;
-            for (let i = 0; i < gameState.levels.length; i++) {
-                if (self.scene.key === gameState.levels[i]) {
-                    if (i + 1 < gameState.levels.length) {
-                        nextLevel = gameState.levels[i + 1];
+            for (let i = 0; i < gameConfig.levels.length; i++) {
+                if (self.scene.key === gameConfig.levels[i]) {
+                    if (i + 1 < gameConfig.levels.length) {
+                        nextLevel = gameConfig.levels[i + 1];
                     } else {
                         nextLevel = 'Endscene'
                     }
@@ -1593,7 +1596,7 @@ class Level2Fight1 extends BaseScene {self
                     self.scene.start(nextLevel);
                 });
             } else {
-                console.error('Current level not found in gameState.levels');
+                console.error('Current level not found in gameConfig.levels');
             }
         }
 
@@ -1825,7 +1828,7 @@ class Level2Fight1 extends BaseScene {self
                 self.time.delayedCall(i * 75, () => {
                     gameState.player.gold = Math.min(gameState.player.gold + 1, gameState.player.goldMax);
                     gameState.goldCounter.setText(gameState.player.gold);
-                    gameState.coinSound.play({ volume: 0.8, seek: 0.02 });
+                    gameConfig.coinSound.play({ volume: 0.8, seek: 0.02 });
                 });
             }
         }
@@ -2189,7 +2192,7 @@ class Level2Fight1 extends BaseScene {self
 
         function displayTokenCard(card) {
             card.tokenSprite.on('pointerover', function() {
-                gameState.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
+                gameConfig.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
                 card.permanentCardSprite = self.add.image(550, 300, card.key).setScale(0.55).setDepth(220);
             });
             card.tokenSprite.on('pointerout', function() {
@@ -2225,7 +2228,7 @@ class Level2Fight1 extends BaseScene {self
             destroyToken(card);
             const player = gameState.player;        
             player.health = Math.min(player.healthMax, player.health + 12);
-            gameState.healSound.play({ volume: 0.5 });
+            gameConfig.healSound.play({ volume: 0.5 });
             self.updateHealthBar(player);
             self.powerUpTweens(player); 
         }
@@ -2250,22 +2253,22 @@ class Level2Fight1 extends BaseScene {self
         function depleteKirisuteGomen(card) { 
             if (gameState.enemies.some(enemy => enemy.health < 30)) {
                 gameState.deck = gameState.deck.filter(c => c !== card);
-                gameState.targetingCursor.setVisible(true);
+                gameConfig.targetingCursor.setVisible(true);
                 let functionActive = true;
 
                 gameState.enemies.forEach (enemy => {
                     enemy.sprite.on('pointerover', function() {
-                        gameState.targetingCursor.setTexture('targetingCursorReady');
+                        gameConfig.targetingCursor.setTexture('targetingCursorReady');
                     });
 
                     enemy.sprite.on('pointerout', function() {
-                        gameState.targetingCursor.setTexture('targetingCursor');
+                        gameConfig.targetingCursor.setTexture('targetingCursor');
                     });
 
                     enemy.sprite.on('pointerup', function() {
                         if (enemy.health < 30 && functionActive) {
                             enemy.health = 0;
-                            gameState.attackSound.play({ volume: 1 });
+                            gameConfig.attackSound.play({ volume: 1 });
                             self.cameras.main.shake(120, .025, false);    
                             
                             if (card.tokenSlot) {
@@ -2287,7 +2290,7 @@ class Level2Fight1 extends BaseScene {self
                             functionActive = false;
                         }
                     
-                    gameState.targetingCursor.setVisible(false);    
+                    gameConfig.targetingCursor.setVisible(false);    
                 
                     });
                 })
@@ -2326,7 +2329,7 @@ class Level2Fight1 extends BaseScene {self
             const ashenEncoreConfig = { fontSize: '32px', fill: '#ff0000' };
             const ashenEncoreDepleteText = self.add.text(550, 350, 'Deals 12 firedamage\n to all enemies', ashenEncoreConfig).setOrigin(0.5);
             self.cameras.main.shake(100, .003, false);
-            gameState.attackSound.play({ volume: 0.8 });
+            gameConfig.attackSound.play({ volume: 0.8 });
             
             self.time.delayedCall(1500, () => {   
                 ashenEncoreDepleteText.destroy();
@@ -2349,25 +2352,25 @@ class Level2Fight1 extends BaseScene {self
             gameState.steelToe = false;
             destroyToken(card);
 
-            gameState.targetingCursor.setVisible(true);
+            gameConfig.targetingCursor.setVisible(true);
             let depleteSteelToeActive = true;
 
             gameState.enemies.forEach (enemy => {
                 enemy.sprite.on('pointerover', function() {
-                    gameState.targetingCursor.setTexture('targetingCursorReady');
+                    gameConfig.targetingCursor.setTexture('targetingCursorReady');
                 });
 
                 enemy.sprite.on('pointerout', function() {
-                    gameState.targetingCursor.setTexture('targetingCursor');
+                    gameConfig.targetingCursor.setTexture('targetingCursor');
                 });
 
                 enemy.sprite.on('pointerup', function() {
                     if (depleteSteelToeActive) {
                         enemy.armor -= 7;
                         updateStats(enemy);
-                        gameState.attackSound.play({ volume: 0.6 });
+                        gameConfig.attackSound.play({ volume: 0.6 });
                         self.cameras.main.shake(100, .012, false);
-                        gameState.targetingCursor.setVisible(false);   
+                        gameConfig.targetingCursor.setVisible(false);   
                         depleteSteelToeActive = false; 
                     }
                 })
@@ -2391,7 +2394,7 @@ class Level2Fight1 extends BaseScene {self
             destroyToken(card);
             const player = gameState.player;
             player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + 5 * player.StancePoints) : player.health;
-            gameState.healSound.play({ volume: 0.5 });
+            gameConfig.healSound.play({ volume: 0.5 });
             self.powerUpTweens(player);
             self.updateHealthBar(player);
         }
@@ -2401,7 +2404,7 @@ class Level2Fight1 extends BaseScene {self
             if (!gameState.player.alive) {
                 gameState.player.alive = true;
                 gameState.player.health = Math.round(gameState.player.healthMax * 0.2);
-                gameState.healSound.play({ volume: 0.5 });
+                gameConfig.healSound.play({ volume: 0.5 });
                 self.updateHealthBar(gameState.player);
             }
             destroyToken(card);
@@ -2593,7 +2596,7 @@ class Level2Fight1 extends BaseScene {self
                                 self.animateCard(card, cardDepth);
                             };
 
-                            gameState.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
+                            gameConfig.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
                             gameState.drawPileText.setText(gameState.drawPile.length);
 
                             if (gameState.ashenEncore && !card.dBeat) {
@@ -2627,7 +2630,7 @@ class Level2Fight1 extends BaseScene {self
                     const ashenEncoreKey = `Deals ${ashenDamage} fire damage to all enemies`;
                     const ashenEncoreDrawText = self.add.text(550, 350, ashenEncoreKey, ashenEncoreConfig).setOrigin(0.5);
                     self.cameras.main.shake(100, .003, false);
-                    gameState.attackSound.play({ volume: 0.8 });
+                    gameConfig.attackSound.play({ volume: 0.8 });
                     
                     self.time.delayedCall(1500, () => {   
                         ashenEncoreDrawText.destroy();
@@ -2809,9 +2812,9 @@ class Level2Fight1 extends BaseScene {self
     }; //End of create
 
     update() {
-        if (gameState.targetingCursor.visible) {
-            gameState.targetingCursor.x = this.input.mousePointer.x;
-            gameState.targetingCursor.y = this.input.mousePointer.y;
+        if (gameConfig.targetingCursor.visible) {
+            gameConfig.targetingCursor.x = this.input.mousePointer.x;
+            gameConfig.targetingCursor.y = this.input.mousePointer.y;
         }
     }
 } //end of scene

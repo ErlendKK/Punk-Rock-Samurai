@@ -1,12 +1,13 @@
-old_code = r''''''
+old_code = "gameState.targetingCursor"
 
-new_code = r''''''
+new_code = "gameConfig.targetingCursor"
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
     "Level2Fight1", "Level2Fight2", "Level2Fight3",
     "Level3Fight1", "Level3Fight2", "Level3Fight3",
-    "Level4Fight1", "Level4Fight2", "Level4Fight3"
+    # "Level4Fight1", "Level4Fight2", "Level4Fight3",
+    "basescene", "preload", "mainmenu", "endscene"
 ]
 
 for level in levels:
@@ -21,6 +22,7 @@ for level in levels:
     
     else:
         print(f'Old code not found in {level}')
+
 
 
     

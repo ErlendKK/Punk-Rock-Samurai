@@ -6,9 +6,10 @@
                                                                                           
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
-const gameState = {};
+let gameState = {};
+let gameConfig = {};
 
-gameState.levels = [
+gameConfig.levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
     "Level2Fight1", "Level2Fight2", "Level2Fight3",
     "Level3Fight1", "Level3Fight2", "Level3Fight3",
@@ -148,6 +149,17 @@ class Preload extends Phaser.Scene {
             this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
             this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
             this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
+
+            this.load.image('shop1', 'assets/images/shop1.jpg'); 
+            this.load.audio('bossTune', 'assets/sounds/music/DecisiveBattle.mp3');
+            this.load.audio('attackSound', 'assets/sounds/attacksound.wav');
+            this.load.audio('powerUpSound', 'assets/sounds/powerupsound.wav');
+            this.load.audio('healSound', 'assets/sounds/healsound.wav');
+            this.load.audio('victorySound', 'assets/sounds/victorysound.mp3');
+            this.load.audio('keyboardSound', 'assets/sounds/keyboardsound.mp3');
+            this.load.audio('coinSound', 'assets/sounds/coinsound.mp3');
+            this.load.image('goldCard', 'assets/images/goldCard.jpg');
+            this.load.image('goldCoin', 'assets/images/goldCoin.png');
         }
     };
 
@@ -164,7 +176,6 @@ class Preload extends Phaser.Scene {
         };
 
         gameState.player = {
-            sprite: this.add.sprite(320, 350, 'player').setScale(0.38).setFlipX(true).setInteractive(), //320 / 330 / 0.41
             healthBarColor: '0x00ff00',
             alive: true,
             stance: 'Neutral',
@@ -228,11 +239,7 @@ class Preload extends Phaser.Scene {
             
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-           
-            {key: 'canibalize',         type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'deadCities',         type: 'targetSelected', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-           
+            {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},    
         ]; 
             
         gameState.bonusCards = [
@@ -324,9 +331,6 @@ class Preload extends Phaser.Scene {
             {key: 13, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
             {key: 14, enemy: `Nice costume, boy.\nDo you do birthdays\nand bar mitzvahs too?`, player: `Just funerals.\nYours is next\non the list.` },
         ];
-
-        
-        
          
         gameState.ratTaunts = [
             {key: 11, enemy: `Hsss..\nYou’ll make a fine\nmeal for my pups!`, player: `Tell them not to wait up.\nDaddy's not comming home tonight!` },
@@ -356,8 +360,8 @@ class Preload extends Phaser.Scene {
         this.add.text(550, 170, 'Punk Rock Samurai', { fontSize: '100px', fill: '#000000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
         this.add.text(550, 500, 'Click to start', { fontSize: '45px', fill: '#ff0000', fontWeight: 'bold' }).setOrigin(0.5);
         let screenClicked = false;
-        gameState.thunder = this.sound.add('thundersound');
-        gameState.musicTheme = this.sound.add('titleTheme'); 
+        gameConfig.thunder = this.sound.add('thundersound');
+        gameConfig.musicTheme = this.sound.add('titleTheme'); 
 
         bgLoadingScreen.on('pointerup', () => {
             if (!screenClicked) {
@@ -374,7 +378,7 @@ class Preload extends Phaser.Scene {
         })
 
         function openMainMenu() {
-            gameState.thunder.play( {volume: 0.9, seek: 0.25 } ); 
+            gameConfig.thunder.play( {volume: 0.9, seek: 0.25 } ); 
             self.cameras.main.shake(200, .002, false); 
             self.cameras.main.flash(100);
 
@@ -383,7 +387,7 @@ class Preload extends Phaser.Scene {
             }, [], this);
 
             self.time.delayedCall(200, () => { //1000
-                gameState.musicTheme.play( { loop: true, volume: 0.30 } );
+                gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 self.time.delayedCall(100, () => { //500
                     self.scene.start('Mainmenu');
                     console.log(`Mainmenu called`);
