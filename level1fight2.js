@@ -678,8 +678,7 @@ class Level1Fight2 extends BaseScene {self
             }
             if (card.key === 'noFuture') {
                 gameState.noFutureCondition = true;
-                gameState.player.healthMax += 5;
-                gameState.player.health += 5;
+                gameState.player.healthMax += 7;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -2043,7 +2042,7 @@ class Level1Fight2 extends BaseScene {self
                 })
 
             } else if (card.key === 'enduringSpirit') {
-                if (!gameState.turn) {
+                if (!gameState.fightStarted) {
                     gameState.player.healthMax += 5;
                     updateHealthBar(gameState.player);
                 }

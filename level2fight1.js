@@ -2105,7 +2105,7 @@ class Level2Fight1 extends BaseScene {self
                 })
 
             } else if (card.key === 'enduringSpirit') {
-                if (!gameState.turn) {
+                if (!gameState.fightStarted) {
                     gameState.player.healthMax += 5;
                     updateHealthBar(gameState.player);
                 }
