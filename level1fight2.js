@@ -123,12 +123,14 @@ class Level1Fight2 extends BaseScene {self
             gameState.skipTaunts = async () => {
                 if (!gameState.skipIntro) {
                     gameState.skipIntro = true;
-                    self.input.keyboard.off('keydown', skipIntro, this);
-                    self.time.removeAllEvents();
                     gameState.startFightObjects.forEach(object => fadeOutGameObject(object, 200));
 
                     await self.delay(300);
-                    if (!gameState.fightStarted) startPlayerTurn();
+                    if (!gameState.fightStarted) {
+                        self.input.keyboard.off('keydown', skipIntro, this);
+                        self.time.removeAllEvents();
+                        startPlayerTurn();
+                    }
                 }
             };
 

@@ -20,6 +20,7 @@ class Level1Fight1 extends BaseScene {self
 
     create() {
         const self = this;
+        this.saveGameState(self.scene.key);    
         this.baseCreate('bakgrunnCity1');
         this.resetPlayer(gameState.player, 0.45, 370, 350); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton();
@@ -97,7 +98,7 @@ class Level1Fight1 extends BaseScene {self
             }
         })
 
-        // self.scene.start('Level3Fight3');
+        // self.scene.start('Level1Fight2');
 
         function startFight() {
             gameState.turn = 0;
@@ -141,12 +142,14 @@ class Level1Fight1 extends BaseScene {self
             gameState.skipTaunts = async () => {
                 if (!gameState.skipIntro) {
                     gameState.skipIntro = true;
-                    self.input.keyboard.off('keydown', skipIntro, this);
-                    self.time.removeAllEvents();
                     gameState.startFightObjects.forEach(object => fadeOutGameObject(object, 200));
 
                     await self.delay(300);
-                    if (!gameState.fightStarted) startPlayerTurn();
+                    if (!gameState.fightStarted) {
+                        self.input.keyboard.off('keydown', skipIntro, this);
+                        self.time.removeAllEvents();
+                        startPlayerTurn();
+                    }
                 }
             };
 
@@ -198,7 +201,6 @@ class Level1Fight1 extends BaseScene {self
             
             if (!gameState.skipIntro) {
                 await self.delay(fadeOutTime);
-                // gameState.skipIntro = false;
                 self.input.keyboard.off('keydown', skipIntro, this);
                 self.time.removeAllEvents();
 
@@ -664,8 +666,7 @@ class Level1Fight1 extends BaseScene {self
             }
             if (card.key === 'noFuture') {
                 gameState.noFutureCondition = true;
-                gameState.player.healthMax += 5;
-                gameState.player.health += 5;
+                gameState.player.healthMax += 7;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);

@@ -117,12 +117,14 @@ class Level3Fight2 extends BaseScene {self
             gameState.skipTaunts = async () => {
                 if (!gameState.skipIntro) {
                     gameState.skipIntro = true;
-                    self.input.keyboard.off('keydown', skipIntro, this);
-                    self.time.removeAllEvents();
                     gameState.startFightObjects.forEach(object => fadeOutGameObject(object, 200));
 
                     await self.delay(300);
-                    if (!gameState.fightStarted) startPlayerTurn();
+                    if (!gameState.fightStarted) {
+                        self.input.keyboard.off('keydown', skipIntro, this);
+                        self.time.removeAllEvents();
+                        startPlayerTurn();
+                    }
                 }
             };
 
@@ -647,8 +649,7 @@ class Level3Fight2 extends BaseScene {self
             }
             if (card.key === 'noFuture') {
                 gameState.noFutureCondition = true;
-                gameState.player.healthMax += 5;
-                gameState.player.health += 5;
+                gameState.player.healthMax += 7;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
