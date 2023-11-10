@@ -152,16 +152,20 @@ class BaseScene extends Phaser.Scene {
         character.healthBarBackground = this.add.graphics();
         character.healthBarBackground.fillStyle(0xFFFFFF, 0.5);
         character.healthBarBackground.fillRect(x - 40, y - height / 2 - 30, 100, 10);
+        character.healthBarBackground.setDepth(12);
 
         character.healthBarFrame = this.add.graphics();
         character.healthBarFrame.lineStyle(3, 0x000000, 1);
         character.healthBarFrame.strokeRect(x - 40, y - height / 2 - 30, 100, 10);
+        character.healthBarFrame.setDepth(13);
         
         character.healthBar = this.add.graphics();
         character.healthBar.fillStyle(color, 1);
         character.healthBar.fillRect(x - 40, y - height / 2 - 30, 100 * (character.health / character.healthMax), 10);
+        character.healthBar.setDepth(14);
         
-        character.healthBarText = this.add.text(x - 18, y - height / 2 - 25, `${character.health}/${character.healthMax}`, textConfig).setOrigin(0.5);      
+        character.healthBarText = this.add.text(x - 18, y - height / 2 - 25, `${character.health}/${character.healthMax}`, textConfig);
+        character.healthBarText.setOrigin(0.5).setDepth(15);  
     };
 
     addManaBar(character) {

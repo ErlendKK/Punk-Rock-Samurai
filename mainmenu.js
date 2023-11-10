@@ -518,28 +518,6 @@ class Mainmenu extends Phaser.Scene {
                 clearElements();
             }
         });
-
-        // loadGameButton.on('pointerup', function () {
-        //     try {
-        //         const serializedState = localStorage.getItem('gameState');
-        //         if (serializedState === null) {
-        //             console.log('No saved game state found.');
-        //             self.cameras.main.shake(70, .002, false);
-        //             // TO DO: Handle the case when there is no saved state, e.g., display a message.
-        //         } else {
-        //             const loadedState = JSON.parse(serializedState);
-        //             gameState = loadedState;
-        //             console.log('Game state loaded successfully.');
-        //             self.scene.start(gameState.savedScene);
-                    
-        //         }
-        //     } catch (e) {
-        //         console.error('Failed to load the game state.', e);
-        //         self.cameras.main.shake(70, .002, false);
-        //         // Handle the error case, e.g., display an error message.
-        //     }
-        // });
-
         
         // implement leaderboard    
         leaderBoardButton.on('pointerup', async () => {

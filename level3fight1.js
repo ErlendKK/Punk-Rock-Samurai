@@ -2043,23 +2043,28 @@ class Level3Fight1 extends BaseScene {self
                 const y = 130;
                 const textConfig = { fontSize: '12px', fill: '#000000' };
 
-                gameState.healButton = self.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();
-                gameState.healText = self.add.text(x, y, 'Heal', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5);
+                gameState.healButton = self.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setDepth(8).setInteractive();
+                gameState.healText = self.add.text(x, y, 'Heal', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5).setDepth(9);
 
                 gameState.healButton.on('pointerover', () => {
                     const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
                     gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
-                    gameState.healText.setDepth(123)
+                    gameState.healText.setDepth(123);
 
                     gameState.healButtonDescriptionBackground = self.add.graphics();
                     gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
                     gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
                     gameState.healButtonDescriptionText = self.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
                 });
+
+                gameState.healButtonObjects = [
+                    gameState.healButton, 
+                    gameState.healText
+                ];
                 
                 gameState.healButton.on('pointerout', () => {
-                    gameState.healButton.setTexture('rectangularButton').setDepth(10);
-                    gameState.healText.setDepth(11)
+                    gameState.healButton.setTexture('rectangularButton').setDepth(8);
+                    gameState.healText.setDepth(9);
                     if (gameState.healButtonDescriptionBackground) gameState.healButtonDescriptionBackground.destroy();
                     if (gameState.healButtonDescriptionText) gameState.healButtonDescriptionText.destroy();
                 });
@@ -2443,8 +2448,13 @@ class Level3Fight1 extends BaseScene {self
             gameState.lustForLife = false;
             destroyToken(card);
             const player = gameState.player;
-            player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + 5 * player.StancePoints) : player.health;
+            player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + 5 * player.stancePoints) : player.health;
             gameConfig.healSound.play({ volume: 0.5 });
+
+            gameState.healButtonObjects.forEach(object => {
+                fadeOutGameObject(object, 200);
+            })
+
             self.powerUpTweens(player);
             self.updateHealthBar(player);
         }
