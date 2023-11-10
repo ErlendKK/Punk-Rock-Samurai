@@ -33,7 +33,8 @@ class BaseScene extends Phaser.Scene {
         gameState.fightStarted = false;
 
         // Reset Permanent effects
-        gameState.kamishimoUberAlles = 0; 
+        gameState.kamishimoUberAlles = 0;
+        gameState.shogunsShellCondition = 0; 
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
         gameState.ashenEncore = false;
@@ -519,7 +520,7 @@ class BaseScene extends Phaser.Scene {
 
     updateStanceBar(character) {       
         const points = gameState.player.stancePoints;
-        if (gameState.player.stancePoints > 0) {
+        if (points > 0) {
             const rand = Math.random();
             if (rand > 0.5) {
                 character.manaStance = 1;

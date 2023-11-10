@@ -1,103 +1,57 @@
-old_code = """} else if (card.key === 'lustForLife') {
-                let healCost = 1;
-                const healAmount = 7
-                const x = 900;
-                const y = 130;
-                const textConfig = { fontSize: '12px', fill: '#000000' };
+old_code = """function updateStrengthAndArmor(character) { 
+            let strengthBushido = 0
 
-                gameState.healButton = self.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();
-                gameState.healText = self.add.text(x, y, 'Heal', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5);
-
-                gameState.healButton.on('pointerover', () => {
-                    const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                    gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
-                    gameState.healText.setDepth(123)
-
-                    gameState.healButtonDescriptionBackground = self.add.graphics();
-                    gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
-                    gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-                    gameState.healButtonDescriptionText = self.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
-                });
+            if (gameState.endOfTurnButtonPressed) {
+                character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard + character.armorStance);
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
                 
-                gameState.healButton.on('pointerout', () => {
-                    gameState.healButton.setTexture('rectangularButton').setDepth(10);
-                    gameState.healText.setDepth(11)
-                    if (gameState.healButtonDescriptionBackground) gameState.healButtonDescriptionBackground.destroy();
-                    if (gameState.healButtonDescriptionText) gameState.healButtonDescriptionText.destroy();
-                });
+                character.strength = Math.min(
+                    character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido
+                );
+            
+            } else {
+                character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
                 
-                gameState.healButton.on('pointerup', () => {
-                    if (gameState.player.gold >= healCost && gameState.playersTurn) {
-                        spendGold(healCost);
-                        gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
-                        self.updateHealthBar(gameState.player);
-    
-                        if (gameState.healButtonDescriptionText) {
-                            const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                            gameState.healButtonDescriptionText.setText(textContent);
-                        }
-                    }
-                })
+                character.strength = Math.min(
+                    character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido
+                ); 
+            }
+
+            if (gameState.kamishimoUberAlles > 0 && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
                 
-                card.tokenSprite.on('pointerup', () => {
-                    if (gameState.playersTurn) {
-                        depleteLustForLife(card); 
-                    } else {
-                        self.cameras.main.shake(70, .002, false);
-                    }
-                })"""
+                character.strength = Math.min(
+                    character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles
+                );
+            }
 
-new_code = """} else if (card.key === 'lustForLife') {
-                let healCost = 1;
-                const healAmount = 7
-                const x = 900;
-                const y = 130;
-                const textConfig = { fontSize: '12px', fill: '#000000' };
+            updateStats(character)
+        }"""
 
-                gameState.healButton = self.add.image(x, y, 'rectangularButton');
-                gameState.healButton.setScale(0.45).setOrigin(0.5).setDepth(10).setInteractive();
-                gameState.healText = self.add.text(x, y, 'Heal', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5).setDepth(11);
+new_code = """function updateStrengthAndArmor(character) { 
+            let strengthBushido = 0
 
-                gameState.healButton.on('pointerover', () => {
-                    const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                    gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
-                    gameState.healText.setDepth(123)
+            if (gameState.endOfTurnButtonPressed) {
+                character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard + character.armorStance);
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido);
+            
+            } else {
+                character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
+            }
 
-                    gameState.healButtonDescriptionBackground = self.add.graphics();
-                    gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
-                    gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-                    gameState.healButtonDescriptionText = self.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
-                });
+            if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
+                character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
+            }
 
-                gameState.healButtonObjects = [gameState.healButton, gameState.healText, gameState.healButtonDescriptionBackground]
-                
-                gameState.healButton.on('pointerout', () => {
-                    gameState.healButton.setTexture('rectangularButton').setDepth(10);
-                    gameState.healText.setDepth(11)
-                    if (gameState.healButtonDescriptionBackground) gameState.healButtonDescriptionBackground.destroy();
-                    if (gameState.healButtonDescriptionText) gameState.healButtonDescriptionText.destroy();
-                });
-                
-                gameState.healButton.on('pointerup', () => {
-                    if (gameState.player.gold >= healCost && gameState.playersTurn) {
-                        spendGold(healCost) ;
-                        gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
-                        self.updateHealthBar(gameState.player);
-    
-                        if (gameState.healButtonDescriptionText) {
-                            const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                            gameState.healButtonDescriptionText.setText(textContent);
-                        }
-                    }
-                })
-                
-                card.tokenSprite.on('pointerup', () => {
-                    if (gameState.playersTurn) {
-                        depleteLustForLife(card); 
-                    } else {
-                        self.cameras.main.shake(70, .002, false);
-                    }
-                })"""
+            if (gameState.shogunsShellCondition && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
+                character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCondition);
+            }
+
+            updateStats(character)
+        }"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

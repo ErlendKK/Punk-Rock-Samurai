@@ -2060,6 +2060,17 @@ class Level1Fight2 extends BaseScene {self
                     }
                 })
 
+            } else if (card.key === 'shogunsShell') {
+                gameState.shogunsShellCondition = 2;
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteShogunsShell(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
             
             
             // -------------- NON-DEPLETED TOKEN-CARDS -----------------------------------
@@ -2159,7 +2170,10 @@ class Level1Fight2 extends BaseScene {self
                     break;
                 case 'enduringSpirit':
                     depleteEnduringSpirit(card);
-                    break;
+                    break;                     
+                case 'shogunsShell':
+                    depleteShogunsShell(card);
+                    break;  
                     
                 // NB! Add any card that is not allowed to deplete from hand
                 case 'kamishimoUberAlles': 
@@ -2373,7 +2387,8 @@ class Level1Fight2 extends BaseScene {self
             gameState.lustForLife = false;
             destroyToken(card);
             const player = gameState.player;
-            player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + 5 * player.stancePoints) : player.health;
+            const goldAmount = 7;
+            player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + goldAmount * player.stancePoints) : player.health;
             gameConfig.healSound.play({ volume: 0.5 });
 
             gameState.healButtonObjects.forEach(object => {
@@ -2411,6 +2426,13 @@ class Level1Fight2 extends BaseScene {self
         function depleteEnduringSpirit(card) {
             destroyToken(card);
         }
+
+        function depleteShogunsShell(card) {
+            gameState.shogunsShellCondition = 0;
+            gameState.player.armor = 15;
+            updateStrengthAndArmor(gameState.player);
+            destroyToken(card);
+        }
         
         // Non-depleted cards
         function depleteKamishimoUberAlles(card, tokenSprite, tokenSlot) {
@@ -2443,25 +2465,20 @@ class Level1Fight2 extends BaseScene {self
             if (gameState.endOfTurnButtonPressed) {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard + character.armorStance);
                 strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
-                
-                character.strength = Math.min(
-                    character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido
-                );
+                character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido);
             
             } else {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
                 strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
-                
-                character.strength = Math.min(
-                    character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido
-                ); 
+                character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
             }
 
-            if (gameState.kamishimoUberAlles > 0 && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
-                
-                character.strength = Math.min(
-                    character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles
-                );
+            if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
+                character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
+            }
+
+            if (gameState.shogunsShellCondition && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
+                character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCondition);
             }
 
             updateStats(character)
