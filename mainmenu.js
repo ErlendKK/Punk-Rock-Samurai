@@ -476,23 +476,7 @@ class Mainmenu extends Phaser.Scene {
                 try {
                     const serializedState = localStorage.getItem('gameState');
                     if (serializedState === null) {
-                        const textContent = 'No saved game state found.'
-                        const textConfig = { fontSize: '40px', fill: '#000000' }
-                        const noSaveText = self.add.text(620, 350, textContent, textConfig).setOrigin(0.5).setDepth(21);
-                        
-                        const bounds = noSaveText.getBounds();
-                        const backgroundWidth = bounds.width + 10; // 5px padding on each side
-                        const backgroundHeight = bounds.height + 10; // 5px padding on each side
-                        const backgroundX = bounds.x - 10; // 5px padding on the left
-                        const backgroundY = bounds.y - 5; // 5px padding on the top
-                        
-                        const textBackground = self.add.graphics();
-                        textBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(20);
-                        textBackground.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, 10);
-                        sceneState.loadGameElements.push(noSaveText, textBackground);
-
-                        console.log(textContent);
-                        self.cameras.main.shake(70, .002, false);
+                        informNoSavedGame();
                     
                     } else {
                         const loadedState = JSON.parse(serializedState);
@@ -505,19 +489,59 @@ class Mainmenu extends Phaser.Scene {
                             }
                         }
                         
+                        const deckList = [
+                            loadedState.deck, 
+                            loadedState.bonusCards,
+                            loadedState.extraCards,
+                        ];
+
+                        deckList.forEach(deck => refreshDeck(deck));
                         gameState = loadedState;
+
                         console.log('Game state loaded successfully.');
                         self.scene.start(gameState.savedScene);
                     }
+
                 } catch (e) {
                     console.error('Failed to load the game state.', e);
                     // TO DO: handle the error case
                 }
+
             } else {
                 loadGameButtonClicked = false;
                 clearElements();
             }
         });
+
+        function refreshDeck(deck) {
+            deck.forEach(deckCard => {
+                const matchingCard = gameConfig.allCards.find(card => card.key === deckCard.key);
+            
+                if (matchingCard) {
+                    Object.assign(deckCard, matchingCard);
+                }
+            });
+        }
+
+        function informNoSavedGame() {
+            const textContent = 'No saved game state found.'
+            const textConfig = { fontSize: '40px', fill: '#000000' }
+            const noSaveText = self.add.text(620, 350, textContent, textConfig).setOrigin(0.5).setDepth(21);
+            
+            const bounds = noSaveText.getBounds();
+            const backgroundWidth = bounds.width + 10; // 5px padding on each side
+            const backgroundHeight = bounds.height + 10; // 5px padding on each side
+            const backgroundX = bounds.x - 10; // 5px padding on the left
+            const backgroundY = bounds.y - 5; // 5px padding on the top
+            
+            const textBackground = self.add.graphics();
+            textBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(20);
+            textBackground.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, 10);
+            sceneState.loadGameElements.push(noSaveText, textBackground);
+
+            console.log(textContent);
+            self.cameras.main.shake(70, .002, false);
+        }
         
         // implement leaderboard    
         leaderBoardButton.on('pointerup', async () => {
@@ -715,12 +739,12 @@ class Mainmenu extends Phaser.Scene {
         };
 
     // ----   USED TO SKIP MENU WHEN TESTING ----
-    // gameState.playerName = 'Punk Rock Samurai';
-    // const bonusCard = gameState.extraCards[0];
-    // bonusCard.freePermanent = true;
-    // gameState.deck.push(bonusCard);
-    // gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
-    // self.scene.start('Level1Fight1');
+    gameState.playerName = 'Punk Rock Samurai';
+    const bonusCard = gameState.extraCards[0];
+    bonusCard.freePermanent = true;
+    gameState.deck.push(bonusCard);
+    gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+    self.scene.start('Level1Fight1');
 
     } // end of create()
 

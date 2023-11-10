@@ -368,71 +368,86 @@ class Level3Fight3 extends BaseScene {self
             { available: true, x: x + 7 * spacing, y: y + 9 * hightAdjustment, index: 7, angle: 4 * cardAngle },
         ];
         
-        function drawCards(numCards) {
+        async function drawCards(numCards) {
             gameState.endOfTurnButton.setTexture('rectangularButton');
             gameState.endOfTurnButton.setInteractive();
             const startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
+            const tweensDuration = 120;
+            const delay = 7;
+            const scale = 0.35
             
             for (let i = 0; i < numCards; i++) {
-                self.time.delayedCall(i * 80, () => {
+                
+                // Check and reshuffle the deck if necessary
+                if (gameState.drawPile.length === 0) {
+                    console.log("Draw pile is empty. Reshuffling...");
+                    if (gameState.discardPile.length === 0) {
+                        console.error("Both draw and discard piles are empty. Cannot continue.");
+                        return;
+                    }
         
-                    // Check and reshuffle the deck if necessary
-                    if (gameState.drawPile.length === 0) {
-                        console.log("Draw pile is empty. Reshuffling...");
-                        if (gameState.discardPile.length === 0) {
-                            console.error("Both draw and discard piles are empty. Cannot continue.");
-                            return;
+                    gameState.drawPile = gameState.discardPile;
+                    self.shuffleDeck(gameState.drawPile);    
+                    gameState.discardPile = [];
+                    gameState.discardPileText.setText(gameState.discardPile.length);
+                }
+        
+                // Draw a card and create a sprite for it
+                const card = gameState.drawPile.pop();
+                const cardDepth = 10 + i + startSlotIndex;
+                card.sprite = self.add.image(120, 600, card.key).setScale(0).setInteractive();
+                card.isBeingPlayed = false;
+                gameState.currentCards.push(card);
+                card.sprite.setDepth(cardDepth);
+                if (card.usedOneShot) card.sprite.setTint(0x808080);
+                
+                // Position the sprite
+                const slot = gameState.slots[startSlotIndex + i];
+                if (slot) {
+                    card.startHeight = slot.y;
+                    card.angle = slot.angle;
+
+                    await self.delay(tweensDuration + i * delay);
+                    
+                    // Tween animation
+                    self.tweens.add({
+                        targets: card.sprite,
+                        x: slot.x,
+                        y: slot.y,
+                        scaleX: scale,
+                        scaleY: scale,
+                        angle: slot.angle,
+                        duration: tweensDuration + i * delay,
+                        ease: 'Circ.easeInOut',
+                        onComplete: () => {
+                            slot.available = false;
+                            card.slot = slot;
+                        },
+                    });
+                }
+                    
+                gameConfig.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
+                gameState.drawPileText.setText(gameState.drawPile.length);
+                self.animateCard(card, cardDepth);
+
+                card.sprite.on('pointerup', function() {
+                    if (gameState.playersTurn) { // NB! Dont allow the player to click before all cards are dealt
+                        console.log(`card sprite clicked`)
+                        
+                        // Disable redraw after the first card has been played but before activateCard is called
+                        if (gameState.redrawEnabled) {
+                            gameState.redrawEnabled = false
+                            gameState.redrawButton.removeInteractive();
+                            gameState.redrawButton.setTexture('rectangularButtonPressed');
                         }
 
-                        gameState.drawPile = gameState.discardPile;
-                        self.shuffleDeck(gameState.drawPile);    
-                        gameState.discardPile = [];
-                        gameState.discardPileText.setText(gameState.discardPile.length);
-                    }
-        
-                    // Draw a card and create a sprite for it
-                    const card = gameState.drawPile.pop();
-                    const cardDepth = 10 + i + startSlotIndex;
-                    card.sprite = self.add.image(0, 0, card.key).setScale(0.35).setInteractive();
-                    card.isBeingPlayed = false;
-                    gameState.currentCards.push(card);
-                    card.sprite.setDepth(cardDepth);
-                    if (card.usedOneShot) card.sprite.setTint(0x808080);
-                    
-                    // Position the sprite
-                    const slot = gameState.slots[startSlotIndex + i];
-                    if (slot) {
-                        card.sprite.x = slot.x;
-                        card.sprite.y = slot.y;
-                        card.startHeight = card.sprite.y;
-                        card.angle = slot.angle;
-                        card.sprite.setAngle(card.angle);
-                        slot.available = false;
-                        card.slot = slot;
-                    }
-                    
-                    gameConfig.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
-                    gameState.drawPileText.setText(gameState.drawPile.length);
-                    self.animateCard(card, cardDepth);
-
-
-                    if (gameState.playersTurn) { // NB! Dont allow the player to click before all cards are dealt
-                        card.sprite.on('pointerup', function() {
-                            
-                            // Disable redraw after the first card has been played but before activateCard is called
-                            if (gameState.redrawEnabled) {
-                                gameState.redrawEnabled = false
-                                gameState.redrawButton.removeInteractive();
-                                gameState.redrawButton.setTexture('rectangularButtonPressed');
-                            }
-
-                            activateCard(card);
-                        })
+                        activateCard(card);
                     }
                 })
-            };
+            }  
 
             gameState.playersTurn = true; // Sets tokens interactive
+            console.log(`gameState.playersTurn: ${gameState.playersTurn}`)
             gameState.redrawEnabled = true;
             gameState.redrawButton.setInteractive();
             gameState.redrawButton.setTexture('rectangularButton');
@@ -2108,7 +2123,7 @@ class Level3Fight3 extends BaseScene {self
             } else if (card.key === 'enduringSpirit') {
                 if (!gameState.fightStarted) {
                     gameState.player.healthMax += 5;
-                    updateHealthBar(gameState.player);
+                    self.updateHealthBar(gameState.player);
                 }
 
                 card.tokenSprite.on('pointerup', () => {
@@ -2787,28 +2802,28 @@ class Level3Fight3 extends BaseScene {self
             gameState.discardPileImage.setScale(0.13).setOrigin(.5,.5).setInteractive().setTint(0xff0000);
             
             gameState.discardPileImage.on('pointerover', function() {
-                    if (gameState.discardPile.length > 0) {
-                        gameState.stanceText.setAlpha(0);
-    
-                        const cardsPerRow = gameState.discardPile.length < 12 ? 4 : 6;
-                        const cardSpacing = 105;
-                        const startX = gameState.discardPile.length < 12 ? 400 : 250;
-                        const startY = 150;
+                gameState.stanceText.setAlpha(0);
+                
+                const cardsPerRow = gameState.discardPile.length < 12 ? 4 : 6;
+                const cardSpacing = 105;
+                const startX = gameState.discardPile.length < 12 ? 400 : 250;
+                const startY = 150;
 
-                        const discardPileText = self.add.text(550, startY-110, "", { fontSize: '60px', fill: '#000000' }).setOrigin(0.5).setDepth(201);
-                        const discardPileTextBackground = self.add.graphics();
-                        self.updateTextAndBackground(discardPileText, discardPileTextBackground, 'Discard Pile', 7, 200, 0.80);
-                        gameState.cardImages.push(discardPileText, discardPileTextBackground);
-                        
-                        gameState.discardPile.forEach( (card, index) => {
-                            let cardX = startX + (index % cardsPerRow) * cardSpacing;
-                            let cardY = startY + Math.floor(index / cardsPerRow) * 1.5 * cardSpacing;
-        
-                            let cardImage = self.add.image(cardX, cardY, card.key).setScale(0.27).setDepth(200);
-                            gameState.cardImages.push(cardImage);
-                        })
-                    }
-                });
+                const discardPileText = self.add.text(550, startY-110, "", { fontSize: '60px', fill: '#000000' }).setOrigin(0.5).setDepth(201);
+                const discardPileTextBackground = self.add.graphics();
+                self.updateTextAndBackground(discardPileText, discardPileTextBackground, 'Discard Pile', 7, 200, 0.80);
+                gameState.cardImages.push(discardPileText, discardPileTextBackground);
+               
+                if (gameState.discardPile.length > 0) {
+                    gameState.discardPile.forEach( (card, index) => {
+                        let cardX = startX + (index % cardsPerRow) * cardSpacing;
+                        let cardY = startY + Math.floor(index / cardsPerRow) * 1.5 * cardSpacing;
+    
+                        let cardImage = self.add.image(cardX, cardY, card.key).setScale(0.27).setDepth(200);
+                        gameState.cardImages.push(cardImage);
+                    })
+                }
+            });
     
             gameState.discardPileImage.on('pointerout', function() {
                 gameState.cardImages.forEach(cardImage => {

@@ -104,8 +104,6 @@ class BaseScene extends Phaser.Scene {
 
                 deck: gameState.deck,
                 bonusCards: gameState.bonusCards,
-                score: gameState.score,
-                bonusCards: gameState.bonusCards,
                 extraCards: gameState.extraCards,
                 minDeckSize: gameState.minDeckSize,
                 latestDraw: gameState.latestDraw,
@@ -113,9 +111,11 @@ class BaseScene extends Phaser.Scene {
                 ratTaunts: gameState.ratTaunts,
                 extraTaunts: gameState.extraTaunts,
                 permanents: gameState.permanents,
+                permanentSlots: gameState.permanentSlots,
                 enemy: gameState.enemy,
                 playerName: gameState.playerName,
                 version: gameState.version,
+                score: gameState.score,
 
                 savedScene: currentScene,
                 loadedGame: true,
