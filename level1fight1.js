@@ -1961,7 +1961,7 @@ class Level1Fight1 extends BaseScene {self
                     }
                 })
 
-            } else if (card.key === 'bouncingSoles') {
+            } else if (card.key === 'bouncingSoles' || card.key === 'bouncingSoles2') {
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2101,6 +2101,7 @@ class Level1Fight1 extends BaseScene {self
                     depleteSoulSquatter(card);
                     break;
                 case 'bouncingSoles':
+                case 'bouncingSoles2':
                     depleteBouncingSoles(card);
                     break;
                 case 'enduringSpirit':
@@ -2352,9 +2353,20 @@ class Level1Fight1 extends BaseScene {self
         }
 
         function depleteBouncingSoles(card) {
-            gameState.permanentSlots.push(            
-                { available: true, x: 50, y: 130, index: 4 },
-            );
+            if (card.key === 'bouncingSoles') {
+                gameState.permanentSlots.push(            
+                    { available: true, x: 50, y: 130, index: 4 },
+                );
+                gameState.deck.push( 
+                    {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
+                );
+
+            } else if (card.key === 'bouncingSoles2') {
+                gameState.permanentSlots.push(            
+                    { available: true, x: 125, y: 130, index: 5 },
+                );
+            }
+
             destroyToken(card);
         }
 

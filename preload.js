@@ -147,9 +147,9 @@ class Preload extends Phaser.Scene {
             this.load.image('hollidayInKamakura', 'assets/images/cards/hollidayInKamakura.jpg');
             this.load.image('kamishimoUberAllesToken', 'assets/images/cards/kamishimoUberAllesToken.png');
             this.load.image('kamishimoUberAlles', 'assets/images/cards/kamishimoUberAlles.jpg');
-            
             this.load.image('bouncingSolesToken', 'assets/images/cards/bouncingSolesToken.png');
             this.load.image('bouncingSoles', 'assets/images/cards/bouncingSoles.jpg');
+            this.load.image('bouncingSoles2', 'assets/images/cards/bouncingSoles2.jpg');
             this.load.image('enduringSpiritToken', 'assets/images/cards/enduringSpiritToken.png');
             this.load.image('enduringSpirit', 'assets/images/cards/enduringSpirit.jpg');
             this.load.image('shogunsShellToken', 'assets/images/cards/shogunsShellToken.png');
@@ -249,8 +249,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-            {key: 'blackFumes',         type: () => gameState.player.stancePoints >= 0 ? 'targetAll' : 'targetSelected', cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 3 : gameState.player.stancePoints < 0 ? 5 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            
+ 
         ]; 
             
         gameState.bonusCards = [
@@ -334,7 +333,8 @@ class Preload extends Phaser.Scene {
         gameConfig.allCards = [
             ...gameState.deck,
             ...gameState.bonusCards,
-            ...gameState.extraCards
+            ...gameState.extraCards,
+            {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
         ];
 
         gameState.minDeckSize = 8
