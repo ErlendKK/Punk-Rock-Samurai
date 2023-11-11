@@ -768,7 +768,7 @@ class Level2Fight2 extends BaseScene {self
         }
         
         function normalizeCard(card, target, isLastEnemy = false) {
-            const stancePoints = gameState.player.stancePoints
+            const stancePoints = gameState.player.stancePoints;
 
             const moshpitMassacreCondition = (card.key === 'moshpitMassacre' && stancePoints > 0 && target.poison > 0);
             const scorchedSoulCondition = (card.key === 'scorchedSoul' && target.poison > 0);
@@ -782,22 +782,22 @@ class Level2Fight2 extends BaseScene {self
             gameState.troopsOfTakamoriCondition = (card.key === 'troopsOfTakamori' ? true : false);
             
             const steelToeOutcome = stancePoints > 0 ? 2 * (1 + stancePoints) : 2;
-            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0    
+            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0
 
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 2 * stancePoints : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
+                firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
                 stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),
                 strengthPlayed: getValueOrInvoke(card.strength),
-                armorPlayed: knuckleFistEdoCondition ? - stancePoints : getValueOrInvoke(card.armor),
+                armorPlayed: knuckleFistEdoCondition ? 2 : getValueOrInvoke(card.armor),
                 reduceTargetArmorPlayed: steelToeCondition ? steelToeOutcome : getValueOrInvoke(card.reduceTargetArmor),
                 reduceTargetStrengthPlayed: roninsRotCondition ? target.poison : getValueOrInvoke(card.reduceTargetStrength),
                 drawCardPlayed: getValueOrInvoke(card.drawCard),
                 poisonRemovePlayed: getValueOrInvoke(card.poisonRemove)
             };
-        }
+        };
         
         function activateDBeat() {
             if (gameState.discardPile.length > 0) {
@@ -2425,7 +2425,7 @@ class Level2Fight2 extends BaseScene {self
                 gameState.permanentSlots.push(            
                     { available: true, x: 50, y: 130, index: 4 },
                 );
-                gameState.deck.push( 
+                gameState.bonusCards.push( 
                     {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
                 );
 

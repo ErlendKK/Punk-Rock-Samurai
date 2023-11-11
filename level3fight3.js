@@ -776,12 +776,12 @@ class Level3Fight3 extends BaseScene {self
             //NB Level specific multiplier (1.5) for fire damage.
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: ( kabutuEdoCondition ? 2 * stancePoints : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)) ),
+                firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
                 stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),
                 strengthPlayed: getValueOrInvoke(card.strength),
-                armorPlayed: knuckleFistEdoCondition ? - stancePoints : getValueOrInvoke(card.armor),
+                armorPlayed: knuckleFistEdoCondition ? 2 : getValueOrInvoke(card.armor),
                 reduceTargetArmorPlayed: steelToeCondition ? steelToeOutcome : getValueOrInvoke(card.reduceTargetArmor),
                 reduceTargetStrengthPlayed: roninsRotCondition ? target.poison : getValueOrInvoke(card.reduceTargetStrength),
                 drawCardPlayed: getValueOrInvoke(card.drawCard),
@@ -2494,7 +2494,7 @@ class Level3Fight3 extends BaseScene {self
                 gameState.permanentSlots.push(            
                     { available: true, x: 50, y: 130, index: 4 },
                 );
-                gameState.deck.push( 
+                gameState.bonusCards.push( 
                     {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
                 );
 
