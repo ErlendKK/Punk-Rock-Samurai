@@ -102,7 +102,9 @@ class Level1Fight1 extends BaseScene {self
 
         function startFight() {
             gameState.turn = 0;
-            gameConfig.musicTheme.stop();
+            if (gameConfig.musicTheme && gameConfig.musicTheme.isPlaying) {
+                gameConfig.musicTheme.stop();
+            }
             self.shuffleDeck(gameState.drawPile);
             activateRedrawButton();
             gameState.redrawButton.removeInteractive();
@@ -115,7 +117,9 @@ class Level1Fight1 extends BaseScene {self
             gameState.startFightObjects.push(gameState.startText);
                
             self.time.delayedCall(300, () => {
-                gameConfig.music.play( { loop: true, volume: 0.35 } );
+                if (!gameConfig.musicTheme || !gameConfig.musicTheme.isPlaying) {
+                    gameConfig.music.play({ loop: true, volume: 0.35 });
+                }
             })
         
             self.time.delayedCall(2300, () => { //timer: 2300
