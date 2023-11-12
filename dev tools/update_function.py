@@ -1,8 +1,8 @@
-old_code = """firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),"""
+old_code = """(card.key === 'pissDrunkBastards' && target.health <= 18)"""
 
 
 
-new_code = """firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),"""
+new_code = """(card.key === 'pissDrunkBastards' && target.health < 18) """
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

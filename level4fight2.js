@@ -307,20 +307,17 @@ class Level4Fight2 extends BaseScene {self
 
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
-                if (gameState.turn === -1) {
-                    initiateTurnOne(numCards);
+                gameState.characters.forEach(character => {
+                    self.describeCharacter(character, character.sprite);
+                }); 
+                drawCards(numCards);
                     
-                } else {
-                    
-                    // NB! These functions should run after gameState.turn has been increased
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                    
-                    drawCards(numCards);
-                }
+                // NB! These functions should run after gameState.turn has been increased
+                gameState.enemies.forEach( enemy => {
+                    updateEnemyActions();  
+                    selectEnemyAction(enemy);
+                    displayEnemyIntention(enemy);
+                });                   
             });                  
         }
 
@@ -358,32 +355,6 @@ class Level4Fight2 extends BaseScene {self
                 fadeOutGameObject(chemicalWarTextBackground, 200);
             })
         }
-
-        function initiateTurnOne(numCards) {
-            self.time.delayedCall(300, () => {
-                const textConfig = { fontSize: '38px', fill: '#ff0000', fontWeight: 'bold' };
-                let introTextContent = `Heads up: Monsters steal\nStrength and Armor!`;
-                const introText  = self.add.text(550, 300, "", textConfig).setOrigin(0.5).setDepth(201);
-                const introTextBackground = self.add.graphics();
-                self.updateTextAndBackground(introText, introTextBackground, introTextContent);
-                    
-                self.time.delayedCall(3000, () => {
-                    fadeOutGameObject(introText, 200);
-                    fadeOutGameObject(introTextBackground, 200);
-
-                    gameState.characters.forEach(character => {
-                        self.describeCharacter(character, character.sprite);
-                    }); 
-                    drawCards(numCards);
-                
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                })
-            })
-        };
 
         // Create grid for cards
         const x = 250;
@@ -697,7 +668,7 @@ class Level4Fight2 extends BaseScene {self
             if (card.key === 'nenguStyle' && gameState.currentCards.length > 0) earnGold(1);
             if (card.key === 'coverCharge' && gameState.player.stancePoints > 1) earnGold(1);
             
-            if (card.key === 'pissDrunkBastards' && target.health <= 18) {
+            if (card.key === 'pissDrunkBastards' && target.health < 18)  {
                 gameState.score.damageDealt += target.health;
                 target.health = 0;
             }
@@ -806,7 +777,7 @@ class Level4Fight2 extends BaseScene {self
 
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
+                firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 10 : getValueOrInvoke(card.fire)),
                 stancePointsPlayed: (kabutuEdoCondition && isLastEnemy) ? -1 : (kabutuEdoCondition && !isLastEnemy) ? 0 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),

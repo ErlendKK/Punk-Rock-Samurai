@@ -704,7 +704,7 @@ class Level2Fight2 extends BaseScene {self
             if (card.key === 'nenguStyle' && gameState.currentCards.length > 0) earnGold(1);
             if (card.key === 'coverCharge' && gameState.player.stancePoints > 1) earnGold(1);
             
-            if (card.key === 'pissDrunkBastards' && target.health <= 18) {
+            if (card.key === 'pissDrunkBastards' && target.health < 18)  {
                 gameState.score.damageDealt += target.health;
                 target.health = 0;
             }
@@ -813,7 +813,7 @@ class Level2Fight2 extends BaseScene {self
 
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
+                firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 10 : getValueOrInvoke(card.fire)),
                 stancePointsPlayed: (kabutuEdoCondition && isLastEnemy) ? -1 : (kabutuEdoCondition && !isLastEnemy) ? 0 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),
