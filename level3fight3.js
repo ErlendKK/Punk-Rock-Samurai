@@ -802,7 +802,7 @@ class Level3Fight3 extends BaseScene {self
             //NB Level specific multiplier (1.5) for fire damage.
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
+                firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
                 stancePointsPlayed: (kabutuEdoCondition && isLastEnemy) ? -1 : (kabutuEdoCondition && !isLastEnemy) ? 0 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),

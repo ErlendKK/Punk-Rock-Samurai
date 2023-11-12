@@ -1,34 +1,8 @@
-old_code = """function depleteHollidayInKamakura(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.player.manaMax += 1;
-            gameState.player.mana += 1;
-            self.updateManaBar(gameState.player);
-            drawNewCards(1);
-        }"""
+old_code = """firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),"""
 
 
 
-new_code = """function depleteHollidayInKamakura(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.player.manaMax += 1;
-            gameState.player.mana += 1;
-            self.updateManaBar(gameState.player);
-            drawNewCards(1);
-        }
-
-        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.chemicalWarfare -= 2;
-        }"""
+new_code = """firePlayed: kabutuEdoCondition ? 3 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
