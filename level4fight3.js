@@ -307,20 +307,18 @@ class Level4Fight3 extends BaseScene {self
 
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
-                if (gameState.turn === -1) {
-                    initiateTurnOne(numCards);
-                    
-                } else {
-                    
-                    // NB! These functions should run after gameState.turn has been increased
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                    
-                    drawCards(numCards);
+                if (gameState.turn === 1) {
+                    gameState.characters.forEach( character => self.describeCharacter(character, character.sprite)); 
                 }
+                    
+                // NB! These functions should run after gameState.turn has been increased
+                gameState.enemies.forEach( enemy => {
+                    updateEnemyActions();  
+                    selectEnemyAction(enemy);
+                    displayEnemyIntention(enemy);
+                });
+                
+                drawCards(numCards);
             });                  
         }
 
@@ -358,32 +356,6 @@ class Level4Fight3 extends BaseScene {self
                 fadeOutGameObject(chemicalWarTextBackground, 200);
             })
         }
-
-        function initiateTurnOne(numCards) {
-            self.time.delayedCall(300, () => {
-                const textConfig = { fontSize: '38px', fill: '#ff0000', fontWeight: 'bold' };
-                let introTextContent = `Heads up: Monsters steal\nStrength and Armor!`;
-                const introText  = self.add.text(550, 300, "", textConfig).setOrigin(0.5).setDepth(201);
-                const introTextBackground = self.add.graphics();
-                self.updateTextAndBackground(introText, introTextBackground, introTextContent);
-                    
-                self.time.delayedCall(3000, () => {
-                    fadeOutGameObject(introText, 200);
-                    fadeOutGameObject(introTextBackground, 200);
-
-                    gameState.characters.forEach(character => {
-                        self.describeCharacter(character, character.sprite);
-                    }); 
-                    drawCards(numCards);
-                
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                })
-            })
-        };
 
         // Create grid for cards
         const x = 250;

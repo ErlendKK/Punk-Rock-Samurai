@@ -326,7 +326,6 @@ class Level1Fight1 extends BaseScene {self
                 });
                 
                 drawCards(numCards);
-
             });                  
         }
 
