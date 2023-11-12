@@ -7,13 +7,14 @@
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
 let gameState = {};
-gameState.version = 1.304;
+gameState.version = 1.305;
 
 let gameConfig = {};
 gameConfig.levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
     "Level2Fight1", "Level2Fight2", "Level2Fight3",
     "Level3Fight1", "Level3Fight2", "Level3Fight3",
+    "Level4Fight1", "Level4Fight2", "Level4Fight3",
     "Endscene"
 ];
 
@@ -154,6 +155,10 @@ class Preload extends Phaser.Scene {
             this.load.image('enduringSpirit', 'assets/images/cards/enduringSpirit.jpg');
             this.load.image('shogunsShellToken', 'assets/images/cards/shogunsShellToken.png');
             this.load.image('shogunsShell', 'assets/images/cards/shogunsShell.jpg');
+            this.load.image('chemicalWarfareToken', 'assets/images/cards/chemicalWarfareToken.png');
+            this.load.image('chemicalWarfare', 'assets/images/cards/chemicalWarfare.jpg');
+
+            
 
             this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
             this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
@@ -249,7 +254,6 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
- 
         ]; 
             
         gameState.bonusCards = [
@@ -260,15 +264,13 @@ class Preload extends Phaser.Scene {
             {key: 'foreverTrue',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'foreverTrueToken'},
             {key: 'toxicFrets',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicFretsToken'},
             {key: 'ashenEncore',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'ashenEncoreToken'},
-            {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
-            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},
             {key: 'punksNotDead',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'punksNotDeadToken'},
             {key: 'toxicAvenger',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'toxicAvengerToken'},
             {key: 'bushido',            type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bushidoToken'},
             {key: 'bouncingSoles',      type: 'permanent',      cost: 3, goldCost: 3, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bouncingSolesToken'},
-            {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
             {key: 'shogunsShell',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'shogunsShellToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
+            {key: 'chemicalWarfare',    type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'chemicalWarfareToken'},
             
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -327,7 +329,10 @@ class Preload extends Phaser.Scene {
             {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
             {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
-          
+            {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
+            {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
+            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},
+           
         ];
 
         gameConfig.allCards = [

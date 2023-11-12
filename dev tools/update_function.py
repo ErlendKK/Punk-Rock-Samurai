@@ -1,36 +1,40 @@
-old_code = """return {
-                damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 2 * stancePoints : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
-                stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
-                poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
-                healPlayed: getValueOrInvoke(card.heal),
-                strengthPlayed: getValueOrInvoke(card.strength),
-                armorPlayed: knuckleFistEdoCondition ? - stancePoints : getValueOrInvoke(card.armor),
-                reduceTargetArmorPlayed: steelToeCondition ? steelToeOutcome : getValueOrInvoke(card.reduceTargetArmor),
-                reduceTargetStrengthPlayed: roninsRotCondition ? target.poison : getValueOrInvoke(card.reduceTargetStrength),
-                drawCardPlayed: getValueOrInvoke(card.drawCard),
-                poisonRemovePlayed: getValueOrInvoke(card.poisonRemove)
-            };"""
+old_code = """function depleteHollidayInKamakura(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.player.manaMax += 1;
+            gameState.player.mana += 1;
+            self.updateManaBar(gameState.player);
+            drawNewCards(1);
+        }"""
 
-new_code = """return {
-                damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
-                firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
-                stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
-                poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
-                healPlayed: getValueOrInvoke(card.heal),
-                strengthPlayed: getValueOrInvoke(card.strength),
-                armorPlayed: knuckleFistEdoCondition ? 2 : getValueOrInvoke(card.armor),
-                reduceTargetArmorPlayed: steelToeCondition ? steelToeOutcome : getValueOrInvoke(card.reduceTargetArmor),
-                reduceTargetStrengthPlayed: roninsRotCondition ? target.poison : getValueOrInvoke(card.reduceTargetStrength),
-                drawCardPlayed: getValueOrInvoke(card.drawCard),
-                poisonRemovePlayed: getValueOrInvoke(card.poisonRemove)
-            };"""
+
+
+new_code = """function depleteHollidayInKamakura(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.player.manaMax += 1;
+            gameState.player.mana += 1;
+            self.updateManaBar(gameState.player);
+            drawNewCards(1);
+        }
+
+        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.chemicalWarfare -= 2;
+        }"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
     "Level2Fight1", "Level2Fight2", "Level2Fight3",
     "Level3Fight1", "Level3Fight2", "Level3Fight3",
-    # "Level4Fight1", "Level4Fight2", "Level4Fight3",
+    "Level4Fight1", "Level4Fight2", "Level4Fight3",
     "basescene", "preload", "mainmenu", "endscene"
 ]
 

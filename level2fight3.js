@@ -61,7 +61,7 @@ class Level2Fight3 extends BaseScene {self
             const card = permanent.card;
             const slot = permanent.slot;
 
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' ) {
+            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
                 slot.available = true;
 
             } else { 
@@ -73,6 +73,12 @@ class Level2Fight3 extends BaseScene {self
                 activatePermanentFromToken(card);
             }
         });
+        
+        startFight();
+
+
+    // ---------------------------------- INTRO -------------------------------------    
+
 
         function startFight() {
             gameState.turn = 0;
@@ -244,8 +250,6 @@ class Level2Fight3 extends BaseScene {self
             })
         }
 
-        startFight();
-
     
     // ---------------------------------- PLAYERS TURN -------------------------------------    
     
@@ -274,6 +278,7 @@ class Level2Fight3 extends BaseScene {self
             checkGameOver();
             updateStrengthAndArmor(gameState.player);
             self.shuffleDeck(gameState.drawPile);
+            if (gameState.chemicalWarfare) activateChemicalWarfare();
 
             const delaytime = (gameState.player.poisonText._text) ? 2500 : 1700;
             self.time.delayedCall(delaytime, () => {
@@ -319,6 +324,23 @@ class Level2Fight3 extends BaseScene {self
             };
 
             if (gameState.noFutureCondition) gameState.player.health -= 2;
+        }
+
+        function activateChemicalWarfare() {
+            gameState.enemies.forEach(enemy => {
+                enemy.poison += gameState.chemicalWarfare;
+            });
+
+            const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
+            const textConfig = { fontSize: '30px', fill: '#ff0000' };
+            const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
+            const chemicalWarTextBackground = self.add.graphics();           
+            self.updateTextAndBackground(chemicalWarText, chemicalWarTextBackground, textContent, 7, 20, 0.7);
+
+            self.time.delayedCall(1500, () => {
+                fadeOutGameObject(chemicalWarText, 200);
+                fadeOutGameObject(chemicalWarTextBackground, 200);
+            })
         }
 
         // Create grid for cards
@@ -744,13 +766,13 @@ class Level2Fight3 extends BaseScene {self
             const steelToeOutcome = stancePoints > 0 ? 2 * (1 + stancePoints) : 2;
             const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0;
 
-            //NB Level specific multiplier (1.5) for fire damage against trees.
-            const fireMultiplier = target === gameState.enemy1 ? 1.5 : 1;
+            //NB Level specific multiplier for fire damage against trees.
+            const fireMultiplier = target === gameState.enemy1 ? 1.20 : 1;
             
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
                 firePlayed: fireMultiplier * ( kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)) ),
-                stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
+                stancePointsPlayed: (kabutuEdoCondition && isLastEnemy) ? -1 : (kabutuEdoCondition && !isLastEnemy) ? 0 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),
                 strengthPlayed: getValueOrInvoke(card.strength),
@@ -1162,26 +1184,26 @@ class Level2Fight3 extends BaseScene {self
 
                 gameState.enemy1.actions = [ 
                     {key: `Intends to\nSummon a Goblin`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Summons a Goblin', summonEnemy: 2, probability: 0.33},
-                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.162 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.16 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 10 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.11},
+                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.19 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 10 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.10},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.06 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.16 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.16 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.05 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.16 : 0) / 5}
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.06 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.05 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 5}
                 ];
 
             } else {
     
                 gameState.enemy1.actions = [ 
                     {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0},
-                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.23 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 10 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
+                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 10, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.26 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.19 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.19 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 10 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.14},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5}
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.19 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.19 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.19 : 0) / 5}
                 ];
             }
 
@@ -1857,7 +1879,7 @@ class Level2Fight3 extends BaseScene {self
             const slot = gameState.permanentSlots.find(slot => slot.available);
 
             // NB!! Add all cards that are not depleted upon use to the conditional!!
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' ) {
+            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
                 gameState.discardPile.push(card);
                 gameState.discardPileText.setText(gameState.discardPile.length);
 
@@ -2174,7 +2196,20 @@ class Level2Fight3 extends BaseScene {self
                             self.cameras.main.shake(70, .002, false);
                         }
                     })
-                }
+
+                } else if (card.key === 'chemicalWarfare') {
+                    const tokenSprite = card.tokenSprite;
+                    const tokenSlot = card.tokenSlot;
+                    gameState.chemicalWarfare += 2;
+
+                    tokenSprite.on( 'pointerup', () => {
+                        if (gameState.playersTurn) {
+                            depleteChemicalWarfare(card, tokenSprite,tokenSlot); 
+                        } else {
+                            self.cameras.main.shake(70, .002, false);
+                        }
+                    })
+                } 
             } 
         
         function activatePermanentFromHand(card) {
@@ -2242,6 +2277,7 @@ class Level2Fight3 extends BaseScene {self
                 // NB! Add any card that is not allowed to deplete from hand
                 case 'kamishimoUberAlles': 
                 case 'hollidayInKamakura':
+                case 'chemicalWarfare':
                     gameState.currentCards.push(card); 
                     card.slot.available = false;
                     break;
@@ -2528,6 +2564,14 @@ class Level2Fight3 extends BaseScene {self
             gameState.player.mana += 1;
             self.updateManaBar(gameState.player);
             drawNewCards(1);
+        }
+
+        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.chemicalWarfare -= 2;
         }
     
     

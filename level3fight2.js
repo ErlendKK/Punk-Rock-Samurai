@@ -62,7 +62,7 @@ class Level3Fight2 extends BaseScene {self
             const card = permanent.card;
             const slot = permanent.slot;
 
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' ) {
+            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
                 slot.available = true;
 
             } else { 
@@ -74,6 +74,12 @@ class Level3Fight2 extends BaseScene {self
                 activatePermanentFromToken(card);
             }
         });
+        
+        startFight();
+
+
+    // ---------------------------------- INTRO -------------------------------------    
+
 
         function startFight() {
             gameState.turn = 0;
@@ -245,8 +251,6 @@ class Level3Fight2 extends BaseScene {self
             })
         }
 
-        startFight();
-
     
     // ---------------------------------- PLAYERS TURN -------------------------------------    
     
@@ -275,6 +279,7 @@ class Level3Fight2 extends BaseScene {self
             checkGameOver();
             updateStrengthAndArmor(gameState.player);
             self.shuffleDeck(gameState.drawPile);
+            if (gameState.chemicalWarfare) activateChemicalWarfare();
 
             const delaytime = (gameState.player.poisonText._text) ? 2500 : 1700;
             self.time.delayedCall(delaytime, () => {
@@ -318,6 +323,23 @@ class Level3Fight2 extends BaseScene {self
             };
 
             if (gameState.noFutureCondition) gameState.player.health -= 2;
+        }
+
+        function activateChemicalWarfare() {
+            gameState.enemies.forEach(enemy => {
+                enemy.poison += gameState.chemicalWarfare;
+            });
+
+            const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
+            const textConfig = { fontSize: '30px', fill: '#ff0000' };
+            const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
+            const chemicalWarTextBackground = self.add.graphics();           
+            self.updateTextAndBackground(chemicalWarText, chemicalWarTextBackground, textContent, 7, 20, 0.7);
+
+            self.time.delayedCall(1500, () => {
+                fadeOutGameObject(chemicalWarText, 200);
+                fadeOutGameObject(chemicalWarTextBackground, 200);
+            })
         }
 
 
@@ -742,7 +764,7 @@ class Level3Fight2 extends BaseScene {self
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
                 firePlayed: kabutuEdoCondition ? 4 : (scorchedSoulCondition ? 13 : getValueOrInvoke(card.fire)),
-                stancePointsPlayed: kabutuEdoCondition && isLastEnemy ? -1 : getValueOrInvoke(card.stancePoints),
+                stancePointsPlayed: (kabutuEdoCondition && isLastEnemy) ? -1 : (kabutuEdoCondition && !isLastEnemy) ? 0 : getValueOrInvoke(card.stancePoints),
                 poisonPlayed: bladesBlightCondition ? target.poison : getValueOrInvoke(card.poison) + rottenResonanceOutcome,
                 healPlayed: getValueOrInvoke(card.heal),
                 strengthPlayed: getValueOrInvoke(card.strength),
@@ -1847,7 +1869,7 @@ class Level3Fight2 extends BaseScene {self
             const slot = gameState.permanentSlots.find(slot => slot.available);
 
             // NB!! Add all cards that are not depleted upon use to the conditional!!
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' ) {
+            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
                 gameState.discardPile.push(card);
                 gameState.discardPileText.setText(gameState.discardPile.length);
 
@@ -2164,7 +2186,20 @@ class Level3Fight2 extends BaseScene {self
                             self.cameras.main.shake(70, .002, false);
                         }
                     })
-                }
+
+                } else if (card.key === 'chemicalWarfare') {
+                    const tokenSprite = card.tokenSprite;
+                    const tokenSlot = card.tokenSlot;
+                    gameState.chemicalWarfare += 2;
+
+                    tokenSprite.on( 'pointerup', () => {
+                        if (gameState.playersTurn) {
+                            depleteChemicalWarfare(card, tokenSprite,tokenSlot); 
+                        } else {
+                            self.cameras.main.shake(70, .002, false);
+                        }
+                    })
+                } 
             } 
         
         function activatePermanentFromHand(card) {
@@ -2232,6 +2267,7 @@ class Level3Fight2 extends BaseScene {self
                 // NB! Add any card that is not allowed to deplete from hand
                 case 'kamishimoUberAlles': 
                 case 'hollidayInKamakura':
+                case 'chemicalWarfare':
                     gameState.currentCards.push(card); 
                     card.slot.available = false;
                     break;
@@ -2518,6 +2554,14 @@ class Level3Fight2 extends BaseScene {self
             gameState.player.mana += 1;
             self.updateManaBar(gameState.player);
             drawNewCards(1);
+        }
+
+        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.chemicalWarfare -= 2;
         }
     
     

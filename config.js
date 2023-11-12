@@ -15,6 +15,7 @@ const config = {
         Level1Fight1, Level1Fight2, Level1Fight3,
         Level2Fight1, Level2Fight2, Level2Fight3,
         Level3Fight1, Level3Fight2, Level3Fight3,
+        Level4Fight1, Level4Fight2, Level4Fight3,
         Endscene
     ],
     scale: {

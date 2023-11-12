@@ -34,6 +34,7 @@ class BaseScene extends Phaser.Scene {
 
         // Reset Permanent effects
         gameState.kamishimoUberAlles = 0;
+        gameState.chemicalWarfare = 0;
         gameState.shogunsShellCondition = 0; 
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
