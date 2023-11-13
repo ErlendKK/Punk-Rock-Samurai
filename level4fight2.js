@@ -307,17 +307,18 @@ class Level4Fight2 extends BaseScene {self
 
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
-                gameState.characters.forEach(character => {
-                    self.describeCharacter(character, character.sprite);
-                }); 
-                drawCards(numCards);
+                if (gameState.turn === 1) {
+                    gameState.characters.forEach( character => self.describeCharacter(character, character.sprite)); 
+                }
                     
                 // NB! These functions should run after gameState.turn has been increased
                 gameState.enemies.forEach( enemy => {
                     updateEnemyActions();  
                     selectEnemyAction(enemy);
                     displayEnemyIntention(enemy);
-                });                   
+                });
+                
+                drawCards(numCards);
             });                  
         }
 

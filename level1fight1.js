@@ -102,7 +102,7 @@ class Level1Fight1 extends BaseScene {self
             }
         })
 
-        // self.scene.start('Level4Fight3');
+        // self.scene.start('Level4Fight2');
 
         function startFight() {
             gameState.turn = 0;
