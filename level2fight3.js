@@ -280,7 +280,7 @@ class Level2Fight3 extends BaseScene {self
             self.shuffleDeck(gameState.drawPile);
             if (gameState.chemicalWarfare) activateChemicalWarfare();
 
-            const delaytime = (gameState.player.poisonText._text) ? 2500 : 1700;
+            const delaytime = (gameState.player.poisonText._text) ? 2500 : 1500;
             self.time.delayedCall(delaytime, () => {
                 const objectsToDestroy = [
                     gameState.player.poisonText,
@@ -911,7 +911,7 @@ class Level2Fight3 extends BaseScene {self
                     }
                 }
 
-                self.time.delayedCall(1700, () => {
+                self.time.delayedCall(1500, () => {
                     enemyTurnTexts.forEach( text => {
                         fadeOutGameObject(text, 100);
                     })
@@ -969,7 +969,7 @@ class Level2Fight3 extends BaseScene {self
                 updateStats(enemy);
             };
         
-            let delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 700 : 1800;
+            let delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 500 : 1500;
             if (gameState.debuffCardPlayed) {
                 delaytime += 1000;
                 gameState.debuffCardPlayed = false;
@@ -1051,7 +1051,7 @@ class Level2Fight3 extends BaseScene {self
             })
         }
 
-        function concludeEnemyAction(enemy, chosenAction) {
+        async function concludeEnemyAction(enemy, chosenAction) {
             [gameState.player, enemy].forEach(character => {
                 self.updateHealthBar(character);
                 removeIfDead(character);
@@ -1060,32 +1060,32 @@ class Level2Fight3 extends BaseScene {self
 
             const delaytime = chosenAction.debuffCard === "doubleDiscard" ? 4500 : gameState.debuffCardPlayed ? 1800 : 1300;
             
-            self.time.delayedCall(delaytime, () => {
-                if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-                if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
-                enemy.turnComplete = true;
-        
-                if (!checkGameOver()) {
-                    // if the last enemy completed their turn or is not alive
-                    if (gameState.enemies[gameState.currentEnemyIndex].turnComplete || !gameState.enemies[gameState.currentEnemyIndex].alive) {
-                        gameState.currentEnemyIndex++;
-                        if (gameState.currentEnemyIndex < gameState.enemies.length) {
-                            initiateEnemiesTurn();
-                        } else {
-                            gameState.currentEnemyIndex = 0;
+            await self.delay(delaytime);
+            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            enemy.turnComplete = true;
+    
+            if (!checkGameOver()) {
+                // if the last enemy completed their turn or is not alive
+                if (gameState.enemies[gameState.currentEnemyIndex].turnComplete || !gameState.enemies[gameState.currentEnemyIndex].alive) {
+                    gameState.currentEnemyIndex++;
+                    if (gameState.currentEnemyIndex < gameState.enemies.length) {
+                        initiateEnemiesTurn();
+                    } else {
+                        gameState.currentEnemyIndex = 0;
 
-                            gameState.summonedEnemies.forEach( enemy => {
-                                if (enemy.alive && !gameState.enemies.includes(enemy)) {
-                                    gameState.enemies.unshift(enemy);
-                                    gameState.characters.unshift(enemy);
-                                }
-                            })
+                        gameState.summonedEnemies.forEach( enemy => {
+                            if (enemy.alive && !gameState.enemies.includes(enemy)) {
+                                gameState.enemies.unshift(enemy);
+                                gameState.characters.unshift(enemy);
+                            }
+                        });S
 
-                            startPlayerTurn();
-                        }
+                        await self.delay(150);
+                        startPlayerTurn();
                     }
                 }
-            })
+            }
         };
 
         function insertDebuffCard(enemy, chosenAction ) {
@@ -1704,7 +1704,6 @@ class Level2Fight3 extends BaseScene {self
 
             // Buy HP
             const levelComplete = (self.scene.key.slice(-1) === '3');
-            const shopHealConditions = gameState.player.gold >= healCost && gameState.player.health < gameState.player.healthMax && !levelComplete;
             const { level, _ } = self.extractLevelFightFromName(self.scene.key);
 
             if (levelComplete) { // Informs the player that health was reset at level completion => no need to buy health!
@@ -1724,6 +1723,8 @@ class Level2Fight3 extends BaseScene {self
             }
 
             shopHealButton.on('pointerup', function() {
+                const shopHealConditions = gameState.player.gold >= healCost && gameState.player.health < gameState.player.healthMax && !levelComplete;
+                
                 if (shopHealConditions && !gameState.shopButtonPressed) {
                     gameState.shopButtonPressed = true
                     shopButtons.forEach(button => button.removeInteractive());
@@ -2883,14 +2884,13 @@ class Level2Fight3 extends BaseScene {self
 
         function updatePoison(character) {
             if (character.poison > 0) {
-                console.log(`character.poison > 0`)
-                character.health = Math.max(1, character.health - character.poison);
-                if (character.poisonText) {
-                    console.log(`character.poisonText exists`)
-                    const lostHP = (character.health + 1 > character.poison) ? character.poison : character.health - 1
-                    const newPoisonText = `-${lostHP} HP from Poison`               
-                    self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
-                }
+                const newHealth = Math.max(1, character.health - character.poison);
+                const lostHP = character.health - newHealth
+                const newPoisonText = `-${lostHP} HP from Poison`
+                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+
+                character.health = newHealth;
+                self.updateHealthBar(character);
                 character.poison -= 1;
             }
         };

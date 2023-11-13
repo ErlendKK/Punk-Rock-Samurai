@@ -303,7 +303,7 @@ class Level1Fight1 extends BaseScene {self
             self.shuffleDeck(gameState.drawPile);
             if (gameState.chemicalWarfare) activateChemicalWarfare();
 
-            const delaytime = (gameState.player.poisonText._text) ? 2500 : 1700;
+            const delaytime = (gameState.player.poisonText._text) ? 2500 : 1500;
             self.time.delayedCall(delaytime, () => {
                 const objectsToDestroy = [
                     gameState.player.poisonText,
@@ -641,26 +641,6 @@ class Level1Fight1 extends BaseScene {self
                 self.updateManaBar(gameState.player);
             }
 
-            // if (gameState.shogunsShellCondition) {
-            //     const stanceIncrease = gameState.stanceAfter > gameState.stanceBefore
-            //     const stanceDecrease = gameState.stanceAfter < gameState.stanceBefore
-            //     const positiveBefore = gameState.stanceBefore >= 0
-            //     const negativeBefore = gameState.stanceBefore < 0
-            //     const positiveAfter = gameState.stanceAfter >= 0
-            //     const negativeAfter = gameState.stanceAfter < 0
-            //     const adjustment = gameState.shogunsShellCondition
-
-            //     if (negativeAfter && negativeBefore && stanceDecrease) {
-            //         gameState.player.armor += adjustment * (gameState.stanceBefore - gameState.stanceAfter)
-                
-            //     } else if (negativeAfter && positiveBefore && stanceDecrease) {
-            //         gameState.player.armor += gameState.shogunsShellCondition * gameState.stanceAfter
-                
-            //     } else if (negativeAfter && stanceIncrease) {
-            //         gameState.player.armor += gameState.shogunsShellCondition * (gameState.stanceBefore - gameState.stanceAfter)
-            //     }
-            // }
-
             // NB! These functions must run after Stance, Armor and Strength has been updated, and tweens have fired.
             updateStats(target);
             self.updateHealthBar(target);
@@ -912,6 +892,7 @@ class Level1Fight1 extends BaseScene {self
     
     // ---------------------------------- ENEMY'S TURN -------------------------------------      
      
+
         function startEnemyTurn(enemy) {
 
             // The conditional ensures that "Enemy turn" is only declared when the first enemy starts their turn.
@@ -940,7 +921,7 @@ class Level1Fight1 extends BaseScene {self
                     }
                 }
 
-                self.time.delayedCall(1700, () => {
+                self.time.delayedCall(1500, () => {
                     enemyTurnTexts.forEach( text => {
                         fadeOutGameObject(text, 100);
                     })
@@ -951,9 +932,9 @@ class Level1Fight1 extends BaseScene {self
             performEnemyAction(enemy);           
         }
 
-        function performEnemyAction(enemy) {
+        async function performEnemyAction(enemy) {
 
-            const poisonTextY = enemy.lifeStealText ? 450 : 380
+            const poisonTextY = enemy.lifeStealText ? 430 : 380
             enemy.poisonText = self.add.text(550, poisonTextY, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
             enemy.poisonTextBackground = self.add.graphics();
             updatePoison(enemy);
@@ -962,87 +943,89 @@ class Level1Fight1 extends BaseScene {self
                 updateStats(enemy);
             };
         
-            const delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 700 : 1800;
+            const delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 500 : 1500;
         
-            self.time.delayedCall(delaytime, () => {
-                fadeOutGameObject(enemy.poisonText);
-                fadeOutGameObject(enemy.poisonTextBackground);
+            await self.delay(delaytime);
+            fadeOutGameObject(enemy.poisonText, 100);
+            fadeOutGameObject(enemy.poisonTextBackground, 100);
 
-                // Perform the chosen action
-                const chosenAction = enemy.chosenAction;
-                const actionTextConfig = {fontSize: '32px', fill: '#ff0000'};
-                gameState.actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
-                gameState.actionTextBackground = self.add.graphics();
+            await self.delay(100);
+            // Perform the chosen action
+            const chosenAction = enemy.chosenAction;
+            const actionTextConfig = {fontSize: '32px', fill: '#ff0000'};
+            gameState.actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
+            gameState.actionTextBackground = self.add.graphics();
+            
+            gameState.player.poison += chosenAction.poison;
+            enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
+            enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
+            updateStats(enemy);
+            enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);    
+    
+            if (chosenAction.damage > 0 || chosenAction.fire > 0 || chosenAction.poison > 0) {
+                const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
+                self.cameras.main.shake(120, .005, false);
+                gameConfig.attackSound.play({ volume: 0.8 });
+                console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
+
+                enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
+                gameState.player.health -= enemy.damageTotal;
+                gameState.score.damageTaken += enemy.damageTotal;
+                let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
+                self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
                 
-                gameState.player.poison += chosenAction.poison;
-                enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
-                enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
-                updateStats(enemy);
-                enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);    
-        
-                if (chosenAction.damage > 0 || chosenAction.fire > 0 || chosenAction.poison > 0) {
-                    const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
-                    self.cameras.main.shake(120, .005, false);
-                    gameConfig.attackSound.play({ volume: 0.8 });
-                    console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
-
-                    enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
-                    gameState.player.health -= enemy.damageTotal;
-                    gameState.score.damageTaken += enemy.damageTotal;
-                    let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
-                    self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
-                    
-                    self.tweens.add({
-                        targets: enemy.sprite,
-                        x: enemy.sprite.x - 60,
-                        duration: 120,
-                        ease: 'Cubic',
-                        yoyo: true
-                    })
-        
-                } else if (chosenAction.heal > 0) {
-                    gameConfig.healSound.play({ volume: 0.5 });
-                    self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
-                    self.powerUpTweens(enemy);
-                    
-        
-                } else if (chosenAction.strength > 0 || chosenAction.armor > 0)  {
-                    gameConfig.powerUpSound.play({ volume: 0.2 });
-                    self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
-                    self.powerUpTweens(enemy);
-                }
-        
-                // NB! enemy.strengthTurn must be reset before concludeEnemyAction() (or an extra call to updateStats() will be required)
-                enemy.strengthTurn = 0; 
-                concludeEnemyAction(enemy, chosenAction);
-            })
+                self.tweens.add({
+                    targets: enemy.sprite,
+                    x: enemy.sprite.x - 60,
+                    duration: 120,
+                    ease: 'Cubic',
+                    yoyo: true
+                })
+    
+            } else if (chosenAction.heal > 0) {
+                gameConfig.healSound.play({ volume: 0.5 });
+                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
+                self.powerUpTweens(enemy);
+                
+    
+            } else if (chosenAction.strength > 0 || chosenAction.armor > 0)  {
+                gameConfig.powerUpSound.play({ volume: 0.2 });
+                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
+                self.powerUpTweens(enemy);
+            }
+    
+            // NB! enemy.strengthTurn must be reset before concludeEnemyAction() (or an extra call to updateStats() will be required)
+            enemy.strengthTurn = 0; 
+            concludeEnemyAction(enemy, chosenAction);
         }
 
-        function concludeEnemyAction(enemy, chosenAction) {
+        async function concludeEnemyAction(enemy, chosenAction) {
             [gameState.player, enemy].forEach(character => {
                 self.updateHealthBar(character);
                 removeIfDead(character);
                 updateStats(character);
             })
+
+            const delaytime = 1300;
             
-            self.time.delayedCall(1300, () => {
-                if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-                if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
-                enemy.turnComplete = true;
-        
-                if (!checkGameOver()) {
-                    // if the last enemy completed their turn or is not alive
-                    if (gameState.enemies[gameState.currentEnemyIndex].turnComplete || !gameState.enemies[gameState.currentEnemyIndex].alive) {
-                        gameState.currentEnemyIndex++;
-                        if (gameState.currentEnemyIndex < gameState.enemies.length) {
-                            initiateEnemiesTurn();
-                        } else {
-                            gameState.currentEnemyIndex = 0;
-                            startPlayerTurn();
-                        }
+            await self.delay(delaytime);
+            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            enemy.turnComplete = true;
+    
+            if (!checkGameOver()) {
+                // if the last enemy completed their turn or is not alive
+                if (gameState.enemies[gameState.currentEnemyIndex].turnComplete || !gameState.enemies[gameState.currentEnemyIndex].alive) {
+                    gameState.currentEnemyIndex++;
+                    if (gameState.currentEnemyIndex < gameState.enemies.length) {
+                        initiateEnemiesTurn();
+                    } else {
+                        gameState.currentEnemyIndex = 0;
+                        await self.delay(150);
+                        startPlayerTurn();
                     }
                 }
-            })
+            }
         };
 
         function updateEnemyActions() {
@@ -1567,7 +1550,6 @@ class Level1Fight1 extends BaseScene {self
 
             // Buy HP
             const levelComplete = (self.scene.key.slice(-1) === '3');
-            const shopHealConditions = gameState.player.gold >= healCost && gameState.player.health < gameState.player.healthMax && !levelComplete;
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
 
             if (levelComplete) { // Informs the player that health was reset at level completion => no need to buy health!
@@ -1587,6 +1569,8 @@ class Level1Fight1 extends BaseScene {self
             }
 
             shopHealButton.on('pointerup', function() {
+                const shopHealConditions = gameState.player.gold >= healCost && gameState.player.health < gameState.player.healthMax && !levelComplete;
+                
                 if (shopHealConditions && !gameState.shopButtonPressed) {
                     gameState.shopButtonPressed = true
                     shopButtons.forEach(button => button.removeInteractive());
@@ -2775,14 +2759,13 @@ class Level1Fight1 extends BaseScene {self
 
         function updatePoison(character) {
             if (character.poison > 0) {
-                console.log(`character.poison > 0`)
-                character.health = Math.max(1, character.health - character.poison);
-                if (character.poisonText) {
-                    console.log(`character.poisonText exists`)
-                    const lostHP = (character.health + 1 > character.poison) ? character.poison : character.health - 1
-                    const newPoisonText = `-${lostHP} HP from Poison`               
-                    self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
-                }
+                const newHealth = Math.max(1, character.health - character.poison);
+                const lostHP = character.health - newHealth
+                const newPoisonText = `-${lostHP} HP from Poison`
+                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+
+                character.health = newHealth;
+                self.updateHealthBar(character);
                 character.poison -= 1;
             }
         };
