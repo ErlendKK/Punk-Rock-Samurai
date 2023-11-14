@@ -1,28 +1,15 @@
-old_code = """function updatePoison(character) {
-            if (character.poison > 0) {
-                const newHealth = Math.max(1, character.health - character.poison);
-                const lostHP = character.health - newHealth
-                const newPoisonText = `-${lostHP} HP from Poison`
-                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
-
-                character.health = newHealth;
-                character.poison -= 1;
-            }
-        };"""
+old_code = """gameState.redrawEnabled = false;
+                    gameState.redrawButton.setTexture('rectangularButtonPressed');
+                    spendGold(gameState.redrawPrice);
+                    gameState.redrawPrice += 1;"""
 
 
-new_code = """function updatePoison(character) {
-            if (character.poison > 0) {
-                const newHealth = Math.max(1, character.health - character.poison);
-                const lostHP = character.health - newHealth
-                const newPoisonText = `-${lostHP} HP from Poison`
-                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
-
-                character.health = newHealth;
-                self.updateHealthBar(character);
-                character.poison -= 1;
-            }
-        };"""
+new_code = """gameState.redrawEnabled = false;
+                    gameState.redrawButton.setTexture('rectangularButtonPressed');
+                    gameState.endOfTurnButton.removeInteractive();
+                    gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
+                    spendGold(gameState.redrawPrice);
+                    gameState.redrawPrice += 1;"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

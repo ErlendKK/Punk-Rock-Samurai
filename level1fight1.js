@@ -102,7 +102,7 @@ class Level1Fight1 extends BaseScene {self
             }
         })
 
-        // self.scene.start('Level4Fight2');
+        // self.scene.start('Level2Fight3');
 
         function startFight() {
             gameState.turn = 0;
@@ -246,13 +246,17 @@ class Level1Fight1 extends BaseScene {self
         }
         
         function activateRedrawButton() {
-            gameState.redrawButton.on('pointerup', () => {
+            gameState.redrawButton.on('pointerup', async function() {
                 if (gameState.player.gold >= gameState.redrawPrice && gameState.redrawEnabled) {
+                    gameState.redrawEnabled = false;
+                    gameState.redrawButton.setTexture('rectangularButtonPressed');
+                    gameState.endOfTurnButton.removeInteractive();
+                    gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
                     spendGold(gameState.redrawPrice);
                     gameState.redrawPrice += 1;
 
                     if (gameState.redrawButtonDescriptionText) {
-                        gameState.redrawButtonDescriptionText.setText(`Redraw your hand\n Cost: ${gameState.redrawPrice} gold`)
+                        gameState.redrawButtonDescriptionText.setText(`Redraw your hand\n Cost: ${gameState.redrawPrice} gold`);
                     }
                     
                     let numOfCards = 0
@@ -270,6 +274,7 @@ class Level1Fight1 extends BaseScene {self
                 } else {
                     self.cameras.main.shake(70, .002, false);
                 }
+                
             })
         }
 
@@ -383,12 +388,11 @@ class Level1Fight1 extends BaseScene {self
         ];
         
         async function drawCards(numCards) {
-            gameState.endOfTurnButton.setTexture('rectangularButton');
-            gameState.endOfTurnButton.setInteractive();
             const startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
             const tweensDuration = 110;
             const delay = 7;
             const scale = 0.35
+
             
             for (let i = 0; i < numCards; i++) {
                 
@@ -458,13 +462,24 @@ class Level1Fight1 extends BaseScene {self
                         activateCard(card);
                     }
                 })
-            }  
 
-            gameState.playersTurn = true; // Sets tokens interactive
-            console.log(`gameState.playersTurn: ${gameState.playersTurn}`)
+                if (i === numCards -1) {
+                    activateButtons(tweensDuration, delay, numCards);
+                    gameState.playersTurn = true; // Sets tokens interactive
+                    console.log(`gameState.playersTurn: ${gameState.playersTurn}`)
+                }
+            }
+        }
+
+        async function activateButtons(tweensDuration, delay, numCards) {
+            const delayTime = 2 * (tweensDuration + delay * numCards);
+            
+            await self.delay(delayTime);
             gameState.redrawEnabled = true;
             gameState.redrawButton.setInteractive();
             gameState.redrawButton.setTexture('rectangularButton');
+            gameState.endOfTurnButton.setTexture('rectangularButton');
+            gameState.endOfTurnButton.setInteractive();
         }
 
         function activateCard(card) {
@@ -575,8 +590,7 @@ class Level1Fight1 extends BaseScene {self
             gameConfig.targetingCursor.setVisible(false);
 
             fadeOutGameObject(card.sprite, 200);
-            if (gameState.actionText) gameState.actionText.destroy();
-            if (gameState.actionTextBackground) gameState.actionTextBackground.destroy();
+            gameState.actionTextObjects.forEach(object => object.destroy());
             const lifeStealPlayed = gameState.player.lifeStealBase + gameState.player.lifeStealThisTurn;
 
             const { 
@@ -659,9 +673,11 @@ class Level1Fight1 extends BaseScene {self
                 gameState.playingCard = false;
             });  
 
-            self.time.delayedCall(1500, () => {   
-                if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-                if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            const currentActionTextObjects = [...gameState.actionTextObjects];
+            self.time.delayedCall(1500, () => {
+                currentActionTextObjects.forEach(object => {
+                    fadeOutGameObject(object, 200);
+                })   
             });
         };
 
@@ -725,8 +741,9 @@ class Level1Fight1 extends BaseScene {self
 
         function addTextAndTweens(damageTotal, poisonPlayed, strengthPlayed, armorPlayed, poisonRemovePlayed) {
             const actionTextConfig = { fontSize: '32px', fill: '#ff0000' };
-            gameState.actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
-            gameState.actionTextBackground = self.add.graphics(); 
+            let actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
+            let actionTextBackground = self.add.graphics();
+            gameState.actionTextObjects.push(actionText, actionTextBackground);
 
             if (gameState.typePlayed === 'targetSelected' || gameState.typePlayed === 'targetAll') {                
                 self.cameras.main.shake(100, .003, false);
@@ -734,25 +751,25 @@ class Level1Fight1 extends BaseScene {self
                 const actionTextAttack = (damageTotal > 0) ?  `Deals ${damageTotal} damage`  : '';
                 const actionTextPoison = (poisonPlayed > 0) ? `Deals ${poisonPlayed} Poison` : ''; 
                 const actionTextTarget = (poisonPlayed && damageTotal) ? `${actionTextAttack}\n\n${actionTextPoison}` : poisonPlayed ? actionTextPoison : actionTextAttack;
-                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextTarget);
+                self.updateTextAndBackground(actionText, actionTextBackground, actionTextTarget);
                 self.attackTweens(gameState.player, 60);
                 
             } else if (strengthPlayed > 0) {
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Gains ${strengthPlayed} Strength`;
-                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
+                self.updateTextAndBackground(actionText, actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
 
             } else if (armorPlayed > 0) {
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Gains ${armorPlayed} Armor`;
-                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
+                self.updateTextAndBackground(actionText, actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
 
             } else if (poisonRemovePlayed > 0) {
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 const actionTextContent = `Heals ${poisonRemovePlayed} Poison`;
-                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, actionTextContent);
+                self.updateTextAndBackground(actionText, actionTextBackground, actionTextContent);
                 self.powerUpTweens(gameState.player);
             }
         }
@@ -843,6 +860,7 @@ class Level1Fight1 extends BaseScene {self
             } else {    
                 this.setTexture('rectangularButtonPressed');
                 this.removeInteractive();
+                gameState.redrawButton.setTexture('rectangularButtonPressed');
                 gameConfig.buttonPressedSound.play();
                 gameState.endOfTurnButtonPressed = true;
                 gameState.redrawEnabled = false;
@@ -870,8 +888,7 @@ class Level1Fight1 extends BaseScene {self
                 }
 
                 self.time.delayedCall(100, () => {   
-                    if (gameState.actionText) gameState.actionText.destroy();
-                    if (gameState.actionTextBackground) gameState.actionTextBackground.destroy();
+                    gameState.actionTextObjects.forEach(object => object.destroy());
                     initiateEnemiesTurn();
                 });
             }
@@ -1115,10 +1132,11 @@ class Level1Fight1 extends BaseScene {self
             self.updateManaBar(gameState.player);
             addHandtoDeck();
             fadeOutGameObject(gameState.actionText, 200);
-            fadeOutGameObject(gameState.actionTextBackground, 200); 
+            fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
+
             gameConfig.music.stop();
             gameState.endOfTurnButton.destroy();
-
             gameState.score.numberOfTurns += gameState.turn;
 
             gameState.gameOverText = self.add.text(550, 300, 'Defeat!', { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
@@ -1171,6 +1189,7 @@ class Level1Fight1 extends BaseScene {self
         
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
@@ -1213,7 +1232,8 @@ class Level1Fight1 extends BaseScene {self
             gameState.enterShopText = self.add.text(550, y + spacing, `Enter Shop`, rewardTextConfig).setOrigin(0.5).setDepth(103);
             
             gameState.rewardAddCardsButton = self.add.image(550, y + spacing * 2, 'rectangularButton');
-            gameState.rewardAddCardsText = self.add.text(550, y + spacing * 2, 'Collect free card\n  and continue', rewardTextConfig).setOrigin(0.5).setDepth(103);
+            const nextLevelText = gameState.deck.length < gameConfig.maxDeckSize ? 'Collect free card\n  and continue' : 'Maximum deck size\n    continue'
+            gameState.rewardAddCardsText = self.add.text(550, y + spacing * 2, nextLevelText, rewardTextConfig).setOrigin(0.5).setDepth(103);
  
             gameState.rewardButtons = [gameState.rewardCollectGoldButton, gameState.enterShopButton, gameState.rewardAddCardsButton];
             const rewardTexts = [gameState.rewardCollectGoldText,  gameState.enterShopText, gameState.rewardAddCardsText];
@@ -1249,7 +1269,12 @@ class Level1Fight1 extends BaseScene {self
                     console.log(`gameOverObjects.length: ${gameOverObjects.length}`);
                 })
                 gameState.endGameMenyExited = true;
-                pickCardAndAddToDeck();
+
+                if (gameState.deck.length < gameConfig.maxDeckSize) {
+                    pickCardAndAddToDeck();
+                } else {
+                    initiateNextLevel();
+                }
             })
         }
 
@@ -1611,7 +1636,7 @@ class Level1Fight1 extends BaseScene {self
 
             // Buy New Card
             shopAddCardButton.on('pointerup', function() {
-                if (gameState.player.gold >= addCardCost && !gameState.shopButtonPressed) {
+                if (gameState.player.gold >= addCardCost && !gameState.shopButtonPressed && gameState.deck.length < gameConfig.maxDeckSize) {
                     gameState.shopButtonPressed = true;
                     shopButtons.forEach(button => button.removeInteractive());
                     shopAddCardButton.setTexture('rectangularButtonPressed');
@@ -1633,7 +1658,7 @@ class Level1Fight1 extends BaseScene {self
             })
 
             shopRemoveCardButton.on('pointerup', function() {
-                if (gameState.player.gold >= removeCardCost && !gameState.shopButtonPressed && gameState.deck.length > gameState.minDeckSize) {
+                if (gameState.player.gold >= removeCardCost && !gameState.shopButtonPressed && gameState.deck.length > gameConfig.minDeckSize) {
                     gameState.shopButtonPressed = true;
                     shopButtons.forEach(button => button.removeInteractive());
                     shopAddCardButton.setTexture('rectangularButtonPressed');
@@ -2686,10 +2711,11 @@ class Level1Fight1 extends BaseScene {self
             gameState.drawPileImage.on('pointerover', function() {
                 if (gameState.drawPile.length > 0) {
                     gameState.stanceText.setAlpha(0);
+                    const length = gameState.drawPile.length
     
-                    const cardsPerRow = gameState.drawPile.length < 12 ? 4 : 6;
+                    const cardsPerRow = length > 32 ? 10 : length > 24 ? 8 : length > 12 ? 6 : 4;
                     const cardSpacing = 105;
-                    const startX = gameState.drawPile.length < 12 ? 400 : 270;
+                    const startX =  length > 32 ? 78 : length > 24 ? 183 : length > 12 ? 287 : 393;
                     const startY = 150;
 
                     const drawPileText = self.add.text(550, startY-110, "", { fontSize: '60px', fill: '#000000' }).setOrigin(0.5).setDepth(201);
@@ -2726,10 +2752,11 @@ class Level1Fight1 extends BaseScene {self
             
             gameState.discardPileImage.on('pointerover', function() {
                 gameState.stanceText.setAlpha(0);
-
-                const cardsPerRow = gameState.discardPile.length < 12 ? 4 : 6;
+                const length = gameState.discardPile.length;
+    
+                const cardsPerRow = length > 24 ? 8 : length > 12 ? 6 : 4;
                 const cardSpacing = 105;
-                const startX = gameState.discardPile.length < 12 ? 400 : 250;
+                const startX =  length > 24 ? 183 : length > 12 ? 287 : 393;
                 const startY = 150;
 
                 const discardPileText = self.add.text(550, startY-110, "", { fontSize: '60px', fill: '#000000' }).setOrigin(0.5).setDepth(201);

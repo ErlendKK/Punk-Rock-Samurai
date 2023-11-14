@@ -20,17 +20,19 @@ class BaseScene extends Phaser.Scene {
         this.input.keyboard.createCursorKeys();
         
         gameConfig.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameState.redrawPrice = 1;
         gameState.endGameMenyExited = false;
         gameState.playingCard = false;
+        gameState.skipIntro = false;
+        gameState.fightStarted = false;
+
         gameState.discardPile = [];
         gameState.drawPile = [];
         gameState.currentCards = [];
         gameState.cardImages = [];
-        gameState.summonedEnemies = []; 
-
-        gameState.redrawPrice = 1;
-        gameState.skipIntro = false;
-        gameState.fightStarted = false;
+        gameState.summonedEnemies = [];
+        gameState.actionTextObjects = [];
+        gameState.redrawButtonObjects = [];
 
         // Reset Permanent effects
         gameState.kamishimoUberAlles = 0;
@@ -106,7 +108,7 @@ class BaseScene extends Phaser.Scene {
                 deck: gameState.deck,
                 bonusCards: gameState.bonusCards,
                 extraCards: gameState.extraCards,
-                minDeckSize: gameState.minDeckSize,
+                minDeckSize: gameConfig.minDeckSize,
                 latestDraw: gameState.latestDraw,
                 taunts: gameState.taunts,
                 ratTaunts: gameState.ratTaunts,
@@ -421,26 +423,32 @@ class BaseScene extends Phaser.Scene {
     addRedrawButton() {
         const x = 900;
         const y = 52;
-        gameState.redrawButton = this.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();;
+        gameState.redrawButton = this.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();
         gameState.redrawText = this.add.text(x, y, 'Redraw', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
 
         gameState.redrawButton.on('pointerover', () => {
-            gameState.redrawButton.setTexture('rectangularButtonHovered');
+            gameState.redrawButtonObjects.forEach(obj => obj.destroy());
+            gameState.redrawButtonObjects = [];
+            if (gameState.redrawEnabled) gameState.redrawButton.setTexture('rectangularButtonHovered');
+            
             gameState.redrawButtonDescriptionBackground = this.add.graphics();
             gameState.redrawButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
             gameState.redrawButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-
+            
             const textConfig = { fontSize: '12px', fill: '#000000' };
             const fullText = `Redraw your hand\n Cost: ${gameState.redrawPrice} gold`;
             gameState.redrawButtonDescriptionText = this.add.text(x, y+50, fullText, textConfig).setDepth(123).setOrigin(0.5, 0.5);
+        
+            gameState.redrawButtonObjects.push(gameState.redrawButtonDescriptionText, gameState.redrawButtonDescriptionBackground);
         });
         
         gameState.redrawButton.on('pointerout', () => {
-            gameState.redrawButton.setTexture('rectangularButton');
-            if (gameState.redrawButtonDescriptionBackground) gameState.redrawButtonDescriptionBackground.destroy();
-            if (gameState.redrawButtonDescriptionText) gameState.redrawButtonDescriptionText.destroy();
+            if (gameState.redrawEnabled) gameState.redrawButton.setTexture('rectangularButton');
+            gameState.redrawButtonObjects.forEach(obj => obj.destroy());
+            gameState.redrawButtonObjects = [];
         });
     }
+
 
     clearBoard() {
         gameState.characters.forEach( (character) => {

@@ -113,6 +113,7 @@ class Preload extends Phaser.Scene {
             this.load.image('wrathOfMoen', 'assets/images/cards/wrathOfMoen.jpg');
             this.load.image('saisenBlaster', 'assets/images/cards/saisenBlaster.jpg');
             this.load.image('riotRonin', 'assets/images/cards/riotRonin.jpg');
+            this.load.image('rebelLife', 'assets/images/cards/rebelLife.jpg');
             
             this.load.image('soulSquatter', 'assets/images/cards/soulSquatter.jpg');
             this.load.image('soulSquatterToken', 'assets/images/cards/soulSquatterToken.png');
@@ -254,6 +255,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
+            {key: 'rebelLife',   type: 'buff',           cost: 0, stancePoints: 1, damage: 0, fire: 0, poison: 0, heal: () => (gameState.player.stancePoints < 0) ? 2 : 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
         ]; 
             
@@ -343,19 +345,20 @@ class Preload extends Phaser.Scene {
             {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
         ];
 
-        gameState.minDeckSize = 8
+        gameConfig.minDeckSize = 8;
+        gameConfig.maxDeckSize = 40;
         gameState.latestDraw = [];
 
         gameState.taunts = [
             {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},
-            {key: 3, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nat survival!` },
+            {key: 3, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nto survive!` },
             {key: 5, enemy: `Got lost on your way\nto a cosplay,\nSamurai boy?`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
             {key: 6, enemy: `You look like a kid who\nfound his granddad's armor.`, player: `And you'll look like\nyour granddad's corpse\nwhen I'm done with you!` },
             {key: 8, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
             {key: 9, enemy: `A Samurai punk rocker?\nHow's that midlife crisis going?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
             {key: 12, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
             {key: 13, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
-            {key: 14, enemy: `Nice costume, boy.\nDo you do birthdays\nand bar mitzvahs too?`, player: `Just funerals.\nYours is next\non the list.` },
+            {key: 14, enemy: `Nice costume, boy.\nDo you do birthdays\nand bar mitzvahs?`, player: `Just funerals.\nYours is next\non the list.` },
         ];
          
         gameState.ratTaunts = [
@@ -375,7 +378,6 @@ class Preload extends Phaser.Scene {
             {key: 11, enemy: `You take this Samurai gig\nseriously, huh?`, player: `Serious as the grave\nI'm about to dig for you!` },
             {key: 11, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the blood\nit will draw from your corpse!` },
             {key: 11, enemy: `Hey, Samurai punk,\nthe circus called,\nthey want their clown back`, player: `Sorry, I'm booked up\nmopping your entrails\noff the floor` },   
-            // {key: 11, enemy: `Look what's dragging\nthrough my sewers...\na samurai in studded leather.?`, player: `The only thing dragging here\nwill be your dead cold body.` },
             {key: 7, enemy: `Still holding onto\npunk's corpse, I see`, player: `The only corpse here\nwill be the one\nI leave behind!` },
             {key: 10, enemy: `Your delusions of grandeur\nare quite entertaining.`, player: `The only entertainment tonight\nwill be your cries of agony!` },
         ];
