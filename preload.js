@@ -255,7 +255,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-           
+    
         ]; 
             
         gameState.bonusCards = [
@@ -326,10 +326,10 @@ class Preload extends Phaser.Scene {
 
         gameState.extraCards = [
 
+            {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'kirisuteGomen',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'kirisuteGomenToken'},
             {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
             {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
-            {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
             {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
             {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
@@ -344,9 +344,11 @@ class Preload extends Phaser.Scene {
             {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
         ];
 
-        gameConfig.minDeckSize = 8;
+        gameConfig.minDeckSize = 10;
         gameConfig.maxDeckSize = 40;
         gameState.latestDraw = [];
+        gameState.lustForLifeCounter = 0
+        gameState.healButtonPermanence = false;
 
         gameState.taunts = [
             {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},

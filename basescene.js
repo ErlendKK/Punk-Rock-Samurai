@@ -33,6 +33,7 @@ class BaseScene extends Phaser.Scene {
         gameState.summonedEnemies = [];
         gameState.actionTextObjects = [];
         gameState.redrawButtonObjects = [];
+        gameState.healButtonTextObjects = [];
 
         // Reset Permanent effects
         gameState.kamishimoUberAlles = 0;
@@ -108,7 +109,6 @@ class BaseScene extends Phaser.Scene {
                 deck: gameState.deck,
                 bonusCards: gameState.bonusCards,
                 extraCards: gameState.extraCards,
-                minDeckSize: gameConfig.minDeckSize,
                 latestDraw: gameState.latestDraw,
                 taunts: gameState.taunts,
                 ratTaunts: gameState.ratTaunts,
@@ -119,6 +119,7 @@ class BaseScene extends Phaser.Scene {
                 playerName: gameState.playerName,
                 version: gameState.version,
                 score: gameState.score,
+                lustForLifeCounter: gameState.lustForLifeCounter,
 
                 savedScene: currentScene,
                 loadedGame: true,
@@ -404,7 +405,7 @@ class BaseScene extends Phaser.Scene {
     // Support functions
 
     addEndOfTurnButton(y=500) {
-        gameState.endOfTurnButton = this.add.image(900, y, 'rectangularButton').setScale(0.45).setOrigin(0.5);
+        gameState.endOfTurnButton = this.add.image(900, y, 'rectangularButtonPressed').setScale(0.45).setOrigin(0.5);
         gameState.endOfTurnText = this.add.text(900, y, 'End Turn', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
         
         gameState.endOfTurnButton.on('pointerover', function () {
@@ -423,7 +424,7 @@ class BaseScene extends Phaser.Scene {
     addRedrawButton() {
         const x = 900;
         const y = 52;
-        gameState.redrawButton = this.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setInteractive();
+        gameState.redrawButton = this.add.image(x, y, 'rectangularButtonPressed').setScale(0.45).setOrigin(0.5).setInteractive();
         gameState.redrawText = this.add.text(x, y, 'Redraw', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
 
         gameState.redrawButton.on('pointerover', () => {
@@ -449,6 +450,49 @@ class BaseScene extends Phaser.Scene {
         });
     }
 
+    addHealButton() {
+        let healCost = 1;
+        const healAmount = 7;
+        const x = 900;
+        const y = 130;
+        const textConfig = { fontSize: '12px', fill: '#000000' };
+        const buttonSprite = gameState.fightStarted ? 'rectangularButton' : 'rectangularButtonPressed'
+
+        gameState.healButton = this.add.image(x, y, buttonSprite).setScale(0.45).setOrigin(0.5).setDepth(8).setInteractive();
+        gameState.healText = this.add.text(x, y, 'Heal', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5).setDepth(9);
+
+        gameState.healButton.on('pointerover', () => {
+            gameState.healButtonTextObjects.forEach(obj => obj.destroy());
+            gameState.healButtonTextObjects = [];
+            if (gameState.healButtonEnabled) {
+                const textContent = ` Heal ${healAmount} HP\nCost: ${healCost} gold`;
+                gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
+                gameState.healText.setDepth(123);
+
+                gameState.healButtonDescriptionBackground = this.add.graphics();
+                gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
+                gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
+                gameState.healButtonDescriptionText = this.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
+
+                gameState.healButtonTextObjects.push(gameState.healButtonDescriptionText, gameState.healButtonDescriptionBackground);
+            }
+        });
+
+        gameState.healButtonObjects = [
+            gameState.healButton, 
+            gameState.healText
+        ];
+        
+        gameState.healButton.on('pointerout', () => {
+            gameState.healButton.setDepth(8);
+            gameState.healText.setDepth(9);
+            if (gameState.healButtonEnabled) {
+                gameState.healButton.setTexture('rectangularButton')
+            }
+            gameState.healButtonTextObjects.forEach(obj => obj.destroy());
+            gameState.healButtonTextObjects = [];
+        });
+    }
 
     clearBoard() {
         gameState.characters.forEach( (character) => {

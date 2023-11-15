@@ -66,6 +66,11 @@ class Level2Fight1 extends BaseScene {self
         this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         this.updateManaBar(gameState.player);
         this.updateHealthBar(gameState.player);
+        
+        if (gameState.lustForLifeCounter) {
+            self.addHealButton();
+            activateHealButton();
+        };
 
         gameState.permanents.forEach(permanent => {
             const card = permanent.card;
@@ -266,9 +271,11 @@ class Level2Fight1 extends BaseScene {self
             gameState.redrawButton.on('pointerup', () => {
                 if (gameState.player.gold >= gameState.redrawPrice && gameState.redrawEnabled) {
                     gameState.redrawEnabled = false;
-                    gameState.redrawButton.setTexture('rectangularButtonPressed');
+                    gameState.healButtonEnabled = false;
                     gameState.endOfTurnButton.removeInteractive();
+                    gameState.redrawButton.setTexture('rectangularButtonPressed');
                     gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
+                    if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
                     spendGold(gameState.redrawPrice);
                     gameState.redrawPrice += 1;
 
@@ -524,10 +531,12 @@ class Level2Fight1 extends BaseScene {self
             
             await self.delay(delayTime);
             gameState.redrawEnabled = true;
+            gameState.healButtonEnabled = true;
             gameState.redrawButton.setInteractive();
             gameState.redrawButton.setTexture('rectangularButton');
             gameState.endOfTurnButton.setTexture('rectangularButton');
             gameState.endOfTurnButton.setInteractive();
+            if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButton');
         }
 
         function activateCard(card) {
@@ -730,8 +739,11 @@ class Level2Fight1 extends BaseScene {self
                 gameState.playingCard = false;
             });  
 
-            self.time.delayedCall(1500, () => {   
-                gameState.actionTextObjects.forEach(object => object.destroy());
+            const currentActionTextObjects = [...gameState.actionTextObjects];
+            self.time.delayedCall(1500, () => {
+                currentActionTextObjects.forEach(object => {
+                    fadeOutGameObject(object, 200);
+                })   
             });
         };
 
@@ -917,9 +929,12 @@ class Level2Fight1 extends BaseScene {self
             } else {    
                 this.setTexture('rectangularButtonPressed');
                 this.removeInteractive();
+                gameState.redrawButton.setTexture('rectangularButtonPressed');
                 gameConfig.buttonPressedSound.play();
                 gameState.endOfTurnButtonPressed = true;
+                gameState.healButtonEnabled = false;
                 gameState.redrawEnabled = false;
+                if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
                 if (gameState.bassSoloPlayed) gameState.bassSoloPlayed = false;
                 if (gameState.player.lifeStealThisTurn) gameState.player.lifeStealThisTurn = 0;
                 addHandtoDeck();
@@ -1093,6 +1108,7 @@ class Level2Fight1 extends BaseScene {self
             await self.delay(delaytime);
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
             enemy.turnComplete = true;
     
             if (!checkGameOver()) {
@@ -1292,10 +1308,11 @@ class Level2Fight1 extends BaseScene {self
             self.updateManaBar(gameState.player);
             addHandtoDeck();
             fadeOutGameObject(gameState.actionText, 200);
-            fadeOutGameObject(gameState.actionTextBackground, 200); 
+            fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
+
             gameConfig.music.stop();
             gameState.endOfTurnButton.destroy();
-
             gameState.score.numberOfTurns += gameState.turn;
 
             gameState.gameOverText = self.add.text(550, 300, 'Defeat!', { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
@@ -1348,6 +1365,7 @@ class Level2Fight1 extends BaseScene {self
         
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
@@ -2078,57 +2096,22 @@ class Level2Fight1 extends BaseScene {self
                 })
                 
             } else if (card.key === 'lustForLife') {
-                let healCost = 1;
-                const healAmount = 7;
-                const x = 900;
-                const y = 130;
-                const textConfig = { fontSize: '12px', fill: '#000000' };
+                gameState.lustForLifeCounter += 1;
+                if (gameState.fightStarted) {
+                    self.addHealButton();
+                    activateHealButton();
+                };
 
-                gameState.healButton = self.add.image(x, y, 'rectangularButton').setScale(0.45).setOrigin(0.5).setDepth(8).setInteractive();
-                gameState.healText = self.add.text(x, y, 'Heal', { fontSize: '20px', fill: '#000000' }).setOrigin(0.5).setDepth(9);
+                if (gameState.lustForLifeCounter >= 5) {
+                    depleteLustForLife(card); 
+                };
 
-                gameState.healButton.on('pointerover', () => {
-                    const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                    gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
-                    gameState.healText.setDepth(123);
-
-                    gameState.healButtonDescriptionBackground = self.add.graphics();
-                    gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
-                    gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-                    gameState.healButtonDescriptionText = self.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
-                });
-
-                gameState.healButtonObjects = [
-                    gameState.healButton, 
-                    gameState.healText
-                ];
-                
-                gameState.healButton.on('pointerout', () => {
-                    gameState.healButton.setTexture('rectangularButton').setDepth(8);
-                    gameState.healText.setDepth(9);
-                    if (gameState.healButtonDescriptionBackground) gameState.healButtonDescriptionBackground.destroy();
-                    if (gameState.healButtonDescriptionText) gameState.healButtonDescriptionText.destroy();
-                });
-                
-                gameState.healButton.on('pointerup', () => {
-                    if (gameState.player.gold >= healCost && gameState.playersTurn) {
-                        spendGold(healCost);
-                        gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
-                        self.updateHealthBar(gameState.player);
-    
-                        if (gameState.healButtonDescriptionText) {
-                            const textContent = `  Heal ${healAmount} HP\n Cost: ${healCost} gold`;
-                            gameState.healButtonDescriptionText.setText(textContent);
-                        }
-                    }
-                })
-                
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
                         depleteLustForLife(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
-                    }
+                    };
                 })
                 
             } else if (card.key === 'punksNotDead') {
@@ -2515,19 +2498,13 @@ class Level2Fight1 extends BaseScene {self
         }
 
         function depleteLustForLife(card) {
-            gameState.lustForLife = false;
+            if (gameState.lustForLifeCounter < 5) {
+                gameState.lustForLifeCounter = 0;
+                gameState.healButtonObjects.forEach(object => {
+                    fadeOutGameObject(object, 200);
+                });
+            }
             destroyToken(card);
-            const player = gameState.player;
-            const goldAmount = 7;
-            player.health = player.stancePoints > 0 ? Math.min(player.healthMax, player.health + goldAmount * player.stancePoints) : player.health;
-            gameConfig.healSound.play({ volume: 0.5 });
-
-            gameState.healButtonObjects.forEach(object => {
-                fadeOutGameObject(object, 200);
-            })
-
-            self.powerUpTweens(player);
-            self.updateHealthBar(player);
         }
 
         function depletePunksNotDead(card) {
@@ -2704,6 +2681,19 @@ class Level2Fight1 extends BaseScene {self
                 })
             }
         };
+
+        function activateHealButton() {
+            gameState.healButton.on('pointerup', () => {
+                const healCost = 1;
+                const healAmount = 7;
+
+                if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
+                    spendGold(healCost);
+                    gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
+                    self.updateHealthBar(gameState.player);
+                }
+            })
+        }
 
         function addHandtoDeck() {    
             while(gameState.currentCards.length > 0) {

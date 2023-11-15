@@ -1,12 +1,10 @@
-old_code = """(`Redraw your hand\n Cost: ${gameState.redrawPrice} gold`)"""
+old_code = """if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);"""
 
 
-new_code = """gameState.redrawEnabled = false;
-                    gameState.redrawButton.setTexture('rectangularButtonPressed');
-                    gameState.endOfTurnButton.removeInteractive();
-                    gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
-                    spendGold(gameState.redrawPrice);
-                    gameState.redrawPrice += 1;"""
+new_code = """if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
@@ -29,6 +27,3 @@ for level in levels:
     else:
         print(f'Old code not found in {level}')
 
-
-
-    
