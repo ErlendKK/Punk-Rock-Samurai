@@ -1,7 +1,4 @@
-old_code = """gameState.redrawEnabled = false;
-                    gameState.redrawButton.setTexture('rectangularButtonPressed');
-                    spendGold(gameState.redrawPrice);
-                    gameState.redrawPrice += 1;"""
+old_code = """(`Redraw your hand\n Cost: ${gameState.redrawPrice} gold`)"""
 
 
 new_code = """gameState.redrawEnabled = false;
