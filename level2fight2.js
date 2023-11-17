@@ -112,7 +112,7 @@ class Level2Fight2 extends BaseScene {self
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
             const startTextConfig = { fontSize: '75px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             const startTextContent = `Level ${level}\nFight ${fight}!`
-            gameState.startText = self.add.text(550, 320, startTextContent, startTextConfig).setOrigin(0.5);
+            gameState.startText = self.add.text(550, 320, startTextContent, startTextConfig).setOrigin(0.5).setDepth(20);
             gameState.startFightObjects.push(gameState.startText);
                
             self.time.delayedCall(350, () => {
@@ -122,7 +122,7 @@ class Level2Fight2 extends BaseScene {self
             })
         
             self.time.delayedCall(2300, () => { //timer: 2300
-                gameState.startText.setText("Fight!")
+                gameState.startText.setText("Fight!").setDepth(20);
                 gameState.startText.setStyle( {fontSize: '100px'})
                 self.time.delayedCall(2300, () => {
                     fadeOutGameObject(gameState.startText, 500);
@@ -296,7 +296,7 @@ class Level2Fight2 extends BaseScene {self
             }
 
             const yourTurnTextContent = 'Your turn!'
-            const yourTurnText = self.add.text(550, 300, "", { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
+            const yourTurnText = self.add.text(550, 310, "", { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
             const yourTurnTextBackground = self.add.graphics();
             self.updateTextAndBackground(yourTurnText, yourTurnTextBackground, yourTurnTextContent);
             
@@ -957,7 +957,7 @@ class Level2Fight2 extends BaseScene {self
             if (gameState.playersTurn) { 
                 gameState.playersTurn = false;
                 const enemyTurnTextContent = "Enemy's turn!"
-                enemy.turnText = self.add.text(550, 300, enemyTurnTextContent, { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
+                enemy.turnText = self.add.text(550, 310, enemyTurnTextContent, { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
                 const enemyTurnTextBackground = self.add.graphics();
                 self.updateTextAndBackground(enemy.turnText, enemyTurnTextBackground, enemyTurnTextContent);               
                 const enemyTurnTexts = [enemy.turnText, enemyTurnTextBackground]
@@ -983,32 +983,25 @@ class Level2Fight2 extends BaseScene {self
                     enemyTurnTexts.forEach(text => fadeOutGameObject(text, 100));
 
                     if (gameState.turn === 1) { // NB! Level-specific function
+                        const goldTextObjects = []
                         const textConfig = {fontSize: '40px', fontWeight: 'bold', fill: '#ff0000' }
-                        const enemyText = self.add.text(550, 300, 'The Goblins are\nevacuating their gold!', textConfig).setOrigin(0.5).setDepth(201);
-                        let textWidth = enemyText.width;
-                        let textHeight = enemyText.height;
-                        let paddingX = 20;
-                        let paddingY = 20;
+                        const enemyTextContent = 'The Goblins are\nevacuating their gold!'
+                        const enemyText = self.add.text(550, 300, '', textConfig).setOrigin(0.5);
                         const enemyTextBackground = self.add.graphics();
-                        enemyTextBackground.fillStyle(0xFFFFFF, 0.70);
-                        enemyTextBackground.fillRect(enemyText.x - (textWidth / 2) - paddingX, enemyText.y - (textHeight / 2) - paddingY, textWidth + 2 * paddingX, textHeight + 2 * paddingY).setDepth(200);
+                        goldTextObjects.push(enemyText, enemyTextBackground);
+                        self.updateTextAndBackground(enemyText, enemyTextBackground, enemyTextContent, 7, 200);
 
                         self.time.delayedCall(2500, () => {
-                            enemyText.destroy();
+                            goldTextObjects.forEach(obj => obj.destroy());
                             enemyTextBackground.destroy();
-
-                            const enemyText2 = self.add.text(550, 300, "Defeat them in\n5 turns to steal\nwhat's left!", textConfig).setOrigin(0.5).setDepth(201);
-                            let textWidth = enemyText2.width;
-                            let textHeight = enemyText2.height;
-                            let paddingX = 20;
-                            let paddingY = 20;
+                            const enemyTextContent2 = `Defeat them in\n5 turns to steal\nwhat's left!`
+                            const enemyText2 = self.add.text(550, 300, '', textConfig).setOrigin(0.5);
                             const enemyTextBackground2 = self.add.graphics();
-                            enemyTextBackground2.fillStyle(0xFFFFFF, 0.70);
-                            enemyTextBackground2.fillRect(enemyText2.x - (textWidth / 2) - paddingX, enemyText2.y - (textHeight / 2) - paddingY, textWidth + 2 * paddingX, textHeight + 2 * paddingY).setDepth(200);
+                            goldTextObjects.push(enemyText2, enemyTextBackground2);
+                            self.updateTextAndBackground(enemyText2, enemyTextBackground2, enemyTextContent2, 7, 200);
                         
                             self.time.delayedCall(2500, () => {
-                                enemyText2.destroy();
-                                enemyTextBackground2.destroy();
+                                goldTextObjects.forEach(obj => obj.destroy());
                                 startPlayerTurn();
                             })
                         });
@@ -1248,12 +1241,16 @@ class Level2Fight2 extends BaseScene {self
             })     
         };
         
-        function initiateVictory() {
+        async function initiateVictory() { // NB! Modified for level 2-2
             gameState.score.numberOfTurns += gameState.turn;
             gameState.score.levelsCompleted += 1;
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
+            
+            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
             gameState.characters.forEach(char => fadeOutGameObject(char.sprite, 200));
 
             gameState.deck.forEach(card => {
@@ -1267,25 +1264,21 @@ class Level2Fight2 extends BaseScene {self
                     card.goldCost = 0;
                 }    
             });
-            
+
+            await self.delay(600);
+            if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
+            if (countdownTimer) {
+                await earnGoblinGold();
+            }
+
+            await self.delay(200);
             const gundanSeizaiIncome = gameState.gundanSeizai ? 1 : 0;
             const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(3, Math.floor(gameState.player.gold * 0.10)) : 0;
             const totalIncome = gundanSeizaiIncome + zaibatsuUndergroundIncome;
-
-            self.time.delayedCall(600, () => {
-                if (gameConfig.attackSound.isPlaying) {
-                    gameConfig.attackSound.stop();
-                }
-                if (totalIncome) {
-                    earnGold(totalIncome);
-                }
-                gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
-                self.clearBoard();
-            });
-        
-            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
-            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
+            if (totalIncome) earnGold(totalIncome);
+            
+            gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
+            self.clearBoard();
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
@@ -1293,7 +1286,7 @@ class Level2Fight2 extends BaseScene {self
             const delayTime = fight === 3 ? 3000 : 100;
             const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to Health Max` : "";
             
-            self.time.delayedCall(1600, () => {
+            self.time.delayedCall(1000, () => {
                 gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);
                 victoryText.setStyle({
@@ -1302,29 +1295,37 @@ class Level2Fight2 extends BaseScene {self
                 });
 
                 self.time.delayedCall(delayTime, () => {
-                    victoryText.destroy()
+                    victoryText.destroy();
                     chooseReward();
                 })
-            })
+            });
         }
 
         // NB! Function "earnGoblinGold() is specific for level2fight2; dont copy elsewhere!
         function earnGoblinGold() {
-            for (let i = 0; i < countdownTimer; i++) {                
-                self.time.delayedCall(i*200, () => {
-                    gameState.player.gold = Math.min(gameState.player.gold + 1, gameState.player.goldMax);
-                    countdownTimer -= 1;
-                    gameState.goldCounter.setText(gameState.player.gold);
-                    gameState.countdownText.setText(countdownTimer);
-                    gameConfig.coinSound.play({ volume: 0.8, seek: 0.02 });
-                    
-                });
-            }
-            if (countdownTimer === 0) {
-                fadeOutGameObject(gameState.countdownTextBox, 250);
-                fadeOutGameObject(gameState.countdownText, 250);
-            }
-        }  // NB! Function "earnGoblinGold() is specific for level2fight2; dont copy elsewhere!
+            return new Promise(resolve => {
+                let delayCount = 0;
+                for (let i = 0; i < countdownTimer; i++) {                
+                    self.time.delayedCall(i * 200, () => {
+                        gameState.player.gold = Math.min(gameState.player.gold + 1, gameState.player.goldMax);
+                        countdownTimer -= 1;
+                        gameState.goldCounter.setText(gameState.player.gold);
+                        gameState.countdownText.setText(countdownTimer);
+                        gameConfig.coinSound.play({ volume: 0.8, seek: 0.02 });
+        
+                        delayCount++;
+                        if (delayCount === countdownTimer) {
+                            if (countdownTimer === 0) {
+                                fadeOutGameObject(gameState.countdownTextBox, 250);
+                                fadeOutGameObject(gameState.countdownText, 250);
+                            }
+                            resolve();
+                        }
+                    });
+                }
+            });
+        }
+          // NB! Function "earnGoblinGold() is specific for level2fight2; dont copy elsewhere!
         
         function chooseReward() {
             const rewardTextConfig = { fontSize: '22px', fill: '#000000' };

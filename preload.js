@@ -374,10 +374,10 @@ class Preload extends Phaser.Scene {
             {key: 6, enemy: `A Samurai punk rocker?\nHow's that midlife\ncrisis going for you?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
             {key: 7, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
             {key: 8, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
-            {key: 9, enemy: `Nice clown costume.\nDo you do birthdays\nand weddings?`, player: `Just funerals.\nYours is next\non the list!` },
+            {key: 9, enemy: `Nice clown costume.\nDo you do childrens\nbirthdays and bar mitzvahs?`, player: `Just funerals.\nYours is next\non the list!` },
             {key: 11, enemy: `A samurai in the\n21st century?\nI want whatever\nyour smoking`, player: `Very soon,\nthe only thing\nyou'll be wanting,\nis mercy!` },
             {key: 17, enemy: `What's the matter,\ndid they run out\nof shirts your size,\nor is this a flex-off?`, player: `I'm saving my shirt\nfor your funeral wake!` },   
-            {key: 18, enemy: `What's with the flex?\nAre you here to fight\nor to pose for some\nhomoerotic magazine?`, player: `The only posing happening\ntoday, will be for your\npost-mortem photography!` },
+            {key: 18, enemy: `What's with the flex?\nAre you here to fight\nor to pose for a\nhomoerotic magazine?`, player: `The only posing happening\ntoday, will be for your\npost-mortem photography!` },
         
         ];
          
