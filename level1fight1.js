@@ -45,6 +45,7 @@ class Level1Fight1 extends BaseScene {self
             this.addStatsDisplay(character, 470);
         });
 
+
         // ------------- NB! Only for Level1Fight1 ---------------
         gameState.player.name = gameState.playerName ? gameState.playerName : "Punk Rock Samurai";      
         gameState.permanents = [];
@@ -57,6 +58,7 @@ class Level1Fight1 extends BaseScene {self
         displayDiscardPile();
         // ------------- NB! Only for Level1Fight1 ---------------
 
+
         this.addManaBar(gameState.player);
         this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         this.updateManaBar(gameState.player);
@@ -65,7 +67,7 @@ class Level1Fight1 extends BaseScene {self
         if (gameState.lustForLifeCounter) {
             self.addHealButton();
             activateHealButton();
-        };
+        }
         
         
         // self.scene.start('Level2Fight3');
@@ -88,7 +90,7 @@ class Level1Fight1 extends BaseScene {self
                 fadeOutGameObject(leveltextBottom, 2000);
                 self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
         self.input.on('pointerup', () => {
             if (!levelStarting) {
@@ -98,7 +100,7 @@ class Level1Fight1 extends BaseScene {self
                 fadeOutGameObject(leveltextBottom, 2000);
                 self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
         self.input.keyboard.on('keydown', () => {
             if (!levelStarting) {
@@ -108,13 +110,10 @@ class Level1Fight1 extends BaseScene {self
                 fadeOutGameObject(leveltextBottom, 2000);
                 self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
-        function startFight() {
+        async function startFight() {
             gameState.turn = 0;
-            if (gameConfig.musicTheme && gameConfig.musicTheme.isPlaying) {
-                gameConfig.musicTheme.stop();
-            }
             self.shuffleDeck(gameState.drawPile);
             activateRedrawButton();
             gameState.redrawButton.removeInteractive();
@@ -125,24 +124,27 @@ class Level1Fight1 extends BaseScene {self
             const startTextContent = `Level ${level}\nFight ${fight}!`
             gameState.startText = self.add.text(550, 320, startTextContent, startTextConfig).setOrigin(0.5);
             gameState.startFightObjects.push(gameState.startText);
-               
-            self.time.delayedCall(300, () => {
-                if (!gameConfig.musicTheme || !gameConfig.musicTheme.isPlaying) {
-                    gameConfig.music.play({ loop: true, volume: 0.35 });
-                }
-            })
-        
-            self.time.delayedCall(2300, () => { //timer: 2300
-                gameState.startText.setText("Fight!")
-                gameState.startText.setStyle( {fontSize: '100px'})
-                self.time.delayedCall(2300, () => {
-                    fadeOutGameObject(gameState.startText, 500);
-                })           
-                exchangeTaunts()
+            
+            if (gameConfig.musicTheme && gameConfig.musicTheme.isPlaying) {
+                gameConfig.musicTheme.stop();
+            }
 
-                self.input.keyboard.on('keydown', skipIntro, this);
-                self.input.on('pointerup', skipIntro, this);
+            await self.delay(300);
+            if (!gameConfig.musicTheme || !gameConfig.musicTheme.isPlaying) {
+                gameConfig.music.play({ loop: true, volume: 0.35 });
+            }
+        
+            await self.delay(2000);
+            gameState.startText.setText("Fight!");
+            gameState.startText.setStyle( {fontSize: '100px'});
+            
+            self.time.delayedCall(2300, () => {
+                fadeOutGameObject(gameState.startText, 500);
             });
+
+            exchangeTaunts();
+            self.input.keyboard.on('keydown', skipIntro, this);
+            self.input.on('pointerup', skipIntro, this);
         }
 
         async function exchangeTaunts() {
