@@ -41,7 +41,7 @@ class Level1Fight2 extends BaseScene {self
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Mutant City Rat';
         gameState.enemy2.cardKey = 'ratCard';
-        gameState.enemy2.sprite = this.add.image(790, 355, 'rat2').setScale(0.42).setFlipX(true).setInteractive(); //740 / 360 / .42
+        gameState.enemy2.sprite = this.add.image(790, 353, 'rat2').setScale(0.42).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy2.health = 50;
         gameState.enemy2.healthMax = 50;
 
@@ -551,7 +551,7 @@ class Level1Fight2 extends BaseScene {self
                 } else if (gameState.typePlayed === 'permanent') {
                     addPermanent(card);
 
-                } else if (gameState.typePlayed === 'infection') {
+                } else if (gameState.typePlayed === 'debuff') {
                     playCard(card, gameState.player);
 
                 } else {
@@ -743,7 +743,7 @@ class Level1Fight2 extends BaseScene {self
             }
             if (card.key === 'noFuture') {
                 gameState.noFutureCondition = true;
-                gameState.player.healthMax += 7;
+                gameState.player.healthMax += 5;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.powerUpTweens(gameState.player);
                 self.updateHealthBar(target);
@@ -1093,8 +1093,8 @@ class Level1Fight2 extends BaseScene {self
                 gameConfig.attackSound.play({ volume: 0.8 });
 
                 const ratCardsList = [ 
-                    {key: 'ratCard', type: 'infection', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-                    {key: 'ratCard', type: 'infection', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+                    {key: 'ratCard', type: 'debuff', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+                    {key: 'ratCard', type: 'debuff', cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
                 ];
 
                 gameState.drawPile.push( ...ratCardsList);
@@ -1103,7 +1103,7 @@ class Level1Fight2 extends BaseScene {self
                 const ratCardTwo = self.add.image(x+gap, y, 'ratCard').setScale(scale).setOrigin(0.5).setDepth(300);
                 const ratCards = [ratCardOne, ratCardTwo];
 
-                let actionTextContent = 'Adds 2 Infectious to your draw pile';
+                let actionTextContent = 'Adds 2 Infections into your draw pile';
                 gameState.actionText.y = y-200;
                 self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
             
@@ -1287,26 +1287,34 @@ class Level1Fight2 extends BaseScene {self
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
+            gameState.characters.forEach(char => fadeOutGameObject(char.sprite, 200));
 
             gameState.deck.forEach(card => {
                 if (card.usedOneShot) {
                     card.usedOneShot = false;
                 }
-                if (card.type === 'infection') {
+                if (card.type === 'debuff') {
                     gameState.deck = gameState.deck.filter(c => c != card);
+                }
+                if (card.key === 'riotRonin') {
+                    card.goldCost = 0;
                 }    
-            })
+            });
             
+            const gundanSeizaiIncome = gameState.gundanSeizai ? 1 : 0;
+            const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(3, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const totalIncome = gundanSeizaiIncome + zaibatsuUndergroundIncome;
+
             self.time.delayedCall(600, () => {
                 if (gameConfig.attackSound.isPlaying) {
                     gameConfig.attackSound.stop();
                 }
-                if (gameState.gundanSeizai && gameState.player.gold < gameState.player.goldMax) {
-                    earnGold(1);
+                if (totalIncome) {
+                    earnGold(totalIncome);
                 }
                 gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
                 self.clearBoard();
-            })
+            });
         
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
@@ -2095,7 +2103,11 @@ class Level1Fight2 extends BaseScene {self
                 if (!gameState.fightStarted) {
                     gameState.player.healthMax += 5;
                     self.updateHealthBar(gameState.player);
-                }
+                    gameState.enduringSpiritCounter +=1;
+                    if (gameState.enduringSpiritCounter >= 7) {
+                        depleteEnduringSpirit(card)
+                    }; 
+                };
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2111,6 +2123,17 @@ class Level1Fight2 extends BaseScene {self
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
                         depleteShogunsShell(card); 
+                    } else {
+                        self.cameras.main.shake(70, .002, false);
+                    }
+                })
+
+            } else if (card.key === 'zaiUnderground') {
+                gameState.zaibatsuUnderground = true;
+
+                card.tokenSprite.on('pointerup', () => {
+                    if (gameState.playersTurn) {
+                        depleteZaibatsuUnderground(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2225,6 +2248,7 @@ class Level1Fight2 extends BaseScene {self
                     break;
                 case 'bouncingSoles':
                 case 'bouncingSoles2':
+                case 'bouncingSoles3':
                     depleteBouncingSoles(card);
                     break;
                 case 'enduringSpirit':
@@ -2232,6 +2256,9 @@ class Level1Fight2 extends BaseScene {self
                     break;                     
                 case 'shogunsShell':
                     depleteShogunsShell(card);
+                    break;
+                case 'zaiUnderground':
+                    depleteZaibatsuUnderground(card);
                     break;  
                     
                 // NB! Add any card that is not allowed to deplete from hand
@@ -2471,20 +2498,12 @@ class Level1Fight2 extends BaseScene {self
         }
 
         function depleteBouncingSoles(card) {
-            if (card.key === 'bouncingSoles') {
-                gameState.permanentSlots.push(            
-                    { available: true, x: 50, y: 130, index: 4 },
-                );
-                gameState.bonusCards.push( 
-                    {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
-                );
-
-            } else if (card.key === 'bouncingSoles2') {
-                gameState.permanentSlots.push(            
-                    { available: true, x: 125, y: 130, index: 5 },
-                );
+            if (gameState.bonusPermanentSlots.length) {
+                gameState.permanentSlots.push(gameState.bonusPermanentSlots.shift());
             }
-
+            if (gameState.bouncingSolesCards.lenght) {
+                gameState.extraCards.push(gameState.bouncingSolesCards.shift());
+            }    
             destroyToken(card);
         }
 
@@ -2496,6 +2515,11 @@ class Level1Fight2 extends BaseScene {self
             gameState.shogunsShellCondition = 0;
             gameState.player.armor = 15;
             updateStrengthAndArmor(gameState.player);
+            destroyToken(card);
+        }
+
+        function depleteZaibatsuUnderground(card) {
+            gameState.zaibatsuUnderground = false;
             destroyToken(card);
         }
         
@@ -2646,7 +2670,7 @@ class Level1Fight2 extends BaseScene {self
                 let card = gameState.currentCards.pop();
                 if (!card.slot.available) card.slot.available = true;
                 if (card.dBeat) delete card.dBeat
-                if (card.type === 'infection') {
+                if (card.type === 'debuff') {
                     gameState.player.poison += 2;
                 }
                 gameState.discardPile.push(card);

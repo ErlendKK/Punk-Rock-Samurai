@@ -1,10 +1,7 @@
-old_code = """if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);"""
+old_code = """const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(4, Math.floor(gameState.player.gold * 0.12)) : 0;"""
 
 
-new_code = """if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
-            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));"""
+new_code = """const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(3, Math.floor(gameState.player.gold * 0.10)) : 0;"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

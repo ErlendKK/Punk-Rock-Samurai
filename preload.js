@@ -7,7 +7,7 @@
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
 let gameState = {};
-gameState.version = 1.305;
+gameState.version = 1.306;
 
 let gameConfig = {};
 gameConfig.levels = [
@@ -152,15 +152,17 @@ class Preload extends Phaser.Scene {
             this.load.image('bouncingSolesToken', 'assets/images/cards/bouncingSolesToken.png');
             this.load.image('bouncingSoles', 'assets/images/cards/bouncingSoles.jpg');
             this.load.image('bouncingSoles2', 'assets/images/cards/bouncingSoles2.jpg');
+            this.load.image('bouncingSoles3', 'assets/images/cards/bouncingSoles3.jpg');
+            this.load.image('bouncingSoles4', 'assets/images/cards/bouncingSoles4.jpg');
             this.load.image('enduringSpiritToken', 'assets/images/cards/enduringSpiritToken.png');
             this.load.image('enduringSpirit', 'assets/images/cards/enduringSpirit.jpg');
             this.load.image('shogunsShellToken', 'assets/images/cards/shogunsShellToken.png');
             this.load.image('shogunsShell', 'assets/images/cards/shogunsShell.jpg');
             this.load.image('chemicalWarfareToken', 'assets/images/cards/chemicalWarfareToken.png');
             this.load.image('chemicalWarfare', 'assets/images/cards/chemicalWarfare.jpg');
-
+            this.load.image('zaibatsuUndergroundToken', 'assets/images/cards/zaibatsuUndergroundToken.png');
+            this.load.image('zaiUnderground', 'assets/images/cards/zaibatsuUnderground.jpg');
             
-
             this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
             this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
             this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
@@ -195,7 +197,7 @@ class Preload extends Phaser.Scene {
             alive: true,
             stance: 'Neutral',
             stancePoints: 0,
-            gold: 0,
+            gold: 20,
             goldMax: 99,
             poison: 0,
             numCards: 5,
@@ -241,21 +243,22 @@ class Preload extends Phaser.Scene {
 
         gameState.deck = [
 
-            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1,  damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1,  damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1,  damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1,  damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1,  damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1, damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1, damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1, damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1, damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'knuckleFist', type: 'targetSelected', cost: 1, stancePoints: 1, damage: 7, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'kabutu',      type: () => (gameState.edoEruption && gameState.player.stancePoints > 0) ? 'targetAll' : 'buff', cost: 1, stancePoints: -1, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             
-            {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0,  damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
-            {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0,  damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0, damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-    
+            {key: 'zaiUnderground',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
+            
         ]; 
             
         gameState.bonusCards = [
@@ -273,6 +276,7 @@ class Preload extends Phaser.Scene {
             {key: 'shogunsShell',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'shogunsShellToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
             {key: 'chemicalWarfare',    type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'chemicalWarfareToken'},
+            {key: 'zaiUnderground',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
             
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -320,12 +324,11 @@ class Preload extends Phaser.Scene {
             {key: 'pyroPunk',           type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 0, fire: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.15), poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'troopsOfTakamori',   type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 6, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'wrathOfMoen',        type: 'targetSelected', cost: 2, stancePoints: 0,  damage: 24, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
-            {key: 'riotRonin',          type: 'targetSelected',  cost: 2, goldCost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'riotRonin',          type: 'targetSelected', cost: 2, goldCost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
         ];
 
         gameState.extraCards = [
-
             {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'kirisuteGomen',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'kirisuteGomenToken'},
             {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
@@ -333,55 +336,83 @@ class Preload extends Phaser.Scene {
             {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
             {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
             {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
-            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},
-           
+            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},   
+        ];
+
+        gameState.bouncingSolesCards = [                
+            {key: 'bouncingSoles2',     type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'},
+            {key: 'bouncingSoles3',     type: 'permanent', cost: 5, goldCost: 5, token: 'bouncingSolesToken'},
+            {key: 'bouncingSoles4',     type: 'permanent', cost: 6, goldCost: 6, token: 'bouncingSolesToken'}
         ];
 
         gameConfig.allCards = [
             ...gameState.deck,
             ...gameState.bonusCards,
             ...gameState.extraCards,
-            {key: 'bouncingSoles2', type: 'permanent', cost: 4, goldCost: 4, token: 'bouncingSolesToken'}
+            ...gameState.bouncingSolesCards
         ];
 
         gameConfig.minDeckSize = 10;
         gameConfig.maxDeckSize = 40;
         gameState.latestDraw = [];
         gameState.lustForLifeCounter = 0
+        gameState.enduringSpiritCounter = 0
         gameState.healButtonPermanence = false;
+
+        gameState.bonusPermanentSlots = [
+            { available: true, x: 50, y: 130, index: 4 },
+            { available: true, x: 125, y: 130, index: 5 },
+            { available: true, x: 200, y: 130, index: 6 },
+            { available: true, x: 275, y: 130, index: 7 },
+        ];
 
         gameState.taunts = [
             {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},
-            {key: 3, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nto survive!` },
-            {key: 5, enemy: `Got lost on your way\nto a cosplay,\nSamurai boy?`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
-            {key: 6, enemy: `You look like a kid who\nfound his granddad's armor.`, player: `And you'll look like\nyour granddad's corpse\nwhen I'm done with you!` },
-            {key: 8, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
-            {key: 9, enemy: `A Samurai punk rocker?\nHow's that midlife crisis going?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
-            {key: 12, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
-            {key: 13, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
-            {key: 14, enemy: `Nice costume, boy.\nDo you do birthdays\nand bar mitzvahs?`, player: `Just funerals.\nYours is next\non the list.` },
+            {key: 2, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt\nto survive this encounter!` },
+            {key: 3, enemy: `You must be lost,\nsamurai boy.\nThe cosplay convention\nis down the street.`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
+            {key: 4, enemy: `You look like a kid who\nfound his grandpa's armor.`, player: `And you'll look like\nyour grandpa's corpse\nwhen I'm done with you!` },
+            {key: 5, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
+            {key: 6, enemy: `A Samurai punk rocker?\nHow's that midlife\ncrisis going for you?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
+            {key: 7, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
+            {key: 8, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
+            {key: 9, enemy: `Nice clown costume.\nDo you do birthdays\nand weddings?`, player: `Just funerals.\nYours is next\non the list!` },
+            {key: 11, enemy: `A samurai in the\n21st century?\nI want whatever\nyour smoking`, player: `Very soon,\nthe only thing\nyou'll be wanting,\nis mercy!` },
+            {key: 17, enemy: `What's the matter,\ndid they run out\nof shirts your size,\nor is this a flex-off?`, player: `I'm saving my shirt\nfor your funeral wake!` },   
+            {key: 18, enemy: `What's with the flex?\nAre you here to fight\nor to pose for some\nhomoerotic magazine?`, player: `The only posing happening\ntoday, will be for your\npost-mortem photography!` },
+        
         ];
          
         gameState.ratTaunts = [
-            {key: 11, enemy: `Hsss..\nYou’ll make a fine\nmeal for my pups!`, player: `Tell them not to wait up.\nDaddy's not comming home tonight!` },
-            {key: 11, enemy: `Hsss..\nYou come here to fight\nor to display your\nHalloween costume?`, player: `The only thing on\ndisplay today\nwill be your entrails!` },
+            {key: 201, enemy: `Hsss..\nYou’ll make a fine\nmeal for my pups!`, player: `Tell them not to wait up.\nDaddy's not comming home tonight!` },
+            {key: 202, enemy: `Hsss..\nYou come here to fight\nor to display your\nHalloween costume?`, player: `The only thing on\ndisplay today\nwill be your entrails!` },
         ]
         
         
         gameState.extraTaunts = [
-            {key: 4, enemy: `You really believe\nyou're a samurai, huh?`, player: `You believe in ghosts?\nBecause you're\nabout to become one!` },
-            {key: 11, enemy: `A Samurai in the\n21st century?\nAre you on drugs?`, player: `The only thing I'm\non is the path\nto your annihilation!` },
-            {key: 12, enemy: `Childish music\nand childish fantasies.\nGrow up!`, player: `I'll make sure you\nnever grow old.` },
-            {key: 13, enemy: `Must be hard, living\na deluded fantasy.`, player: `Not as hard as what's\ncoming for you.` },
-            {key: 10, enemy: `Punk and Samurai?\nTwo failures in one!`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
-            {key: 2, enemy: `Chasing fantasies while\nthe world laughs at you?`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
-            {key: 11, enemy: `You're a relic in a world that's moved on.`, player: `You won't be moving much soon.!` },
-            {key: 11, enemy: `You take this Samurai gig\nseriously, huh?`, player: `Serious as the grave\nI'm about to dig for you!` },
-            {key: 11, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the blood\nit will draw from your corpse!` },
-            {key: 11, enemy: `Hey, Samurai punk,\nthe circus called,\nthey want their clown back`, player: `Sorry, I'm booked up\nmopping your entrails\noff the floor` },   
-            {key: 7, enemy: `Still holding onto\npunk's corpse, I see`, player: `The only corpse here\nwill be the one\nI leave behind!` },
-            {key: 10, enemy: `Your delusions of grandeur\nare quite entertaining.`, player: `The only entertainment tonight\nwill be your cries of agony!` },
-        ];
+            {key: 101, enemy: `You really believe\nyou're a samurai, huh?`, player: `You believe in ghosts?\nBecause you're\nabout to become one!` },
+            {key: 102, enemy: `Childish music\nand childish fantasies.\nGrow up!`, player: `I'll make sure you\nnever grow old!` },
+            {key: 103, enemy: `Must be hard, living\na deluded fantasy.`, player: `Not as hard as what's\ncoming for you!` },
+            {key: 104, enemy: `Punk and Samurai?\nTwo failures in one!`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
+            {key: 105, enemy: `Chasing fantasies while\nthe world laughs at you?`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
+            {key: 106, enemy: `You're a relic in a world that's moved on.`, player: `You won't be moving much soon!` },
+            {key: 107, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the pain\nyou're about to feel!` },
+            {key: 108, enemy: `Hey, Samurai punk,\nthe circus called,\nthey want their clown back`, player: `Sorry, I'm booked up\nmopping your entrails\noff the floor!` },   
+            {key: 109, enemy: `Still holding onto\npunk's corpse, I see`, player: `The only corpse here\nwill be the one\nI leave behind!` },
+            {key: 110, enemy: `Your delusions of grandeur\nare quite entertaining.`, player: `The only entertainment tonight\nwill be your cries of agony!` },
+            {key: 111, enemy: `I've seen better costumes\nat a kid's party.`, player: `And I've seen better\nfighters in a retirement home!` },
+            {key: 112, enemy: `That haircut's\na cry for help.`, player: `The only one crying\nfor help will be you,\nsoon enough!` },      
+            {key: 113, enemy: `Whats with the outfit?\nAre you auditioning for\na bad action movie?`, player: `No movie could capture\nthe reality of the suffering\nyour about to experience!` },
+            {key: 16, enemy: `What's with the\nsilly haircut,\nsamurai wannabe?`, player: `Not as silly as your\nentrails will look\nsprawled all over the ground!` },
+            {key: 15, enemy: `You take this Samurai gig\npretty seriously, huh??`, player: `As serious as the grave\nyou're about to fill!` },
+            {key: 10, enemy: `Whats with the outfit?\nYou look like you\nraided a costume store`, player: `And you look like\nsomeone whose about to\nhave a very bad day!` },
+            {key: 13, enemy: `Nice cosplay.\nWhere's the convention?`, player: `No time for conventions.\nI'm' booked up\nmopping whats left of\nyou off the floor!` },
+            {key: 14, enemy: `Trying to be a samurai\nor just lost a bet?`, player: `The only thing worth\nbetting on today is\nwhich part of you\nhits the ground first!` },
+            {key: 12, enemy: `You look like an\nantagonist from a bad\nMad Max movie`, player: `And you look like\nthe first stunt\nto get taken out!` },
+        ];  
+
+
+        
+
 
         if (gameState.restartGame) self.scene.start('Mainmenu');
              

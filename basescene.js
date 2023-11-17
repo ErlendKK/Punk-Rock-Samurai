@@ -46,6 +46,7 @@ class BaseScene extends Phaser.Scene {
         gameState.steelToe = false;
         gameState.gundanSeizai = false;
         gameState.noFutureCondition = false;
+        gameState.zaibatsuUnderground = false;
         
         // Initiate sounds
         gameConfig.cardsDealtSound = this.sound.add('cardsDealtSound');
@@ -120,6 +121,9 @@ class BaseScene extends Phaser.Scene {
                 version: gameState.version,
                 score: gameState.score,
                 lustForLifeCounter: gameState.lustForLifeCounter,
+                enduringSpiritCounter: gameState.enduringSpiritCounter,
+                bouncingSolesCards: gameState.bouncingSolesCards,
+                bonusPermanentSlots: gameState.bonusPermanentSlots,
 
                 savedScene: currentScene,
                 loadedGame: true,
