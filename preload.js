@@ -197,7 +197,7 @@ class Preload extends Phaser.Scene {
             alive: true,
             stance: 'Neutral',
             stancePoints: 0,
-            gold: 20,
+            gold: 0,
             goldMax: 99,
             poison: 0,
             numCards: 5,
