@@ -223,7 +223,7 @@ class Level4Fight3 extends BaseScene {self
             return new Promise((resolve) => {
                 let index = 0;
                 let currentText = "";
-                const delay = 33.4;
+                const delay = 35;
         
                 const addNextLetter = () => {
                     if (gameState.skipIntro) {
@@ -1381,12 +1381,16 @@ class Level4Fight3 extends BaseScene {self
             })     
         };
         
-        function initiateVictory() {
+        async function initiateVictory() { // NB! Modified for level 2-2
             gameState.score.numberOfTurns += gameState.turn;
             gameState.score.levelsCompleted += 1;
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
+            
+            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
+            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
+            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
             gameState.characters.forEach(char => fadeOutGameObject(char.sprite, 200));
 
             gameState.deck.forEach(card => {
@@ -1400,45 +1404,45 @@ class Level4Fight3 extends BaseScene {self
                     card.goldCost = 0;
                 }    
             });
-            
+
+            await self.delay(600);
+            if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
+
+            await self.delay(200);
             const gundanSeizaiIncome = gameState.gundanSeizai ? 1 : 0;
             const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(3, Math.floor(gameState.player.gold * 0.10)) : 0;
             const totalIncome = gundanSeizaiIncome + zaibatsuUndergroundIncome;
-
-            self.time.delayedCall(600, () => {
-                if (gameConfig.attackSound.isPlaying) {
-                    gameConfig.attackSound.stop();
-                }
-                if (totalIncome) {
-                    earnGold(totalIncome);
-                }
-                gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
-                self.clearBoard();
-            });
-        
-            if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
-            if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
-            gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
+            if (totalIncome) earnGold(totalIncome);
+            
+            if (gameState.gundanSeizai || gameState.zaibatsuUnderground) {
+                gameState.permanents.forEach(perm => {
+                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaiUnderground') {
+                        perm.sprite = perm.tokenSprite;
+                        self.powerUpTweens(perm);
+                    }
+                });
+            }
+            
+            gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
+            self.clearBoard();
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
-            const delayTime = fight === 3 ? 3000 : 100;
-            const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nLevel 5 is comming in the next patch :)` : "";
+            const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to Health Max` : "";
             
-            self.time.delayedCall(1600, () => {
+            const delayBeforeRemoveText = totalIncome ? 1500 : 1200;
+            self.time.delayedCall(delayBeforeRemoveText, () => {
                 gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);
-                victoryText.setStyle({
-                    fontSize: '60px',
-                    // fontFamily: 'Arial',
-                });
+                victoryText.setStyle({fontSize: '60px'});
 
-                self.time.delayedCall(delayTime, () => {
-                    victoryText.destroy()
+                const delayBeforeEndFight = fight === 3 ? 3000 : 100;
+                self.time.delayedCall(delayBeforeEndFight, () => {
+                    victoryText.destroy();
                     chooseReward();
                 })
-            })
+            });
         }
         
         function chooseReward() {

@@ -36,21 +36,21 @@ class Level2Fight2 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Junior Goblin\nApprentice of poison';
         gameState.enemy1.sprite = this.add.sprite(670, 380, 'goblin1').setScale(0.20).setFlipX(true).setInteractive(), //690 / 350 / .33
-        gameState.enemy1.health = 30;
+        gameState.enemy1.health = 1;
         gameState.enemy1.healthMax = 30;
         gameState.enemy1.armor = 0;
         
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Junior Goblin\nApprentice of poison';
         gameState.enemy2.sprite = this.add.sprite(800, 380, 'goblin3').setScale(0.18).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy2.health = 30;
+        gameState.enemy2.health = 1;
         gameState.enemy2.healthMax = 30; 
         gameState.enemy2.armor = 0;
             
         gameState.enemy3  = Object.create(gameState.enemy);
         gameState.enemy3.name = 'Senior Goblin\nMaster of poison';
         gameState.enemy3.sprite = this.add.sprite(930, 380, 'goblin2').setScale(0.25).setFlipX(false).setInteractive(), //910 / 310 / .25
-        gameState.enemy3.health = 45;
+        gameState.enemy3.health = 1;
         gameState.enemy3.healthMax = 45;
         gameState.enemy3.armor = 0;
 
@@ -221,7 +221,7 @@ class Level2Fight2 extends BaseScene {self
             return new Promise((resolve) => {
                 let index = 0;
                 let currentText = "";
-                const delay = 33.4;
+                const delay = 35;
         
                 const addNextLetter = () => {
                     if (gameState.skipIntro) {
@@ -1125,6 +1125,28 @@ class Level2Fight2 extends BaseScene {self
                     {key: `Intends to\nEvacuate Gold`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Evacuates Gold', probability: 1},
                 ];
 
+            } else if (gameState.turn === 2) {
+                gameState.enemy1.actions = [
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 1},
+                ];
+                gameState.enemy2.actions = [
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 1},
+                ];
+                gameState.enemy3.actions = [
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 1},
+                ];
+
+            } else if (gameState.turn === 3) {
+                gameState.enemy1.actions = [
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: 1},
+                ];
+                gameState.enemy2.actions = [
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: 1},
+                ];
+                gameState.enemy3.actions = [
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy3.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage\nAnd 1 Poison', probability: 0.11 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6}
+                ];
+
             } else {
 
                 gameState.enemy1.actions = [ 
@@ -1136,7 +1158,7 @@ class Level2Fight2 extends BaseScene {self
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 6}
-                ]
+                ];
         
                 gameState.enemy2.actions = [ 
                     {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.00 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
@@ -1147,7 +1169,7 @@ class Level2Fight2 extends BaseScene {self
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.14 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 2, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 2 poison', probability: 0.18 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 6}
-                ]
+                ];
             
                 gameState.enemy3.actions = [ 
                     {key: `Intends to\nDeal 7 fire damage`, damage: 0, fire: 7, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 7 fire damage', probability: 0.0 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
@@ -1158,7 +1180,7 @@ class Level2Fight2 extends BaseScene {self
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 4, text: 'Gains 4 armor', probability: 0.18 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6},
                     {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 0.19 + ((gameState.enemy3.health >= gameState.enemy3.healthMax) ? 0.22 : 0) / 6}
-                ]
+                ];
             }
         
         }  
@@ -1267,7 +1289,7 @@ class Level2Fight2 extends BaseScene {self
 
             await self.delay(600);
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
-            if (countdownTimer) {
+            if (countdownTimer && gameState.countdownText) {
                 await earnGoblinGold();
             }
 
@@ -1277,24 +1299,31 @@ class Level2Fight2 extends BaseScene {self
             const totalIncome = gundanSeizaiIncome + zaibatsuUndergroundIncome;
             if (totalIncome) earnGold(totalIncome);
             
+            if (gameState.gundanSeizai || gameState.zaibatsuUnderground) {
+                gameState.permanents.forEach(perm => {
+                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaiUnderground') {
+                        perm.sprite = perm.tokenSprite;
+                        self.powerUpTweens(perm);
+                    }
+                });
+            }
+            
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
             self.clearBoard();
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
-            const delayTime = fight === 3 ? 3000 : 100;
             const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to Health Max` : "";
             
-            self.time.delayedCall(1000, () => {
+            const delayBeforeRemoveText = totalIncome ? 1500 : 1200;
+            self.time.delayedCall(delayBeforeRemoveText, () => {
                 gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);
-                victoryText.setStyle({
-                    fontSize: '60px',
-                    // fontFamily: 'Arial',
-                });
+                victoryText.setStyle({fontSize: '60px'});
 
-                self.time.delayedCall(delayTime, () => {
+                const delayBeforeEndFight = fight === 3 ? 3000 : 100;
+                self.time.delayedCall(delayBeforeEndFight, () => {
                     victoryText.destroy();
                     chooseReward();
                 })
@@ -1305,16 +1334,18 @@ class Level2Fight2 extends BaseScene {self
         function earnGoblinGold() {
             return new Promise(resolve => {
                 let delayCount = 0;
-                for (let i = 0; i < countdownTimer; i++) {                
+                const originalTimer = countdownTimer;
+        
+                for (let i = 0; i < originalTimer; i++) {                
                     self.time.delayedCall(i * 200, () => {
                         gameState.player.gold = Math.min(gameState.player.gold + 1, gameState.player.goldMax);
                         countdownTimer -= 1;
                         gameState.goldCounter.setText(gameState.player.gold);
                         gameState.countdownText.setText(countdownTimer);
                         gameConfig.coinSound.play({ volume: 0.8, seek: 0.02 });
-        
+            
                         delayCount++;
-                        if (delayCount === countdownTimer) {
+                        if (delayCount === originalTimer) {
                             if (countdownTimer === 0) {
                                 fadeOutGameObject(gameState.countdownTextBox, 250);
                                 fadeOutGameObject(gameState.countdownText, 250);
