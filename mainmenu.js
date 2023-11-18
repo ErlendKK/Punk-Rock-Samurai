@@ -739,12 +739,12 @@ class Mainmenu extends Phaser.Scene {
         };
 
     // ----   USED TO SKIP MENU WHEN TESTING ----
-    gameState.playerName = 'Punk Rock Samurai';
-    const bonusCard = gameState.extraCards[0];
-    bonusCard.freePermanent = true;
-    gameState.deck.push(bonusCard);
-    gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
-    self.scene.start('Level1Fight1');
+    // gameState.playerName = 'Punk Rock Samurai';
+    // const bonusCard = gameState.extraCards[0];
+    // bonusCard.freePermanent = true;
+    // gameState.deck.push(bonusCard);
+    // gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+    // self.scene.start('Level1Fight1');
 
     } // end of create()
 
