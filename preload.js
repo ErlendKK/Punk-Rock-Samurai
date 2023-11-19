@@ -7,7 +7,7 @@
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
 let gameState = {};
-gameState.version = 1.306;
+gameState.version = 1.307;
 
 let gameConfig = {};
 gameConfig.levels = [
@@ -47,6 +47,9 @@ class Preload extends Phaser.Scene {
         const percentTextConfig = { font: '18px monospace', fill: '#ffffff' };
         const percentText = this.add.text(x, y - 5, '0%', percentTextConfig).setOrigin(0.5, 0.5);
 
+        const fileLoadingTextConfig = { font: '16px monospace', fill: '#ffffff' };
+        const fileLoadingText = this.add.text(x, y + 30, '', fileLoadingTextConfig).setOrigin(0.5, 0.5);
+
         // Update progress bar as files are loaded
         this.load.on('progress', function (value) {
             percentText.setText(parseInt(value * 100) + '%');
@@ -55,13 +58,19 @@ class Preload extends Phaser.Scene {
             progressBar.fillRect(width / 2 - 150, 280, 300 * value, 30);
         });
 
+        this.load.on('fileprogress', function (file) {
+            fileLoadingText.setText('Loading: ' + file.key);
+        });
+
         // Once all assets are loaded
         this.load.on('complete', function () {
             progressBar.destroy();
             progressBox.destroy();
             loadingText.destroy();
             percentText.destroy();
+            fileLoadingText.destroy();
         });
+
         if (!gameState.restartGame) {
             this.load.image('knuckleFist', 'assets/images/cards/knuckleFist.jpg');
             this.load.image('kabutu', 'assets/images/cards/kabutu.jpg');
@@ -132,6 +141,8 @@ class Preload extends Phaser.Scene {
             this.load.image('edoEruption', 'assets/images/cards/edoEruption.jpg');
             this.load.image('edoEruptionToken', 'assets/images/cards/edoEruptionToken.png');  
             this.load.image('steelToe', 'assets/images/cards/steelToe.jpg');
+            this.load.image('steelToe2', 'assets/images/cards/steelToe2.jpg');
+
             this.load.image('steelToeToken', 'assets/images/cards/steelToeToken.png');
             this.load.image('foreverTrueToken', 'assets/images/cards/foreverTrueToken.png'); 
             this.load.image('foreverTrue', 'assets/images/cards/foreverTrue.jpg');
@@ -161,22 +172,25 @@ class Preload extends Phaser.Scene {
             this.load.image('chemicalWarfareToken', 'assets/images/cards/chemicalWarfareToken.png');
             this.load.image('chemicalWarfare', 'assets/images/cards/chemicalWarfare.jpg');
             this.load.image('zaibatsuUndergroundToken', 'assets/images/cards/zaibatsuUndergroundToken.png');
-            this.load.image('zaiUnderground', 'assets/images/cards/zaibatsuUnderground.jpg');
+            this.load.image('zaibatsuU', 'assets/images/cards/zaibatsuUnderground.jpg');
+            this.load.image('chintaiShunyuToken', 'assets/images/cards/chintaiShunyuToken.png');
+            this.load.image('chintaiShunyu', 'assets/images/cards/chintaiShunyu.jpg');
+            
             
             this.load.image('bgLoadingScreen', 'assets/images/bgLoadingScreen.jpg');
-            this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
-            this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
-
             this.load.image('shop1', 'assets/images/shop1.jpg'); 
+            this.load.image('goldCard', 'assets/images/goldCard.jpg');
+            this.load.image('goldCoin', 'assets/images/goldCoin.png');
+
+            this.load.audio('titleTheme', 'assets/sounds/music/TitleTheme.mp3');
             this.load.audio('bossTune', 'assets/sounds/music/DecisiveBattle.mp3');
+            this.load.audio('thundersound', 'assets/sounds/thundersound.mp3');
             this.load.audio('attackSound', 'assets/sounds/attacksound.wav');
             this.load.audio('powerUpSound', 'assets/sounds/powerupsound.wav');
             this.load.audio('healSound', 'assets/sounds/healsound.wav');
             this.load.audio('victorySound', 'assets/sounds/victorysound.mp3');
             this.load.audio('keyboardSound', 'assets/sounds/keyboardsound.mp3');
             this.load.audio('coinSound', 'assets/sounds/coinsound.mp3');
-            this.load.image('goldCard', 'assets/images/goldCard.jpg');
-            this.load.image('goldCoin', 'assets/images/goldCoin.png');
         }
     };
 
@@ -257,7 +271,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0, damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-   
+  
         ]; 
             
         gameState.bonusCards = [
@@ -275,7 +289,7 @@ class Preload extends Phaser.Scene {
             {key: 'shogunsShell',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'shogunsShellToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
             {key: 'chemicalWarfare',    type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'chemicalWarfareToken'},
-            {key: 'zaiUnderground',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
+            {key: 'zaibatsuU',          type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
             {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
 
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -335,7 +349,7 @@ class Preload extends Phaser.Scene {
             {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
             {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
             {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
-            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},   
+            {key: 'deadTokugawas',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'deadTokugawasToken'},          
         ];
 
         gameState.bouncingSolesCards = [                
@@ -344,19 +358,44 @@ class Preload extends Phaser.Scene {
             {key: 'bouncingSoles4',     type: 'permanent', cost: 6, goldCost: 6, token: 'bouncingSolesToken'}
         ];
 
+        gameState.steelToeCards = [
+            {key: 'steelToe2',          type: 'permanent',      cost: 2, goldCost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
+        ];
+
+        gameState.zaibatsuCards = [
+            {key: 'chintaiShunyu',      type: 'permanent',      cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'chintaiShunyuToken'},   
+        ];
+
         gameConfig.allCards = [
             ...gameState.deck,
             ...gameState.bonusCards,
             ...gameState.extraCards,
-            ...gameState.bouncingSolesCards
+            ...gameState.bouncingSolesCards,
+            ...gameState.steelToeCards,
+            ...gameState.zaibatsuCards
+        ];
+
+        gameConfig.bouncingSolesCardNames = [  
+            'bouncingSoles',
+            'bouncingSoles2',
+            'bouncingSoles3',
+            'bouncingSoles4'             
+        ];
+
+        gameConfig.tokenCardNames = [
+            'chemicalWarfare', 
+            'kamishimoUberAlles', 
+            'hollidayInKamakura',
+            'chintaiShunyu'
         ];
 
         gameConfig.minDeckSize = 10;
         gameConfig.maxDeckSize = 40;
         gameState.latestDraw = [];
-        gameState.lustForLifeCounter = 0
-        gameState.enduringSpiritCounter = 0
-        gameState.healButtonPermanence = false;
+        gameState.permanents = [];
+
+        gameState.lustForLifeCounter = 0;
+        gameState.enduringSpiritCounter = 0;
 
         gameState.bonusPermanentSlots = [
             { available: true, x: 50, y: 130, index: 4 },
@@ -368,24 +407,25 @@ class Preload extends Phaser.Scene {
         gameState.taunts = [
             {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},
             {key: 2, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt to\nsurvive this encounter!` },
-            {key: 3, enemy: `You must be lost,\nsamurai boy.\nThe cosplay convention\nis down the street.`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
+            {key: 3, enemy: `You must be lost, samurai boy.\nThe cosplay convention is\ndown the street.`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
             {key: 4, enemy: `You look like a kid who\nfound his grandpa's armor.`, player: `And you'll look like\nyour grandpa's corpse\nwhen I'm done with you!` },
-            {key: 5, enemy: `Nice samurai outfit, kid!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
+            {key: 5, enemy: `Nice samurai outfit, punk!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
             {key: 6, enemy: `A Samurai punk rocker?\nHow's that midlife\ncrisis going for you?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
-            {key: 7, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here\nis the one whose about to\nbe begging me for mercy!` },
+            {key: 7, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here is\nthe one whose about to\nbe begging me for mercy!` },
             {key: 8, enemy: `What's with the big sword?\nCompensating for something?`, player: `The only things small here\nare your chances of survival!` },
-            {key: 9, enemy: `Nice clown costume.\nDo you do childrens\nbirthdays and bar mitzvahs?`, player: `Just funerals.\nYours is next\non the list!` },
-            {key: 11, enemy: `A samurai in the 21st century?\nI want some of whatever your smoking`, player: `Soon enough, the\nonly thing you'll be\nwanting, is mercy!` },
-            {key: 17, enemy: `What's with the flex?\ndid they run out\nof shirts your size?`, player: `I'm saving my shirt\nfor your funeral wake!` },   
-            {key: 18, enemy: `What's with the flex?\nAre you here to fight\nor to pose for an\nerotic magazine?`, player: `The only posing happening\ntoday, will be for your\npost-mortem photography!` },
-        
+            {key: 9, enemy: `Nice clown costume.\nDo you do childrens\nbirthdays and\nbar mitzvahs?`, player: `Just funerals.\nYours is next\non the list!` },
+            {key: 10, enemy: `A samurai in the 21st century?\nI want whatever your smoking!`, player: `Soon enough, the\nonly thing you'll be\nwanting, is mercy!` },
+        ];
+
+        gameState.taunts2 = [
+            {key: 11, enemy: `What's with the flex?\ndid they run out\nof shirts your size?`, player: `I'm saving my shirt\nfor your funeral wake!` },   
+            {key: 12, enemy: `What's with the flex?\nAre you here to fight\nor to pose for\nGay Times?`, player: `The only posing happening\ntoday, will be for your\npost-mortem photography!` },      
         ];
          
         gameState.ratTaunts = [
             {key: 201, enemy: `Hsss..\nYou’ll make a fine\nmeal for my pups!`, player: `Tell them not to wait up.\nDaddy's not comming home tonight!` },
             {key: 202, enemy: `Hsss..\nYou come here to fight\nor to display your\nHalloween costume?`, player: `The only thing on\ndisplay today\nwill be your entrails!` },
-        ]
-        
+        ];
         
         gameState.extraTaunts = [
             {key: 101, enemy: `You really believe\nyou're a samurai, huh?`, player: `You believe in ghosts?\nBecause you're\nabout to become one!` },
@@ -403,10 +443,10 @@ class Preload extends Phaser.Scene {
             {key: 113, enemy: `Whats with the outfit?\nAre you auditioning for\na bad action movie?`, player: `No movie could capture\nthe reality of the suffering\nyour about to experience!` },
             {key: 16, enemy: `What's with the\nsilly haircut,\nsamurai wannabe?`, player: `Not as silly as your\nentrails will look\nsprawled all over the ground!` },
             {key: 15, enemy: `You take this Samurai gig\npretty seriously, huh??`, player: `As serious as the grave\nyou're about to fill!` },
-            {key: 10, enemy: `Whats with the outfit?\nYou look like you\nraided a costume store`, player: `And you look like\nsomeone whose about to\nhave a very bad day!` },
+            {key: 17, enemy: `Whats with the outfit?\nYou look like you\nraided a costume store`, player: `And you look like\nsomeone whose about to\nhave a very bad day!` },
             {key: 13, enemy: `Nice cosplay.\nWhere's the convention?`, player: `No time for conventions.\nI'm' booked up\nmopping whats left of\nyou off the floor!` },
             {key: 14, enemy: `Trying to be a samurai\nor just lost a bet?`, player: `The only thing worth\nbetting on today is\nwhich part of you\nhits the ground first!` },
-            {key: 12, enemy: `You look like an\nantagonist from a bad\nMad Max movie`, player: `And you look like\nthe first stunt\nto get taken out!` },
+            {key: 18, enemy: `You look like an\nantagonist from a bad\nMad Max movie`, player: `And you look like\nthe first stunt\nto get taken out!` },
         ];  
 
 

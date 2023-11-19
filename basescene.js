@@ -38,15 +38,16 @@ class BaseScene extends Phaser.Scene {
         // Reset Permanent effects
         gameState.kamishimoUberAlles = 0;
         gameState.chemicalWarfare = 0;
-        gameState.shogunsShellCondition = 0; 
+        gameState.shogunsShellCounter = 0; 
+        gameState.zaibatsuMax = 0;
+        gameState.steelToeCount = 0;
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
         gameState.ashenEncore = false;
         gameState.edoEruption = false;
-        gameState.steelToe = false;
         gameState.gundanSeizai = false;
         gameState.noFutureCondition = false;
-        gameState.zaibatsuUnderground = false;
+        
         
         // Initiate sounds
         gameConfig.cardsDealtSound = this.sound.add('cardsDealtSound');
@@ -63,6 +64,21 @@ class BaseScene extends Phaser.Scene {
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
+        if (gameState.taunts2.length) {
+            gameState.taunts.push(gameState.taunts2.pop());
+        };
+
+        // Remove 'steelToe2' from the game if 'steelToe' is depleted
+        // if (!gameState.permanents.some(p => p.card.key === 'steelToe')) {
+        //     const arraysToCheck = [gameState.deck, gameState.bonusCards, gameState.extraCards];
+
+        //     arraysToCheck.forEach(array => {
+        //         const index = array.findIndex(card => card.key === 'steelToe2');
+        //         if (index !== -1) {
+        //             array.splice(index, 1);
+        //         }
+        //     });
+        // }
     }
 
     resetPlayer(player, scale, x=360, y=350) {
@@ -96,6 +112,7 @@ class BaseScene extends Phaser.Scene {
     saveGameState(currentScene) {
         try {
             const saveData = {
+
                 player: {
                     health: gameState.player.health,
                     healthMax: gameState.player.healthMax,
@@ -107,26 +124,32 @@ class BaseScene extends Phaser.Scene {
                     alive: gameState.player.alive
                 },
 
-                deck: gameState.deck,
-                bonusCards: gameState.bonusCards,
-                extraCards: gameState.extraCards,
-                latestDraw: gameState.latestDraw,
-                taunts: gameState.taunts,
-                ratTaunts: gameState.ratTaunts,
-                extraTaunts: gameState.extraTaunts,
-                permanents: gameState.permanents,
-                permanentSlots: gameState.permanentSlots,
                 enemy: gameState.enemy,
                 playerName: gameState.playerName,
                 version: gameState.version,
                 score: gameState.score,
-                lustForLifeCounter: gameState.lustForLifeCounter,
-                enduringSpiritCounter: gameState.enduringSpiritCounter,
-                bouncingSolesCards: gameState.bouncingSolesCards,
-                bonusPermanentSlots: gameState.bonusPermanentSlots,
-
+                latestDraw: gameState.latestDraw,
                 savedScene: currentScene,
                 loadedGame: true,
+
+                deck: gameState.deck,
+                bonusCards: gameState.bonusCards,
+                extraCards: gameState.extraCards,
+                latestDraw: gameState.latestDraw,
+                permanents: gameState.permanents,
+                steelToeCards: gameState.steelToeCards,
+                bouncingSolesCards: gameState.bouncingSolesCards,
+
+                permanentSlots: gameState.permanentSlots,
+                bonusPermanentSlots: gameState.bonusPermanentSlots,
+                
+                lustForLifeCounter: gameState.lustForLifeCounter,
+                enduringSpiritCounter: gameState.enduringSpiritCounter,      
+                
+                taunts: gameState.taunts,
+                taunts2: gameState.taunts2,
+                ratTaunts: gameState.ratTaunts,
+                extraTaunts: gameState.extraTaunts,
                 
             };
 

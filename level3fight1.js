@@ -77,7 +77,7 @@ class Level3Fight1 extends BaseScene {self
             const card = permanent.card;
             const slot = permanent.slot;
 
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
+            if (gameConfig.tokenCardNames.includes(card.key)) {
                 slot.available = true;
 
             } else { 
@@ -848,12 +848,12 @@ class Level3Fight1 extends BaseScene {self
             const rottenResonanceCondition = (card.key === 'rottenResonance' && target.poison === 0);
             const roninsRotCondition = (card.key === 'roninsRot' && target.poison > 0);
             const kabutuEdoCondition = (card.key === 'kabutu' && gameState.edoEruption && stancePoints > 0);
-            const steelToeCondition = (card.key === 'combatBoots' && gameState.steelToe);
+            const steelToeCondition = (card.key === 'combatBoots' && gameState.steelToeCount);
             const knuckleFistEdoCondition = (card.key === 'knuckleFist' && gameState.edoEruption && stancePoints < 0)
             
             gameState.troopsOfTakamoriCondition = (card.key === 'troopsOfTakamori' ? true : false);
             
-            const steelToeOutcome = stancePoints > 0 ? 2 * (1 + stancePoints) : 2;
+            const steelToeOutcome = stancePoints > 0 ? gameState.steelToeCount + stancePoints + 1 : gameState.steelToeCount + 1;
             const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0    
 
             return {
@@ -1364,7 +1364,7 @@ class Level3Fight1 extends BaseScene {self
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
             gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
-            gameState.characters.forEach(char => fadeOutGameObject(char.sprite, 200));
+            self.clearBoard();
 
             gameState.deck.forEach(card => {
                 if (card.usedOneShot) {
@@ -1382,14 +1382,14 @@ class Level3Fight1 extends BaseScene {self
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
 
             await self.delay(200);
-            const gundanSeizaiIncome = gameState.gundanSeizai ? 1 : 0;
-            const zaibatsuUndergroundIncome = gameState.zaibatsuUnderground ? Math.min(3, Math.floor(gameState.player.gold * 0.10)) : 0;
-            const totalIncome = gundanSeizaiIncome + zaibatsuUndergroundIncome;
-            if (totalIncome) earnGold(totalIncome);
-            
-            if (gameState.gundanSeizai || gameState.zaibatsuUnderground) {
+            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.max(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const totalIncome = gundanIncome + zaibatsuIncome;
+
+            if (totalIncome) {
+                earnGold(totalIncome);
                 gameState.permanents.forEach(perm => {
-                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaiUnderground') {
+                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaibatsuU') {
                         perm.sprite = perm.tokenSprite;
                         self.powerUpTweens(perm);
                     }
@@ -1397,12 +1397,11 @@ class Level3Fight1 extends BaseScene {self
             }
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
-            self.clearBoard();
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
             let victoryText = self.add.text(550, 300, "Victory!", victoryTextConfig).setOrigin(0.5).setDepth(21);
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
-            const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to Health Max` : "";
+            const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to ${gameState.player.healthMax}/${gameState.player.healthMax}` : "";
             
             const delayBeforeRemoveText = totalIncome ? 1500 : 1200;
             self.time.delayedCall(delayBeforeRemoveText, () => {
@@ -1955,15 +1954,29 @@ class Level3Fight1 extends BaseScene {self
 
         
         function addPermanent(card) {       
-            const slot = gameState.permanentSlots.find(slot => slot.available);
+            let slot = gameState.permanentSlots.find(slot => slot.available);
 
-            // NB!! Add all cards that are not depleted upon use to the conditional!!
-            if (card.key === 'kamishimoUberAlles' || card.key === 'hollidayInKamakura' || card.key === 'chemicalWarfare') {
+            // Keep token cards in the deck
+            if (gameConfig.tokenCardNames.includes(card.key)) {
                 gameState.discardPile.push(card);
                 gameState.discardPileText.setText(gameState.discardPile.length);
 
             } else {
                     gameState.deck = gameState.deck.filter(c => c !== card);
+            }
+
+            if (card.key === 'steelToe2') {
+                gameState.permanents.forEach(p => {
+                    console.log(p.card.key);
+                });
+                const depletedToken = gameState.permanents.find(p => p.card.key === 'steelToe');
+                if (depletedToken) {
+                    console.log('depletedToken found');
+                    slot = depletedToken.slot;
+                    depleteSteelToe(depletedToken, false);
+                } else {
+                    console.error('Error: steelToe token not found for depletion.');
+                }
             }
 
             // The conditional avoids error if no slots are available.
@@ -2092,8 +2105,11 @@ class Level3Fight1 extends BaseScene {self
                     }
                 })
                 
-            } else if (card.key === 'steelToe') {
-                gameState.steelToe = true;
+            } else if (card.key === 'steelToe' || card.key === 'steelToe2') {
+                gameState.steelToeCount = card.key === 'steelToe' ? 1 : 2;
+                if (gameState.steelToeCards.lenght) {
+                    gameState.extraCards.push(gameState.steelToeCards.shift());
+                }
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2101,7 +2117,7 @@ class Level3Fight1 extends BaseScene {self
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
-                }) 
+                });
 
             } else if (card.key === 'gundanSeizai') {
                 gameState.gundanSeizai = true;
@@ -2167,7 +2183,8 @@ class Level3Fight1 extends BaseScene {self
                     }
                 })
 
-            } else if (card.key === 'bouncingSoles' || card.key === 'bouncingSoles2') {
+            // bouncing soles permanents  
+            } else if(gameConfig.bouncingSolesCardNames.includes(card.key)) {
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2196,7 +2213,7 @@ class Level3Fight1 extends BaseScene {self
                 })
 
             } else if (card.key === 'shogunsShell') {
-                gameState.shogunsShellCondition = 2;
+                gameState.shogunsShellCounter = 2;
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2206,8 +2223,11 @@ class Level3Fight1 extends BaseScene {self
                     }
                 })
 
-            } else if (card.key === 'zaiUnderground') {
-                gameState.zaibatsuUnderground = true;
+            } else if (card.key === 'zaibatsuU') {
+                gameState.zaibatsuMax = 3;
+                if (gameState.zaibatsuCards.lenght) {
+                    gameState.extraCards.push(gameState.zaibatsuCards.shift());
+                }
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
@@ -2268,7 +2288,23 @@ class Level3Fight1 extends BaseScene {self
                             self.cameras.main.shake(70, .002, false);
                         }
                     })
-                } 
+
+                } else if (card.key === 'chintaiShunyu') {
+                    const tokenSprite = card.tokenSprite;
+                    const tokenSlot = card.tokenSlot;
+                    
+                    if (gameState.zaibatsuMax) {
+                        gameState.zaibatsuMax += 1;
+                    }
+
+                    tokenSprite.on( 'pointerup', () => {
+                        if (gameState.playersTurn) {
+                            depleteChintaiShunyu(card, tokenSprite,tokenSlot); 
+                        } else {
+                            self.cameras.main.shake(70, .002, false);
+                        }
+                    })
+                }  
             } 
         
         function activatePermanentFromHand(card) {
@@ -2305,6 +2341,7 @@ class Level3Fight1 extends BaseScene {self
                     depleteEdoEruption(card); 
                     break;
                 case 'steelToe':
+                case 'steelToe2':
                     depleteSteelToe(card); 
                     break; 
                 case 'deadTokugawas':
@@ -2325,6 +2362,7 @@ class Level3Fight1 extends BaseScene {self
                 case 'bouncingSoles':
                 case 'bouncingSoles2':
                 case 'bouncingSoles3':
+                case 'bouncingSoles3':    
                     depleteBouncingSoles(card);
                     break;
                 case 'enduringSpirit':
@@ -2333,16 +2371,18 @@ class Level3Fight1 extends BaseScene {self
                 case 'shogunsShell':
                     depleteShogunsShell(card);
                     break;
-                case 'zaiUnderground':
+                case 'zaibatsuU':
                     depleteZaibatsuUnderground(card);
                     break;    
                     
-                // NB! Add any card that is not allowed to deplete from hand
-                case 'kamishimoUberAlles': 
-                case 'hollidayInKamakura':
-                case 'chemicalWarfare':
-                    gameState.currentCards.push(card); 
-                    card.slot.available = false;
+                // Token-cards are non-depletable from hand
+                default:
+                    if (gameConfig.tokenCardNames.includes(card.key)) {
+                        gameState.currentCards.push(card); 
+                        card.slot.available = false;
+                    } else {
+                        console.log(`Unknown card key: ${card.key}`);
+                    }
                     break;
             }
         }    
@@ -2505,34 +2545,65 @@ class Level3Fight1 extends BaseScene {self
             destroyToken(card);
         } 
 
-        function depleteSteelToe(card) {
-            gameState.steelToe = false;
+        function depleteSteelToe(card, depletionTriggeredByActivation=true) {
             destroyToken(card);
 
-            gameConfig.targetingCursor.setVisible(true);
-            let depleteSteelToeActive = true;
+            // Reduce target's armor if depletion was triggered by clicking the token or playing the card from hand
+            if (depletionTriggeredByActivation) {
+                gameState.steelToeCount = 0;
+                gameConfig.targetingCursor.setVisible(true);
+                let depleteSteelToeActive = true;
 
-            gameState.enemies.forEach (enemy => {
-                enemy.sprite.on('pointerover', function() {
-                    gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                gameState.enemies.forEach(enemy => {
+                    enemy.sprite.on('pointerover', function() {
+                        gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                    });
+
+                    enemy.sprite.on('pointerout', function() {
+                        gameConfig.targetingCursor.setTexture('targetingCursor');
+                    });
+
+                    enemy.sprite.on('pointerup', function() {
+                        if (depleteSteelToeActive) {
+                            const armorReduction = card.key === 'steelToe' ? 7 : 9;
+                            enemy.armor -= armorReduction;
+                            updateStats(enemy);
+                            gameConfig.attackSound.play({ volume: 0.6 });
+                            self.cameras.main.shake(100, .012, false);
+                            gameConfig.targetingCursor.setVisible(false);   
+                            depleteSteelToeActive = false; 
+                        }
+                    });
                 });
 
-                enemy.sprite.on('pointerout', function() {
-                    gameConfig.targetingCursor.setTexture('targetingCursor');
-                });
-
-                enemy.sprite.on('pointerup', function() {
-                    if (depleteSteelToeActive) {
-                        enemy.armor -= 7;
-                        updateStats(enemy);
-                        gameConfig.attackSound.play({ volume: 0.6 });
-                        self.cameras.main.shake(100, .012, false);
-                        gameConfig.targetingCursor.setVisible(false);   
-                        depleteSteelToeActive = false; 
-                    }
-                })
-            })   
-        
+                // Remove SteelToe2 from the game
+                if (gameState.currentCards.some(c => c.key === 'steelToe2')) {
+                    gameState.currentCards = gameState.currentCards.filter(c => {
+                        if (c.key === 'steelToe2') {
+                            fadeOutGameObject(c.sprite);
+                            return false;
+                        }
+                        return true;
+                    });
+                    gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
+                
+                } else if (gameState.deck.some(c => c.key === 'steelToe2')) {
+                    gameState.drawPile = gameState.drawPile.filter(c => c.key !== 'steelToe2');
+                    gameState.discardPile = gameState.discardPile.filter(c => c.key !== 'steelToe2');
+                    gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
+                    
+                    gameState.drawPileText.setText(gameState.drawPile.length);
+                    gameState.discardPileText.setText(gameState.discardPile.length);
+                
+                } else {
+                    [gameState.bonusCards, gameState.extraCards].forEach(deck => {
+                        const index = deck.findIndex(c => c.key === 'steelToe2');
+                        if (index !== -1) {
+                            deck.splice(index, 1);
+                        }
+                    });
+                }
+            }
         }
 
         function depleteDeadTokugawas(card) {
@@ -2588,14 +2659,14 @@ class Level3Fight1 extends BaseScene {self
         }
 
         function depleteShogunsShell(card) {
-            gameState.shogunsShellCondition = 0;
-            gameState.player.armor = 15;
+            gameState.shogunsShellCounter = 0;
+            gameState.player.armorCard  = 15;
             updateStrengthAndArmor(gameState.player);
             destroyToken(card);
         }
 
         function depleteZaibatsuUnderground(card) {
-            gameState.zaibatsuUnderground = false;
+            gameState.zaibatsuMax = 0;
             destroyToken(card);
         }
         
@@ -2627,6 +2698,14 @@ class Level3Fight1 extends BaseScene {self
             gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
             gameState.chemicalWarfare -= 2;
         }
+
+        function depleteChintaiShunyu(card, tokenSprite, tokenSlot) {
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.zaibatsuMax = Math.max(0, gameState.zaibatsuMax - 1);
+        }
     
     
     // ---------------------------------- UTILITIES-------------------------------------      
@@ -2650,8 +2729,8 @@ class Level3Fight1 extends BaseScene {self
                 character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
             }
 
-            if (gameState.shogunsShellCondition && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
-                character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCondition);
+            if (gameState.shogunsShellCounter && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
+                character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCounter);
             }
 
             updateStats(character)
