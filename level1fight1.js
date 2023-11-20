@@ -291,12 +291,12 @@ class Level1Fight1 extends BaseScene {self
     
     
         function startPlayerTurn() {
-            gameState.fightStarted = true
+            gameState.fightStarted = true;
             gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
+            gameState.endOfTurnButtonPressed = false; 
             let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
 
-            const yourTurnTextContent = 'Your turn!'
+            const yourTurnTextContent = 'Your turn!';
             const yourTurnText = self.add.text(550, 300, "", { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
             const yourTurnTextBackground = self.add.graphics();
             self.updateTextAndBackground(yourTurnText, yourTurnTextBackground, yourTurnTextContent);
@@ -305,7 +305,7 @@ class Level1Fight1 extends BaseScene {self
             gameState.player.poisonTextBackground = self.add.graphics();
             console.log(`player's turn number ${gameState.turn} has started`);
 
-            resetStats() // NB! Call this first!
+            resetStats(); // NB! Call this first!
             self.updateStanceBar(gameState.player);
             updatePoison(gameState.player);
             self.updateManaBar(gameState.player);
@@ -323,7 +323,7 @@ class Level1Fight1 extends BaseScene {self
                     gameState.player.poisonTextBackground,
                     yourTurnText,
                     yourTurnTextBackground
-                ]
+                ];
 
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
@@ -2632,13 +2632,18 @@ class Level1Fight1 extends BaseScene {self
 
         function activateHealButton() {
             gameState.healButton.on('pointerup', () => {
-                const healCost = 1;
+                const healCost = gameState.lustForLifeCost;
                 const healAmount = 7;
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
+                    gameState.lustForLifeCost ++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
+
+                    if (gameState.healButtonDescriptionText) {
+                        gameState.healButtonDescriptionText.setText(` Heal ${healAmount} HP\nCost: ${gameState.lustForLifeCost} gold`);
+                    }
                 }
             })
         }

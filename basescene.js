@@ -41,6 +41,7 @@ class BaseScene extends Phaser.Scene {
         gameState.shogunsShellCounter = 0; 
         gameState.zaibatsuMax = 0;
         gameState.steelToeCount = 0;
+        gameState.lustForLifeCost = 0;
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
         gameState.ashenEncore = false;
@@ -139,6 +140,7 @@ class BaseScene extends Phaser.Scene {
                 permanents: gameState.permanents,
                 steelToeCards: gameState.steelToeCards,
                 bouncingSolesCards: gameState.bouncingSolesCards,
+                lustForLifeCost: gameState.lustForLifeCost,
 
                 permanentSlots: gameState.permanentSlots,
                 bonusPermanentSlots: gameState.bonusPermanentSlots,
@@ -478,7 +480,8 @@ class BaseScene extends Phaser.Scene {
     }
 
     addHealButton() {
-        let healCost = 1;
+        
+        let healCost = gameState.lustForLifeCost;
         const healAmount = 7;
         const x = 900;
         const y = 130;

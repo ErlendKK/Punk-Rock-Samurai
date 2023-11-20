@@ -37,8 +37,8 @@ class Level3Fight2 extends BaseScene {self
         gameState.enemy1.name = 'Bonebaron';
         gameState.enemy1.cardKey = 'hellFire'
         gameState.enemy1.sprite = this.add.sprite(830, 310, 'skeleton2').setScale(0.35).setFlipX(false).setInteractive(), //910 / 310 / .25
-        gameState.enemy1.health = 120;
-        gameState.enemy1.healthMax = 120;
+        gameState.enemy1.health = 110;
+        gameState.enemy1.healthMax = 110;
         gameState.enemy1.armor = 0;
 
         gameState.enemies = [gameState.enemy1]; //NB! Add all enemies!
@@ -267,12 +267,12 @@ class Level3Fight2 extends BaseScene {self
     
     
         function startPlayerTurn() {
-            gameState.fightStarted = true
+            gameState.fightStarted = true;
             gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
+            gameState.endOfTurnButtonPressed = false; 
             let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
 
-            const yourTurnTextContent = 'Your turn!'
+            const yourTurnTextContent = 'Your turn!';
             const yourTurnText = self.add.text(550, 300, "", { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
             const yourTurnTextBackground = self.add.graphics();
             self.updateTextAndBackground(yourTurnText, yourTurnTextBackground, yourTurnTextContent);
@@ -281,7 +281,7 @@ class Level3Fight2 extends BaseScene {self
             gameState.player.poisonTextBackground = self.add.graphics();
             console.log(`player's turn number ${gameState.turn} has started`);
 
-            resetStats() // NB! Call this first!
+            resetStats(); // NB! Call this first!
             self.updateStanceBar(gameState.player);
             updatePoison(gameState.player);
             self.updateManaBar(gameState.player);
@@ -299,7 +299,7 @@ class Level3Fight2 extends BaseScene {self
                     gameState.player.poisonTextBackground,
                     yourTurnText,
                     yourTurnTextBackground
-                ]
+                ];
 
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
@@ -1210,8 +1210,8 @@ class Level3Fight2 extends BaseScene {self
                
                 gameState.enemy1.actions = [ 
                     {key: `Intends to\nDeal 8 fire damage`, damage: 0, fire: 8, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 8 fire damage', probability: 0.05 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.30 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.20 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.30 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(17 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 17, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 17 damage', probability: 0.20 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.14},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.07 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.19 : 0) / 5},
@@ -2768,13 +2768,18 @@ class Level3Fight2 extends BaseScene {self
 
         function activateHealButton() {
             gameState.healButton.on('pointerup', () => {
-                const healCost = 1;
+                const healCost = gameState.lustForLifeCost;
                 const healAmount = 7;
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
+                    gameState.lustForLifeCost ++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
+
+                    if (gameState.healButtonDescriptionText) {
+                        gameState.healButtonDescriptionText.setText(` Heal ${healAmount} HP\nCost: ${gameState.lustForLifeCost} gold`);
+                    }
                 }
             })
         }

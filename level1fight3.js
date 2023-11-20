@@ -271,10 +271,10 @@ class Level1Fight3 extends BaseScene {self
     
     
         function startPlayerTurn() {
-            gameState.fightStarted = true
+            gameState.fightStarted = true;
             gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
-            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
+            gameState.endOfTurnButtonPressed = false;
+            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;;
 
             turnsTillPoliceArrive -= 1;
 
@@ -2677,13 +2677,18 @@ class Level1Fight3 extends BaseScene {self
 
         function activateHealButton() {
             gameState.healButton.on('pointerup', () => {
-                const healCost = 1;
+                const healCost = gameState.lustForLifeCost;
                 const healAmount = 7;
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
+                    gameState.lustForLifeCost ++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
+
+                    if (gameState.healButtonDescriptionText) {
+                        gameState.healButtonDescriptionText.setText(` Heal ${healAmount} HP\nCost: ${gameState.lustForLifeCost} gold`);
+                    }
                 }
             })
         }

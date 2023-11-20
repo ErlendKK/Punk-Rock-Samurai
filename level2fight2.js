@@ -2756,13 +2756,18 @@ class Level2Fight2 extends BaseScene {self
 
         function activateHealButton() {
             gameState.healButton.on('pointerup', () => {
-                const healCost = 1;
+                const healCost = gameState.lustForLifeCost;
                 const healAmount = 7;
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
+                    gameState.lustForLifeCost ++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
+
+                    if (gameState.healButtonDescriptionText) {
+                        gameState.healButtonDescriptionText.setText(` Heal ${healAmount} HP\nCost: ${gameState.lustForLifeCost} gold`);
+                    }
                 }
             })
         }

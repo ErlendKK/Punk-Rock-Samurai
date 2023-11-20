@@ -1,17 +1,14 @@
-old_code = """function depleteShogunsShell(card) {
-            gameState.shogunsShellCounter = 0;
-            gameState.player.armor = 15;
-            updateStrengthAndArmor(gameState.player);
-            destroyToken(card);
-        }"""
+old_code = """gameState.fightStarted = true
+            gameState.turn += 1;
+            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
+            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;"""
 
 
-new_code = """function depleteShogunsShell(card) {
-            gameState.shogunsShellCounter = 0;
-            gameState.player.armorCard  = 15;
-            updateStrengthAndArmor(gameState.player);
-            destroyToken(card);
-        }"""
+new_code = """function startPlayerTurn() {
+            gameState.fightStarted = true;
+            gameState.turn += 1;
+            gameState.endOfTurnButtonPressed = false;
+            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;;"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

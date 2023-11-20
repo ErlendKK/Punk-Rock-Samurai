@@ -37,8 +37,8 @@ class Level3Fight3 extends BaseScene {self
         gameState.enemy1.name = 'Soulripper';
         gameState.enemy1.cardKey = 'hellFire'
         gameState.enemy1.sprite = this.add.sprite(770, 305, 'wraith2').setScale(0.36).setFlipX(false).setInteractive(), //690 / 350 / .33
-        gameState.enemy1.health = 120;
-        gameState.enemy1.healthMax = 120;
+        gameState.enemy1.health = 100;
+        gameState.enemy1.healthMax = 100;
         gameState.enemy1.armor = 12;
 
         gameState.enemies = [gameState.enemy1]; //NB! Add all enemies!
@@ -267,10 +267,10 @@ class Level3Fight3 extends BaseScene {self
     
     
         function startPlayerTurn() { 
-            gameState.fightStarted = true
+            gameState.fightStarted = true;
             gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
-            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
+            gameState.endOfTurnButtonPressed = false;
+            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;;
 
             const yourTurnTextContent = 'Your turn!'
             const yourTurnText = self.add.text(550, 300, "", { fontSize: '60px', fill: '#ff0000' }).setOrigin(0.5).setDepth(21);
@@ -1232,8 +1232,8 @@ class Level3Fight3 extends BaseScene {self
             } else if (!gameState.enemy2 || !gameState.enemy2.alive) {
                 gameState.enemy1.actions = [
                     {key: `Intends to\nSummon a Voidling`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Summons a Voidling', probability: 0.4, summonEnemy: 2 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4},
-                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.30 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 20, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.30 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 10 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'discard', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.05 : 0) / 4}
                 ];
@@ -1241,12 +1241,12 @@ class Level3Fight3 extends BaseScene {self
             } else {
     
                 gameState.enemy1.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.45 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 3},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 20, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 20 damage', probability: 0.20 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 3},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.45 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.20 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 1, armor: 0, text: 'Heals 10 HP\nGains 1 strenght', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.10},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 2, armor: 0, text: 'Heals 10 HP\nGains 2 strenght', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.05 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.10 : 0) / 3},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'discard', probability: 0.15},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.05 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.10 : 0) / 4},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'discard', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.15 : 0) / 4},
                     {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Applies a debuff', debuffCard: 'doubleDiscard', probability: 0.05}
                 ]
             }
@@ -2792,13 +2792,18 @@ class Level3Fight3 extends BaseScene {self
 
         function activateHealButton() {
             gameState.healButton.on('pointerup', () => {
-                const healCost = 1;
+                const healCost = gameState.lustForLifeCost;
                 const healAmount = 7;
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
+                    gameState.lustForLifeCost ++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
+
+                    if (gameState.healButtonDescriptionText) {
+                        gameState.healButtonDescriptionText.setText(` Heal ${healAmount} HP\nCost: ${gameState.lustForLifeCost} gold`);
+                    }
                 }
             })
         }
