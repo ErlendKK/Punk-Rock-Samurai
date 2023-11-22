@@ -38,8 +38,8 @@ class Level2Fight1 extends BaseScene {self
         gameState.enemy1.name = 'Timbermaw\nLoses Armor when attacked\nTakes +50% damage from Fire';
         gameState.enemy1.cardKey = 'rooted'
         gameState.enemy1.sprite = this.add.sprite(680, 315, 'tree1').setScale(0.32).setFlipX(false).setInteractive(); //690 / 350 / .33
-        gameState.enemy1.health = 60;
-        gameState.enemy1.healthMax = 60;
+        gameState.enemy1.health = 55;
+        gameState.enemy1.healthMax = 55;
         gameState.enemy.armor = 15;
             
         gameState.enemy2  = Object.create(gameState.enemy);
@@ -276,6 +276,7 @@ class Level2Fight1 extends BaseScene {self
                     gameState.redrawButton.setTexture('rectangularButtonPressed');
                     gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
                     if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
+                    animatePermanent('deadTokugawas');
                     spendGold(gameState.redrawPrice);
                     gameState.redrawPrice += 1;
 
@@ -362,9 +363,16 @@ class Level2Fight1 extends BaseScene {self
         function resetStats() {
             gameState.player.armorCard = 0;
             gameState.player.strengthCard = 0;
-
             const manaMax = gameState.player.manaBase + gameState.player.manaStance;
-            gameState.player.manaMax = (gameState.rebelSpirit && gameState.turn % 3 === 0) ? manaMax + 1 : manaMax;
+            
+            if (gameState.rebelSpirit && gameState.turn % 3 === 0) {
+                gameState.player.manaMax = manaMax + 1;
+                animatePermanent('rebelSpirit');
+                
+            } else {
+                gameState.player.manaMax = manaMax;
+            }
+
             gameState.player.mana = gameState.player.manaMax;
 
             if (gameState.foreverTrue && gameState.player.stancePoints > 0) { // NB! Stance must be reset/kept after mana
@@ -387,11 +395,12 @@ class Level2Fight1 extends BaseScene {self
             const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
             const chemicalWarTextBackground = self.add.graphics();           
             self.updateTextAndBackground(chemicalWarText, chemicalWarTextBackground, textContent, 7, 20, 0.7);
+            animatePermanent('chemicalWarfare')
 
             self.time.delayedCall(1500, () => {
                 fadeOutGameObject(chemicalWarText, 200);
                 fadeOutGameObject(chemicalWarTextBackground, 200);
-            })
+            });
         }
 
         function initiateTurnOne(numCards) {
@@ -403,7 +412,7 @@ class Level2Fight1 extends BaseScene {self
                 self.updateTextAndBackground(introText, introTextBackground, introTextContent);
 
                 self.time.delayedCall(3000, () => {    
-                    introTextContent = 'Naturally, they are also\nvulnerabel to fire';
+                    introTextContent = 'Naturally, they are also\nvulnerable to fire';
                     self.updateTextAndBackground(introText, introTextBackground, introTextContent);
                     
                     self.time.delayedCall(3000, () => {
@@ -859,7 +868,10 @@ class Level2Fight1 extends BaseScene {self
             gameState.troopsOfTakamoriCondition = (card.key === 'troopsOfTakamori' ? true : false);
             
             const steelToeOutcome = stancePoints > 0 ? gameState.steelToeCount + stancePoints + 1 : gameState.steelToeCount + 1;
-            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0
+            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0;
+
+            if (knuckleFistEdoCondition || kabutuEdoCondition) animatePermanent('edoEruption');
+            if (steelToeCondition) animatePermanent('steelToe');
 
             //NB Level specific multiplier for fire damage against trees.
             const fireMultiplier = 1.20;
@@ -942,9 +954,11 @@ class Level2Fight1 extends BaseScene {self
                 updateEnemyActions();
 
                 // adds health if rebelHeart is active
-                if (gameState.rebelHeart) { 
+                if (gameState.rebelHeart && gameState.player.health < gameState.player.healthMax) { 
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + Math.abs(gameState.player.stancePoints) );
                     self.updateHealthBar(gameState.player);
+                    gameConfig.healSound.play({ volume: 0.5 });
+                    animatePermanent('rebelHeart');
                 }
 
                 gameState.enemies.forEach( enemy => {
@@ -1005,6 +1019,8 @@ class Level2Fight1 extends BaseScene {self
                         enemy.lifeStealTextBackground = self.add.graphics();
                         self.updateTextAndBackground(enemy.lifeStealText, enemy.lifeStealTextBackground, lifeStealTextContent);       
                         enemyTurnTexts.push(enemy.lifeStealText, enemy.lifeStealTextBackground);
+                        gameConfig.healSound.play({ volume: 0.5 });
+                        animatePermanent('soulSquatter');
                     }
                 }
 
@@ -1370,12 +1386,8 @@ class Level2Fight1 extends BaseScene {self
 
             if (totalIncome) {
                 earnGold(totalIncome);
-                gameState.permanents.forEach(perm => {
-                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaibatsuU') {
-                        perm.sprite = perm.tokenSprite;
-                        self.powerUpTweens(perm);
-                    }
-                });
+                animatePermanent('gundanSeizai');
+                animatePermanent('zaibatsuU');
             }
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
@@ -1406,7 +1418,8 @@ class Level2Fight1 extends BaseScene {self
             const spacing = 100;
             gameState.goldCollected = false;
 
-            const gameOverTextContent = '  Collect loot and get\nready for your next fight!';
+            const { level, fight } = self.extractLevelFightFromName(self.scene.key);
+            const gameOverTextContent = fight === 3 ? `Collect loot and get\nready for Level ${level +1}!` : '  Collect loot and get\nready for your next fight!';
             const gameOverTextConfig = { fontSize: '40px', fill: '#ff0000' };
             const gameOverText = self.add.text(550, 130, gameOverTextContent, gameOverTextConfig).setOrigin(0.5).setDepth(103);
             const gameOverTextBackground = self.add.graphics();
@@ -1508,11 +1521,11 @@ class Level2Fight1 extends BaseScene {self
                         }
                     })
 
-                    gameState.latestDraw.forEach(card => { // Avoids adding selected permanents back into bonusCards
-                        if (card === bonusCard && card.type === 'permanent') {
-                            gameState.latestDraw = gameState.latestDraw.filter(c => c != bonusCard);
-                        }
-                    })
+                    const maxExemplarsCondition = gameState.deck.filter(c => c.key === bonusCard.key).length >= gameConfig.maxCardExemplars;
+                    const permanentCondition = bonusCard.type === 'permanent';
+                    if (maxExemplarsCondition || permanentCondition) {
+                        gameState.latestDraw = gameState.latestDraw.filter(c => c !== bonusCard);
+                    }
         
                     self.tweens.add({
                         targets: bonusCard.sprite,
@@ -2261,7 +2274,7 @@ class Level2Fight1 extends BaseScene {self
                 } else if (card.key === 'chemicalWarfare') {
                     const tokenSprite = card.tokenSprite;
                     const tokenSlot = card.tokenSlot;
-                    gameState.chemicalWarfare += 2;
+                    gameState.chemicalWarfare += 1;
 
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
@@ -2698,17 +2711,19 @@ class Level2Fight1 extends BaseScene {self
 
             if (gameState.endOfTurnButtonPressed) {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard + character.armorStance);
-                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido);
             
             } else {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
-                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
+                if (strengthBushido) animatePermanent('bushido'); 
             }
 
             if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
                 character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
+                animatePermanent('kamishimoUberAlles'); 
             }
 
             if (gameState.shogunsShellCounter && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
@@ -2796,7 +2811,7 @@ class Level2Fight1 extends BaseScene {self
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
-                    gameState.lustForLifeCost ++;
+                    gameState.lustForLifeCost++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
 
@@ -2896,6 +2911,7 @@ class Level2Fight1 extends BaseScene {self
                     const ashenEncoreDrawText = self.add.text(550, 350, ashenEncoreKey, ashenEncoreConfig).setOrigin(0.5);
                     self.cameras.main.shake(100, .003, false);
                     gameConfig.attackSound.play({ volume: 0.8 });
+                    animatePermanent('ashenEncore');
                     
                     self.time.delayedCall(1500, () => {   
                         ashenEncoreDrawText.destroy();
@@ -3030,6 +3046,15 @@ class Level2Fight1 extends BaseScene {self
                 character.poison -= 1;
             }
         };
+
+        function animatePermanent(permanentKey) {
+            gameState.permanents.forEach(perm => {
+                if (perm.card.key === permanentKey) {
+                    perm.sprite = perm.tokenSprite;
+                    self.powerUpTweens(perm);
+                }
+            });
+        }
 
 
         function addAdminTools() {

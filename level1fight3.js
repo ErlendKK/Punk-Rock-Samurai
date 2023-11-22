@@ -22,7 +22,7 @@ class Level1Fight3 extends BaseScene {self
         const self = this;   
         this.saveGameState(self.scene.key);   
         this.baseCreate('bakgrunnCity3');
-        this.resetPlayer(gameState.player, 0.50, 360, 340); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
+        this.resetPlayer(gameState.player, 0.49, 360, 340); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton(510) 
         this.addRedrawButton()
         this.addGoldCoin(); //must be called after resetPlayer()
@@ -35,13 +35,13 @@ class Level1Fight3 extends BaseScene {self
 
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Sgt. Pig';
-        gameState.enemy1.sprite = this.add.image(680, 340, 'police1').setScale(0.26).setFlipX(true).setInteractive(); //740 / 360 / .42
+        gameState.enemy1.sprite = this.add.image(680, 340, 'police1').setScale(0.255).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy1.health = 45;
         gameState.enemy1.healthMax = 45;
 
         gameState.enemy2 = Object.create(gameState.enemy);
         gameState.enemy2.name = 'Lt. Pig';
-        gameState.enemy2.sprite = this.add.image(840, 340, 'police2').setScale(0.40).setFlipX(true).setInteractive(); //740 / 360 / .42
+        gameState.enemy2.sprite = this.add.image(840, 340, 'police2').setScale(0.39).setFlipX(true).setInteractive(); //740 / 360 / .42
         gameState.enemy2.health = 60;
         gameState.enemy2.healthMax = 60;
 
@@ -241,6 +241,7 @@ class Level1Fight3 extends BaseScene {self
                     gameState.redrawButton.setTexture('rectangularButtonPressed');
                     gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
                     if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
+                    animatePermanent('deadTokugawas');
                     spendGold(gameState.redrawPrice);
                     gameState.redrawPrice += 1;
 
@@ -274,7 +275,7 @@ class Level1Fight3 extends BaseScene {self
             gameState.fightStarted = true;
             gameState.turn += 1;
             gameState.endOfTurnButtonPressed = false;
-            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;;
+            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
 
             turnsTillPoliceArrive -= 1;
 
@@ -348,9 +349,16 @@ class Level1Fight3 extends BaseScene {self
         function resetStats() {
             gameState.player.armorCard = 0;
             gameState.player.strengthCard = 0;
-
             const manaMax = gameState.player.manaBase + gameState.player.manaStance;
-            gameState.player.manaMax = (gameState.rebelSpirit && gameState.turn % 3 === 0) ? manaMax + 1 : manaMax;
+            
+            if (gameState.rebelSpirit && gameState.turn % 3 === 0) {
+                gameState.player.manaMax = manaMax + 1;
+                animatePermanent('rebelSpirit');
+                
+            } else {
+                gameState.player.manaMax = manaMax;
+            }
+
             gameState.player.mana = gameState.player.manaMax;
 
             if (gameState.foreverTrue && gameState.player.stancePoints > 0) { // NB! Stance must be reset/kept after mana
@@ -373,11 +381,12 @@ class Level1Fight3 extends BaseScene {self
             const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
             const chemicalWarTextBackground = self.add.graphics();           
             self.updateTextAndBackground(chemicalWarText, chemicalWarTextBackground, textContent, 7, 20, 0.7);
+            animatePermanent('chemicalWarfare')
 
             self.time.delayedCall(1500, () => {
                 fadeOutGameObject(chemicalWarText, 200);
                 fadeOutGameObject(chemicalWarTextBackground, 200);
-            })
+            });
         }
 
         // Create grid for cards
@@ -804,7 +813,10 @@ class Level1Fight3 extends BaseScene {self
             gameState.troopsOfTakamoriCondition = (card.key === 'troopsOfTakamori' ? true : false);
             
             const steelToeOutcome = stancePoints > 0 ? gameState.steelToeCount + stancePoints + 1 : gameState.steelToeCount + 1;
-            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0
+            const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0;
+
+            if (knuckleFistEdoCondition || kabutuEdoCondition) animatePermanent('edoEruption');
+            if (steelToeCondition) animatePermanent('steelToe');
 
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
@@ -884,9 +896,11 @@ class Level1Fight3 extends BaseScene {self
                 updateEnemyActions();
 
                 // adds health if rebelHeart is active
-                if (gameState.rebelHeart) { 
+                if (gameState.rebelHeart && gameState.player.health < gameState.player.healthMax) { 
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + Math.abs(gameState.player.stancePoints) );
                     self.updateHealthBar(gameState.player);
+                    gameConfig.healSound.play({ volume: 0.5 });
+                    animatePermanent('rebelHeart');
                 }
 
                 gameState.enemies.forEach( enemy => {
@@ -948,6 +962,8 @@ class Level1Fight3 extends BaseScene {self
                         enemy.lifeStealTextBackground = self.add.graphics();
                         self.updateTextAndBackground(enemy.lifeStealText, enemy.lifeStealTextBackground, lifeStealTextContent);       
                         enemyTurnTexts.push(enemy.lifeStealText, enemy.lifeStealTextBackground);
+                        gameConfig.healSound.play({ volume: 0.5 });
+                        animatePermanent('soulSquatter');
                     }
                 }
 
@@ -980,7 +996,7 @@ class Level1Fight3 extends BaseScene {self
                             policeTextBackground.fillStyle(0xFFFFFF, 0.70);
                             policeTextBackground.fillRoundedRect(policeText.x - (textWidth / 2) - paddingX, policeText.y - (textHeight / 2) - paddingY, textWidth + 2 * paddingX, textHeight + 2 * paddingY, cornerRadius).setDepth(200);
                         
-                            self.time.delayedCall(4500, () => {
+                            self.time.delayedCall(4000, () => {
                                 policeText.destroy();
                                 policeTextBackground.destroy();
                                 startPlayerTurn();
@@ -1118,7 +1134,7 @@ class Level1Fight3 extends BaseScene {self
                     {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.240 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
                     {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
                 ];
@@ -1127,7 +1143,7 @@ class Level1Fight3 extends BaseScene {self
                     {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.240 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
                     {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 25 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.13 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
                 ];
@@ -1246,12 +1262,8 @@ class Level1Fight3 extends BaseScene {self
 
             if (totalIncome) {
                 earnGold(totalIncome);
-                gameState.permanents.forEach(perm => {
-                    if (perm.card.key === 'gundanSeizai' || perm.card.key === 'zaibatsuU') {
-                        perm.sprite = perm.tokenSprite;
-                        self.powerUpTweens(perm);
-                    }
-                });
+                animatePermanent('gundanSeizai');
+                animatePermanent('zaibatsuU');
             }
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
@@ -1282,7 +1294,8 @@ class Level1Fight3 extends BaseScene {self
             const spacing = 100;
             gameState.goldCollected = false;
 
-            const gameOverTextContent = 'Collect loot and get\n ready for Level 2!';
+            const { level, fight } = self.extractLevelFightFromName(self.scene.key);
+            const gameOverTextContent = fight === 3 ? `Collect loot and get\nready for Level ${level +1}!` : '  Collect loot and get\nready for your next fight!';
             const gameOverTextConfig = { fontSize: '40px', fill: '#ff0000' };
             const gameOverText = self.add.text(550, 130, gameOverTextContent, gameOverTextConfig).setOrigin(0.5).setDepth(103);
             const gameOverTextBackground = self.add.graphics();
@@ -1388,11 +1401,11 @@ class Level1Fight3 extends BaseScene {self
                         }
                     })
 
-                    gameState.latestDraw.forEach(card => { // Avoids adding selected permanents back into bonusCards
-                        if (card === bonusCard && card.type === 'permanent') {
-                            gameState.latestDraw = gameState.latestDraw.filter(c => c != bonusCard);
-                        }
-                    })
+                    const maxExemplarsCondition = gameState.deck.filter(c => c.key === bonusCard.key).length >= gameConfig.maxCardExemplars;
+                    const permanentCondition = bonusCard.type === 'permanent';
+                    if (maxExemplarsCondition || permanentCondition) {
+                        gameState.latestDraw = gameState.latestDraw.filter(c => c !== bonusCard);
+                    }
         
                     self.tweens.add({
                         targets: bonusCard.sprite,
@@ -2146,7 +2159,7 @@ class Level1Fight3 extends BaseScene {self
                 } else if (card.key === 'chemicalWarfare') {
                     const tokenSprite = card.tokenSprite;
                     const tokenSlot = card.tokenSlot;
-                    gameState.chemicalWarfare += 2;
+                    gameState.chemicalWarfare += 1;
 
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
@@ -2581,28 +2594,30 @@ class Level1Fight3 extends BaseScene {self
 
         // NB! Should only be used for character = player. The argument is keept in place for a future revision to multiple player characters.
         function updateStrengthAndArmor(character) { 
-            let strengthBushido = 0
+            let strengthBushido = 0;
 
             if (gameState.endOfTurnButtonPressed) {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard + character.armorStance);
-                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + strengthBushido);
             
             } else {
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
-                strengthBushido = gameState.bushido ? Math.floor(character.armor / 4) : 0; // Account for Bushido
+                strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
+                if (strengthBushido) animatePermanent('bushido'); 
             }
 
             if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
                 character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
+                animatePermanent('kamishimoUberAlles'); 
             }
 
             if (gameState.shogunsShellCounter && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
                 character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCounter);
             }
 
-            updateStats(character)
+            updateStats(character);
         }
 
         function updateStats(character) {
@@ -2682,7 +2697,7 @@ class Level1Fight3 extends BaseScene {self
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
-                    gameState.lustForLifeCost ++;
+                    gameState.lustForLifeCost++;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
 
@@ -2782,6 +2797,7 @@ class Level1Fight3 extends BaseScene {self
                     const ashenEncoreDrawText = self.add.text(550, 350, ashenEncoreKey, ashenEncoreConfig).setOrigin(0.5);
                     self.cameras.main.shake(100, .003, false);
                     gameConfig.attackSound.play({ volume: 0.8 });
+                    animatePermanent('ashenEncore');
                     
                     self.time.delayedCall(1500, () => {   
                         ashenEncoreDrawText.destroy();
@@ -2914,6 +2930,15 @@ class Level1Fight3 extends BaseScene {self
                 character.poison -= 1;
             }
         };
+
+        function animatePermanent(permanentKey) {
+            gameState.permanents.forEach(perm => {
+                if (perm.card.key === permanentKey) {
+                    perm.sprite = perm.tokenSprite;
+                    self.powerUpTweens(perm);
+                }
+            });
+        }
 
 
         function addAdminTools() {

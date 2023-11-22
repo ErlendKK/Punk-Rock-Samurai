@@ -665,6 +665,8 @@ class Mainmenu extends Phaser.Scene {
                     `and the enemy's turn begins. You win the fight by killing all enemies. Losing a fight\n` + 
                     `results in permadeath. Missing health carries over from fight to fight\n\n` +
 
+                    `Decks consists of ${gameConfig.minDeckSize} - ${gameConfig.maxDeckSize} cards, and can include uptil ${gameConfig.maxCardExemplars} exemplars of the same card\n\n` +
+
                     `Stance represents the balance between Discipline and Freedom.\n` +
                     `-Positive Discipline during your turn: +3 Strength.\n` +
                     `-Positive Discipline at the end of your turn: +3 Armor.\n` +
@@ -691,8 +693,8 @@ class Mainmenu extends Phaser.Scene {
                     `effects and then removes them from the game. If there are no empty slots for new permanents,\n` +
                     `permanent cards may be played directly from hand for their depletion effects.\n\n` +
 
-                    `Gold is earned by defeating enemies, and may be spent in the shop, or on in-fight bonuses.\n`,                    
-                    
+                    `Gold is earned by defeating enemies, and may be spent in the shop, or on in-fight bonuses.\n\n`,
+
                     textConfig
                 );
 

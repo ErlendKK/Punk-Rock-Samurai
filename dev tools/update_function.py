@@ -1,14 +1,38 @@
-old_code = """gameState.fightStarted = true
-            gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false; // Plays a different role than gameStale.playersTurnStarted, so keep both!
-            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;"""
+old_code = """function updatePoison(character) {
+            if (character.poison > 0) {
+                const newHealth = Math.max(1, character.health - character.poison);
+                const lostHP = character.health - newHealth
+                const newPoisonText = `-${lostHP} HP from Poison`
+                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+
+                character.health = newHealth;
+                self.updateHealthBar(character);
+                character.poison -= 1;
+            }
+        };"""
 
 
-new_code = """function startPlayerTurn() {
-            gameState.fightStarted = true;
-            gameState.turn += 1;
-            gameState.endOfTurnButtonPressed = false;
-            let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;;"""
+new_code = """function updatePoison(character) {
+            if (character.poison > 0) {
+                const newHealth = Math.max(1, character.health - character.poison);
+                const lostHP = character.health - newHealth
+                const newPoisonText = `-${lostHP} HP from Poison`
+                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+
+                character.health = newHealth;
+                self.updateHealthBar(character);
+                character.poison -= 1;
+            }
+        };
+
+        function animatePermanent(permanentKey) {
+            gameState.permanents.forEach(perm => {
+                if (perm.card.key === permanentKey) {
+                    perm.sprite = perm.tokenSprite;
+                    self.powerUpTweens(perm);
+                }
+            });
+        }"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

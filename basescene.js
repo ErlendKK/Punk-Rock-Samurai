@@ -41,7 +41,7 @@ class BaseScene extends Phaser.Scene {
         gameState.shogunsShellCounter = 0; 
         gameState.zaibatsuMax = 0;
         gameState.steelToeCount = 0;
-        gameState.lustForLifeCost = 0;
+        gameState.lustForLifeCost = 1;
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
         gameState.ashenEncore = false;

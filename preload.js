@@ -7,7 +7,7 @@
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
 let gameState = {};
-gameState.version = 1.307;
+gameState.version = 1.308;
 
 let gameConfig = {};
 gameConfig.levels = [
@@ -290,8 +290,7 @@ class Preload extends Phaser.Scene {
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
             {key: 'chemicalWarfare',    type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'chemicalWarfareToken'},
             {key: 'zaibatsuU',          type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
-            {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
-
+           
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rocknRonin',         type: 'buff',           cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: () => gameState.player.strength, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'rawEnergy',          type: 'buff',           cost: () => gameState.player.stancePoints > 0 ? -2 : -1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -308,7 +307,7 @@ class Preload extends Phaser.Scene {
             {key: 'gutterGeisha',       type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: () => Math.floor((gameState.player.healthMax - gameState.player.health) * 0.1), reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'noFuture',           type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'coverCharge',        type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
-            {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: -5, poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'seppuku',            type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: () => - Math.round(gameState.player.healthMax * 0.05), poisonRemove: 0, strength: () => gameState.player.stancePoints < 0 ? 2 - gameState.player.stancePoints : 2, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'canibalize',         type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'saisenBlaster',      type: 'buff',           cost: 1, goldCost: 1, stancePoints: -2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 10, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
            
@@ -334,7 +333,7 @@ class Preload extends Phaser.Scene {
             {key: 'nastyNihonto',       type: 'targetSelected', cost: 2, stancePoints: 0, damage: 10, fire: 0, poison: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'shikoroStrike',      type: 'targetSelected', cost: 1, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 8 : 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 3 : 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'laidoSoho',          type: 'targetSelected', cost: 1, stancePoints: 0, damage: () => gameState.player.armor > 0 ? gameState.player.armor : 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},    
-            {key: 'roninMerc',          type: 'targetSelected', cost: 0, goldCost: 1, stancePoints: 0,  damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
+            {key: 'roninMerc',          type: 'targetSelected', cost: 1, goldCost: 1, stancePoints: 0,  damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'pyroPunk',           type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 0, fire: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.15), poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'troopsOfTakamori',   type: 'targetSelected', cost: 1, stancePoints: 0,  damage: 6, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'wrathOfMoen',        type: 'targetSelected', cost: 2, stancePoints: 0,  damage: 24, fire: 0, poison: () => gameState.toxicFrets ? 1 : 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
@@ -343,9 +342,10 @@ class Preload extends Phaser.Scene {
         ];
 
         gameState.extraCards = [
+            {key: 'edoEruption',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'edoEruptionToken'},
+            {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
             {key: 'lustForLife',        type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'lustForLifeToken'},
             {key: 'kirisuteGomen',      type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'kirisuteGomenToken'},
-            {key: 'rebelHeart',         type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'rebelHeartToken'},
             {key: 'gundanSeizai',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'gundanSeizaiToken'},
             {key: 'soulSquatter',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'soulSquatterToken'},
             {key: 'enduringSpirit',     type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'enduringSpiritToken'},
@@ -359,7 +359,7 @@ class Preload extends Phaser.Scene {
         ];
 
         gameState.steelToeCards = [
-            {key: 'steelToe2',          type: 'permanent',      cost: 2, goldCost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
+            {key: 'steelToe2',          type: 'permanent',      cost: 1, goldCost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
         ];
 
         gameState.zaibatsuCards = [
@@ -391,6 +391,7 @@ class Preload extends Phaser.Scene {
 
         gameConfig.minDeckSize = 10;
         gameConfig.maxDeckSize = 40;
+        gameConfig.maxCardExemplars = 3;
         gameState.latestDraw = [];
         gameState.permanents = [];
 
