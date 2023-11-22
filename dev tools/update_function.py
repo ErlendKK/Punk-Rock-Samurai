@@ -1,38 +1,23 @@
-old_code = """function updatePoison(character) {
-            if (character.poison > 0) {
-                const newHealth = Math.max(1, character.health - character.poison);
-                const lostHP = character.health - newHealth
-                const newPoisonText = `-${lostHP} HP from Poison`
-                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+old_code = """await self.delay(200);
+            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.max(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const totalIncome = gundanIncome + zaibatsuIncome;
 
-                character.health = newHealth;
-                self.updateHealthBar(character);
-                character.poison -= 1;
-            }
-        };"""
+            if (totalIncome) {
+                earnGold(totalIncome);
+                animatePermanent('gundanSeizai');
+                animatePermanent('zaibatsuU');
+            }"""
 
 
-new_code = """function updatePoison(character) {
-            if (character.poison > 0) {
-                const newHealth = Math.max(1, character.health - character.poison);
-                const lostHP = character.health - newHealth
-                const newPoisonText = `-${lostHP} HP from Poison`
-                self.updateTextAndBackground(character.poisonText, character.poisonTextBackground, newPoisonText, 7, 20, 0.7);
+new_code = """await self.delay(200);
+            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const totalIncome = gundanIncome + zaibatsuIncome;
 
-                character.health = newHealth;
-                self.updateHealthBar(character);
-                character.poison -= 1;
-            }
-        };
-
-        function animatePermanent(permanentKey) {
-            gameState.permanents.forEach(perm => {
-                if (perm.card.key === permanentKey) {
-                    perm.sprite = perm.tokenSprite;
-                    self.powerUpTweens(perm);
-                }
-            });
-        }"""
+            if (totalIncome) earnGold(totalIncome);
+            if (zaibatsuIncome) animatePermanent('zaibatsuU');
+            if (gundanIncome) animatePermanent('gundanSeizai');"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

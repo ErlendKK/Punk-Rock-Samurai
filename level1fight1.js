@@ -68,7 +68,7 @@ class Level1Fight1 extends BaseScene {self
         }
         
         
-        // self.scene.start('Level1Fight3');
+        // self.scene.start('Level1Fight2');
 
 
     // ---------------------------------- INTRO -------------------------------------    
@@ -1218,14 +1218,12 @@ class Level1Fight1 extends BaseScene {self
 
             await self.delay(200);
             const gundanIncome = gameState.gundanSeizai ? 1 : 0;
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.max(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
             const totalIncome = gundanIncome + zaibatsuIncome;
 
-            if (totalIncome) {
-                earnGold(totalIncome);
-                animatePermanent('gundanSeizai');
-                animatePermanent('zaibatsuU');
-            }
+            if (totalIncome) earnGold(totalIncome);
+            if (zaibatsuIncome) animatePermanent('zaibatsuU');
+            if (gundanIncome) animatePermanent('gundanSeizai');
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
@@ -2559,7 +2557,8 @@ class Level1Fight1 extends BaseScene {self
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
                 strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
-                if (strengthBushido) animatePermanent('bushido'); 
+                if (strengthBushido > gameState.strengthBushido) animatePermanent('bushido');
+                gameState.strengthBushido = strengthBushido; 
             }
 
             if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
@@ -2569,7 +2568,6 @@ class Level1Fight1 extends BaseScene {self
 
             if (gameState.shogunsShellCounter && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
                 character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCounter);
-                animatePermanent('shogunsShell'); 
             }
 
             updateStats(character);
@@ -2890,16 +2888,7 @@ class Level1Fight1 extends BaseScene {self
         function animatePermanent(permanentKey) {
             gameState.permanents.forEach(perm => {
                 if (perm.card.key === permanentKey) {
-                    perm.sprite = perm.tokenSprite;
-                    self.powerUpTweens(perm);
-                }
-            });
-        }
-
-        function animatePermanent(permanentKey) {
-            gameState.permanents.forEach(perm => {
-                if (perm.card.key === permanentKey) {
-                    perm.sprite = perm.tokenSprite;
+                    perm.sprite = perm.card.tokenSprite;
                     self.powerUpTweens(perm);
                 }
             });

@@ -1122,17 +1122,17 @@ class Level1Fight3 extends BaseScene {self
 
             } else if (gameState.turn === 2) {
                 gameState.enemy1.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 1},
+                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.12 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 1},
                 ];
                 gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 1},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.12 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 1},
                 ];
     
             } else {
     
                 gameState.enemy1.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(10 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 10 damage', probability: 0.240 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
-                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.240 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 3, armor: 0, text: 'Gains 3 strenght', probability: 0.13 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 4},
@@ -1140,8 +1140,8 @@ class Level1Fight3 extends BaseScene {self
                 ];
     
                 gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.240 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
-                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.240 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
+                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.17 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.17},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.13 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.22 : 0) / 4},
@@ -1257,14 +1257,12 @@ class Level1Fight3 extends BaseScene {self
 
             await self.delay(200);
             const gundanIncome = gameState.gundanSeizai ? 1 : 0;
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.max(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
             const totalIncome = gundanIncome + zaibatsuIncome;
 
-            if (totalIncome) {
-                earnGold(totalIncome);
-                animatePermanent('gundanSeizai');
-                animatePermanent('zaibatsuU');
-            }
+            if (totalIncome) earnGold(totalIncome);
+            if (zaibatsuIncome) animatePermanent('zaibatsuU');
+            if (gundanIncome) animatePermanent('gundanSeizai');
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
@@ -2605,7 +2603,8 @@ class Level1Fight3 extends BaseScene {self
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
                 strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
-                if (strengthBushido) animatePermanent('bushido'); 
+                if (strengthBushido > gameState.strengthBushido) animatePermanent('bushido');
+                gameState.strengthBushido = strengthBushido; 
             }
 
             if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
@@ -2934,7 +2933,7 @@ class Level1Fight3 extends BaseScene {self
         function animatePermanent(permanentKey) {
             gameState.permanents.forEach(perm => {
                 if (perm.card.key === permanentKey) {
-                    perm.sprite = perm.tokenSprite;
+                    perm.sprite = perm.card.tokenSprite;
                     self.powerUpTweens(perm);
                 }
             });

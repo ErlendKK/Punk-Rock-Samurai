@@ -41,6 +41,7 @@ class BaseScene extends Phaser.Scene {
         gameState.shogunsShellCounter = 0; 
         gameState.zaibatsuMax = 0;
         gameState.steelToeCount = 0;
+        gameState.strengthBushido = 0
         gameState.lustForLifeCost = 1;
         gameState.kirisuteGomen = false; 
         gameState.toxicFrets = false;
@@ -68,18 +69,6 @@ class BaseScene extends Phaser.Scene {
         if (gameState.taunts2.length) {
             gameState.taunts.push(gameState.taunts2.pop());
         };
-
-        // Remove 'steelToe2' from the game if 'steelToe' is depleted
-        // if (!gameState.permanents.some(p => p.card.key === 'steelToe')) {
-        //     const arraysToCheck = [gameState.deck, gameState.bonusCards, gameState.extraCards];
-
-        //     arraysToCheck.forEach(array => {
-        //         const index = array.findIndex(card => card.key === 'steelToe2');
-        //         if (index !== -1) {
-        //             array.splice(index, 1);
-        //         }
-        //     });
-        // }
     }
 
     resetPlayer(player, scale, x=360, y=350) {
@@ -325,8 +314,8 @@ class BaseScene extends Phaser.Scene {
         
         gameState.stanceText.on('pointerover', () => {
 
-            const stanceText = `Stance represents the ever-shifting balance\nbetween the conflicting ideals of the\n` + 
-                `punk rock samurai: Discipline and Freedom.\n\nPositive Discipline during your turn:\n+3 Strength\n\n` +
+            const stanceText = `Stance represents the balance\nbetween Discipline and Freedom.\n\n` +
+                `Positive Discipline during your turn:\n+3 Strength\n\n` +
                 `Positive Discipline at the end of your turn:\n+3 Armor\n\nMax Discipline at the end of your turn:\n` +
                 `-1 card next turn\n\nPositive Freedom during your turn:\n+1 mana\n\nPositive Freedom at the end of your turn:\n` + 
                 `50% chance of +1 card next turn\n50% chance of +1 mana next turn\n\nMax Freedom at the end of your turn:\n-2 Armor`;
