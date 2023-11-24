@@ -377,7 +377,7 @@ class BaseScene extends Phaser.Scene {
                 onComplete: () => attackTweenStarted = false
             }, this);
         }
-    };
+    }
 
     cardTweens(target, scale, duration) {
         this.tweens.add({
@@ -387,6 +387,21 @@ class BaseScene extends Phaser.Scene {
             duration: duration,
             ease: 'Cubic'
         }, this);
+    }
+
+    animatePermanent(permanentKey) {
+        gameState.permanents.forEach(p => {
+            if (p.card.key === permanentKey) {  
+                this.tweens.add({
+                    targets: p.card.tokenSprite,
+                    scaleY: p.card.tokenSprite.scaleX * 1.125,
+                    scaleX: p.card.tokenSprite.scaleY * 1.125,
+                    duration: 120,
+                    ease: 'Cubic',
+                    yoyo: true
+                }, this);
+            }
+        });
     }
 
     animateCard(card, depth) {

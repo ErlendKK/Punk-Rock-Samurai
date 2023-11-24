@@ -276,7 +276,7 @@ class Level2Fight1 extends BaseScene {self
                     gameState.redrawButton.setTexture('rectangularButtonPressed');
                     gameState.endOfTurnButton.setTexture('rectangularButtonPressed');
                     if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
-                    animatePermanent('deadTokugawas');
+                    self.animatePermanent('deadTokugawas');
                     spendGold(gameState.redrawPrice);
                     gameState.redrawPrice += 1;
 
@@ -367,7 +367,7 @@ class Level2Fight1 extends BaseScene {self
             
             if (gameState.rebelSpirit && gameState.turn % 3 === 0) {
                 gameState.player.manaMax = manaMax + 1;
-                animatePermanent('rebelSpirit');
+                self.animatePermanent('rebelSpirit');
                 
             } else {
                 gameState.player.manaMax = manaMax;
@@ -390,12 +390,21 @@ class Level2Fight1 extends BaseScene {self
                 enemy.poison += gameState.chemicalWarfare;
             });
 
+            gameState.permanents.forEach(p => {
+                if (p.card.key === 'chemicalWarfare') {
+                    p.card.turnsToDepletion -= 1;
+                    if (p.card.turnsToDepletion === 0) {
+                        depleteChemicalWarfare(p.card, p.card.tokenSprite, p.card.tokenSlot);
+                    }
+                }
+            });
+
             const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
             const textConfig = { fontSize: '30px', fill: '#ff0000' };
             const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
             const chemicalWarTextBackground = self.add.graphics();           
             self.updateTextAndBackground(chemicalWarText, chemicalWarTextBackground, textContent, 7, 20, 0.7);
-            animatePermanent('chemicalWarfare')
+            self.animatePermanent('chemicalWarfare');
 
             self.time.delayedCall(1500, () => {
                 fadeOutGameObject(chemicalWarText, 200);
@@ -870,8 +879,8 @@ class Level2Fight1 extends BaseScene {self
             const steelToeOutcome = stancePoints > 0 ? gameState.steelToeCount + stancePoints + 1 : gameState.steelToeCount + 1;
             const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0;
 
-            if (knuckleFistEdoCondition || kabutuEdoCondition) animatePermanent('edoEruption');
-            if (steelToeCondition) animatePermanent('steelToe');
+            if (knuckleFistEdoCondition || kabutuEdoCondition) self.animatePermanent('edoEruption');
+            if (steelToeCondition) self.animatePermanent('steelToe');
 
             //NB Level specific multiplier for fire damage against trees.
             const fireMultiplier = 1.20;
@@ -954,11 +963,11 @@ class Level2Fight1 extends BaseScene {self
                 updateEnemyActions();
 
                 // adds health if rebelHeart is active
-                if (gameState.rebelHeart && gameState.player.health < gameState.player.healthMax) { 
+                if (gameState.rebelHeart && gameState.player.health < gameState.player.healthMax && gameState.player.stancePoints !== 0) { 
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + Math.abs(gameState.player.stancePoints) );
                     self.updateHealthBar(gameState.player);
                     gameConfig.healSound.play({ volume: 0.5 });
-                    animatePermanent('rebelHeart');
+                    self.animatePermanent('rebelHeart');
                 }
 
                 gameState.enemies.forEach( enemy => {
@@ -1020,7 +1029,7 @@ class Level2Fight1 extends BaseScene {self
                         self.updateTextAndBackground(enemy.lifeStealText, enemy.lifeStealTextBackground, lifeStealTextContent);       
                         enemyTurnTexts.push(enemy.lifeStealText, enemy.lifeStealTextBackground);
                         gameConfig.healSound.play({ volume: 0.5 });
-                        animatePermanent('soulSquatter');
+                        self.animatePermanent('soulSquatter');
                     }
                 }
 
@@ -1254,21 +1263,19 @@ class Level2Fight1 extends BaseScene {self
                 gameState.enemy1.actions = [ 
                     {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.26 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                     {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
-                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.13},
-                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 15 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.05},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.18},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                 ]
             
                 gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.28 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 15 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.15},
-                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, text: 'Heals 20 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.05},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.30 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.18},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
                 ]
             }
         
@@ -1385,8 +1392,8 @@ class Level2Fight1 extends BaseScene {self
             const totalIncome = gundanIncome + zaibatsuIncome;
 
             if (totalIncome) earnGold(totalIncome);
-            if (zaibatsuIncome) animatePermanent('zaibatsuU');
-            if (gundanIncome) animatePermanent('gundanSeizai');
+            if (zaibatsuIncome) self.animatePermanent('zaibatsuU');
+            if (gundanIncome) self.animatePermanent('gundanSeizai');
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
@@ -1949,9 +1956,9 @@ class Level2Fight1 extends BaseScene {self
         function addPermanent(card) {       
             let slot = gameState.permanentSlots.find(slot => slot.available);
 
-            // Keep token cards in the deck
+            // For token-cards: add a shallow copy back to discardPile
             if (gameConfig.tokenCardNames.includes(card.key)) {
-                gameState.discardPile.push(card);
+                gameState.discardPile.push(Object.assign({}, card));
                 gameState.discardPileText.setText(gameState.discardPile.length);
 
             } else {
@@ -2272,7 +2279,7 @@ class Level2Fight1 extends BaseScene {self
                 } else if (card.key === 'chemicalWarfare') {
                     const tokenSprite = card.tokenSprite;
                     const tokenSlot = card.tokenSlot;
-                    gameState.chemicalWarfare += 1;
+                    gameState.chemicalWarfare += 2;
 
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
@@ -2287,7 +2294,7 @@ class Level2Fight1 extends BaseScene {self
                     const tokenSlot = card.tokenSlot;
                     
                     if (gameState.zaibatsuMax) {
-                        gameState.zaibatsuMax += 1;
+                        gameState.zaibatsuMax += 2;
                     }
 
                     tokenSprite.on( 'pointerup', () => {
@@ -2716,13 +2723,13 @@ class Level2Fight1 extends BaseScene {self
                 character.armor = Math.min(character.armorMax, character.armorBase + character.armorCard);
                 strengthBushido = gameState.bushido ? Math.floor(character.armor / 3) : 0; // Account for Bushido
                 character.strength = Math.min(character.strengthMax, character.strengthBase + character.strengthStance + character.strengthCard + strengthBushido); 
-                if (strengthBushido > gameState.strengthBushido) animatePermanent('bushido');
+                if (strengthBushido > gameState.strengthBushido) self.animatePermanent('bushido');
                 gameState.strengthBushido = strengthBushido; 
             }
 
             if (gameState.kamishimoUberAlles && gameState.player.stancePoints < 0) { // Adjust for Strength tokens
                 character.strength = Math.min(character.strengthMax, character.strength - gameState.player.stancePoints * gameState.kamishimoUberAlles);
-                animatePermanent('kamishimoUberAlles'); 
+                self.animatePermanent('kamishimoUberAlles'); 
             }
 
             if (gameState.shogunsShellCounter && gameState.player.stancePoints < 0) { //Account for Shogun's Shell
@@ -2910,7 +2917,7 @@ class Level2Fight1 extends BaseScene {self
                     const ashenEncoreDrawText = self.add.text(550, 350, ashenEncoreKey, ashenEncoreConfig).setOrigin(0.5);
                     self.cameras.main.shake(100, .003, false);
                     gameConfig.attackSound.play({ volume: 0.8 });
-                    animatePermanent('ashenEncore');
+                    self.animatePermanent('ashenEncore');
                     
                     self.time.delayedCall(1500, () => {   
                         ashenEncoreDrawText.destroy();
@@ -3046,14 +3053,7 @@ class Level2Fight1 extends BaseScene {self
             }
         };
 
-        function animatePermanent(permanentKey) {
-            gameState.permanents.forEach(perm => {
-                if (perm.card.key === permanentKey) {
-                    perm.sprite = perm.card.tokenSprite;
-                    self.powerUpTweens(perm);
-                }
-            });
-        }
+        
 
 
         function addAdminTools() {
