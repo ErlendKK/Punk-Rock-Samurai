@@ -69,6 +69,13 @@ class BaseScene extends Phaser.Scene {
         if (gameState.taunts2.length) {
             gameState.taunts.push(gameState.taunts2.pop());
         };
+
+        if (gameState.permanentSlots) {
+            gameState.permanentSlots.forEach(slot =>{
+                slot.available = true;
+            });
+        }
+
     }
 
     resetPlayer(player, scale, x=360, y=350) {
