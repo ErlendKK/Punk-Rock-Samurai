@@ -1370,6 +1370,7 @@ class Level2Fight1 extends BaseScene {self
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
+            let zaibatsuDelay = 0;
             
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
