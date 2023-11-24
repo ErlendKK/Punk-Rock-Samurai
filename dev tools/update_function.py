@@ -1,14 +1,31 @@
-old_code = """// Keep token cards in the deck
-            if (gameConfig.tokenCardNames.includes(card.key)) {
-                gameState.discardPile.push(card);
-                gameState.discardPileText.setText(gameState.discardPile.length);"""
+old_code = """await self.delay(200);
+            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
+            if (gundanIncome) self.animatePermanent('gundanSeizai');
+
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            if (zaibatsuIncome) self.animatePermanent('zaibatsuU');
+            
+            const totalIncome = gundanIncome + zaibatsuIncome;
+            if (totalIncome) earnGold(totalIncome);"""
 
 
 
-new_code = """// For token-cards: add a shallow copy back to discardPile
-            if (gameConfig.tokenCardNames.includes(card.key)) {
-                gameState.discardPile.push(Object.assign({}, card));
-                gameState.discardPileText.setText(gameState.discardPile.length);"""
+new_code = """await self.delay(600);
+            if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
+            
+            await self.delay(200);
+            if (gameState.gundanSeizai) {
+                earnGold(1);
+                self.animatePermanent('gundanSeizai');
+                zaibatsuDelay = 200;
+            }
+
+            await self.delay(zaibatsuDelay);
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            if (zaibatsuIncome) {
+                earnGold(zaibatsuIncome);
+                self.animatePermanent('zaibatsuU');
+            }"""
 
 
 levels = [

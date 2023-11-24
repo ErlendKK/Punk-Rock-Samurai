@@ -724,9 +724,14 @@ class Level2Fight2 extends BaseScene {self
             self.updateHealthBar(target);
             updateStrengthAndArmor(gameState.player);
             removeIfDead(target);
-            checkGameOver();
-            updateEnemyActions();
-            drawNewCards(drawCardPlayed);
+
+            if (!checkGameOver()) {
+                updateEnemyActions();
+                drawNewCards(drawCardPlayed);
+                gameState.enemies.forEach( enemy => {
+                    self.updateEnemyIntention(enemy);
+                });
+            }
 
             gameState.enemies.forEach( enemy => {
                 self.updateEnemyIntention(enemy);
@@ -1311,6 +1316,7 @@ class Level2Fight2 extends BaseScene {self
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
             addHandtoDeck();
+            let zaibatsuDelay = 0;
             
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
             if (gameState.actionTextBackground) fadeOutGameObject(gameState.actionTextBackground, 200);
@@ -1336,13 +1342,18 @@ class Level2Fight2 extends BaseScene {self
             }
 
             await self.delay(200);
-            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
-            const totalIncome = gundanIncome + zaibatsuIncome;
+            if (gameState.gundanSeizai) {
+                earnGold(1);
+                self.animatePermanent('gundanSeizai');
+                zaibatsuDelay = 200;
+            }
 
-            if (totalIncome) earnGold(totalIncome);
-            if (zaibatsuIncome) self.animatePermanent('zaibatsuU');
-            if (gundanIncome) self.animatePermanent('gundanSeizai');
+            await self.delay(zaibatsuDelay);
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            if (zaibatsuIncome) {
+                earnGold(zaibatsuIncome);
+                self.animatePermanent('zaibatsuU');
+            }
             
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
@@ -1351,7 +1362,7 @@ class Level2Fight2 extends BaseScene {self
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
             const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to ${gameState.player.healthMax}/${gameState.player.healthMax}` : "";
             
-            const delayBeforeRemoveText = totalIncome ? 1500 : 1200;
+            const delayBeforeRemoveText = gameState.gundanSeizai || zaibatsuIncome ? 1500 : 1200;
             self.time.delayedCall(delayBeforeRemoveText, () => {
                 gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);

@@ -673,9 +673,14 @@ class Level2Fight3 extends BaseScene {self
             self.updateHealthBar(target);
             updateStrengthAndArmor(gameState.player);
             removeIfDead(target);
-            checkGameOver();
-            updateEnemyActions();
-            drawNewCards(drawCardPlayed);
+
+            if (!checkGameOver()) {
+                updateEnemyActions();
+                drawNewCards(drawCardPlayed);
+                gameState.enemies.forEach( enemy => {
+                    self.updateEnemyIntention(enemy);
+                });
+            }
 
             gameState.enemies.forEach( enemy => {
                 self.updateEnemyIntention(enemy);
@@ -1261,8 +1266,8 @@ class Level2Fight3 extends BaseScene {self
 
             if (gameState.enemy2) {
                 gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage\nAnd 1 Poison`, probability: 0.25 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 3},
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage\nAnd 1 Poison`, probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 3},
+                    {key: () => `Intends to\nDeal ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 8, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals ${Math.round(8 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage\nAnd 1 Poison`, probability: 0.25 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 3},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 1, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals ${Math.round(12 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage\nAnd 1 Poison`, probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 3},
                     {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.20},
                     {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 3, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 3 poison', probability: 0.40 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 3}
                 ];
@@ -1374,16 +1379,20 @@ class Level2Fight3 extends BaseScene {self
 
             await self.delay(600);
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
-
-            await self.delay(200);
-            const gundanIncome = gameState.gundanSeizai ? 1 : 0;
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
-            const totalIncome = gundanIncome + zaibatsuIncome;
-
-            if (totalIncome) earnGold(totalIncome);
-            if (zaibatsuIncome) self.animatePermanent('zaibatsuU');
-            if (gundanIncome) self.animatePermanent('gundanSeizai');
             
+            await self.delay(200);
+            if (gameState.gundanSeizai) {
+                earnGold(1);
+                self.animatePermanent('gundanSeizai');
+                zaibatsuDelay = 200;
+            }
+
+            await self.delay(zaibatsuDelay);
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            if (zaibatsuIncome) {
+                earnGold(zaibatsuIncome);
+                self.animatePermanent('zaibatsuU');
+            } 
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
@@ -1391,7 +1400,7 @@ class Level2Fight3 extends BaseScene {self
             const { level, fight } = self.extractLevelFightFromName(self.scene.key);
             const levelCompleteText = fight === 3 ? `You have completed Level ${level}\nHealth is resorted to ${gameState.player.healthMax}/${gameState.player.healthMax}` : "";
             
-            const delayBeforeRemoveText = totalIncome ? 1500 : 1200;
+            const delayBeforeRemoveText = gameState.gundanSeizai || zaibatsuIncome ? 1500 : 1200;
             self.time.delayedCall(delayBeforeRemoveText, () => {
                 gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
                 victoryText.setText(levelCompleteText);
