@@ -19,9 +19,10 @@ class Level1Fight3 extends BaseScene {self
     }; 
 
     create() {
-        const self = this;   
-        this.saveGameState(self.scene.key);   
-        this.baseCreate('bakgrunnCity3');
+        const self = this;
+        const sceneKey = self.scene.key
+        this.saveGameState(sceneKey);    
+        this.baseCreate('bakgrunnCity3', sceneKey);
         this.resetPlayer(gameState.player, 0.49, 360, 340); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton(510) 
         this.addRedrawButton()
@@ -523,7 +524,7 @@ class Level1Fight3 extends BaseScene {self
                 gameState.costPlayed = typeof card.cost === 'function' ? card.cost() : card.cost;   
             }
 
-            const goldCostCondition = !card.goldCost || card.goldCost < gameState.player.gold;
+            const goldCostCondition = !card.goldCost || card.goldCost <= gameState.player.gold;
             const manaCostCondition = gameState.player.mana >= gameState.costPlayed;
             const otherConditions = gameState.playingCard === false && !card.usedOneShot;
 
@@ -732,7 +733,6 @@ class Level1Fight3 extends BaseScene {self
             }
             if (card.key === 'zenZine') {
                 gameState.player.healthMax += 2 * costPlayed;
-                gameState.player.health += 2 * costPlayed;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -1278,7 +1278,7 @@ class Level1Fight3 extends BaseScene {self
             }
 
             await self.delay(zaibatsuDelay);
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.15)) : 0;
             if (zaibatsuIncome) {
                 earnGold(zaibatsuIncome);
                 self.animatePermanent('zaibatsuU');
@@ -1861,9 +1861,6 @@ class Level1Fight3 extends BaseScene {self
             }
 
             if (card.key === 'steelToe2') {
-                gameState.permanents.forEach(p => {
-                    console.log(p.card.key);
-                });
                 const depletedToken = gameState.permanents.find(p => p.card.key === 'steelToe');
                 if (depletedToken) {
                     console.log('depletedToken found');
@@ -2002,7 +1999,7 @@ class Level1Fight3 extends BaseScene {self
                 
             } else if (card.key === 'steelToe' || card.key === 'steelToe2') {
                 gameState.steelToeCount = card.key === 'steelToe' ? 1 : 2;
-                if (gameState.steelToeCards.lenght) {
+                if (gameState.steelToeCards.length) {
                     gameState.extraCards.push(gameState.steelToeCards.shift());
                 }
                 
@@ -2277,6 +2274,7 @@ class Level1Fight3 extends BaseScene {self
                     if (gameConfig.tokenCardNames.includes(card.key)) {
                         gameState.currentCards.push(card); 
                         card.slot.available = false;
+                        gameState.player.mana += card.cost;
                     } else {
                         console.log(`Unknown card key: ${card.key}`);
                     }
@@ -2363,11 +2361,13 @@ class Level1Fight3 extends BaseScene {self
                         if (enemy.health < 30 && functionActive) {
                             enemy.health = 0;
                             gameConfig.attackSound.play({ volume: 1 });
-                            self.cameras.main.shake(120, .025, false);    
+                            self.cameras.main.shake(120, .025, false);
+                            gameConfig.targetingCursor.setVisible(false);   
                             
                             if (card.tokenSlot) {
                                 card.tokenSlot.available = true;
-                                gameState.player.strengthMax -= 5
+                                gameState.player.strengthMax -= 5;
+                                gameState.player.strengt = Math.min(gameState.player.strengt, gameState.player.strengthMax);
                             }
 
                             if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely

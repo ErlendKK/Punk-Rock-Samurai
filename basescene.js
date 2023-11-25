@@ -14,7 +14,7 @@ class BaseScene extends Phaser.Scene {
 
     // Initiaiate level
 
-    baseCreate(backgoundImage, scale = 0.75) {
+    baseCreate(backgoundImage, sceneKey, scale = 0.75) {
         this.add.image(0,0, backgoundImage).setScale(scale).setOrigin(0.02,0); 
         this.cameras.main.fadeIn(600, 0, 0, 0);   
         this.input.keyboard.createCursorKeys();
@@ -63,16 +63,29 @@ class BaseScene extends Phaser.Scene {
         gameConfig.coinSound = this.sound.add('coinSound');
         gameConfig.keyboardSound = this.sound.add('keyboardSound');
 
+        gameState.extraCards.forEach(card => {
+            console.log(card.key);
+        })
+
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
-        if (gameState.taunts2.length) {
+        if (gameState.taunts2.length && sceneKey !== 'Level1Fight1') {
             gameState.taunts.push(gameState.taunts2.pop());
         };
 
+        const tokenCardIndexes = [];
+        gameState.permanents.forEach(p => {
+            if (gameConfig.tokenCardNames.includes(p.card.key)) {
+                tokenCardIndexes.push(p.slot.index);
+            }
+        });
+
         if (gameState.permanentSlots) {
             gameState.permanentSlots.forEach(slot =>{
-                slot.available = true;
+                if (tokenCardIndexes.includes(slot.index)) {
+                    slot.available = true;
+                }
             });
         }
 
@@ -135,6 +148,7 @@ class BaseScene extends Phaser.Scene {
                 latestDraw: gameState.latestDraw,
                 permanents: gameState.permanents,
                 steelToeCards: gameState.steelToeCards,
+                zaibatsuCards: gameState.zaibatsuCards,
                 bouncingSolesCards: gameState.bouncingSolesCards,
                 lustForLifeCost: gameState.lustForLifeCost,
 

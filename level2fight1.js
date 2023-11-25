@@ -20,9 +20,10 @@ class Level2Fight1 extends BaseScene {self
     }; 
 
     create() {
-        const self = this; 
-        this.saveGameState(self.scene.key);     
-        this.baseCreate('bakgrunnForest1');
+        const self = this;
+        const sceneKey = self.scene.key
+        this.saveGameState(sceneKey);    
+        this.baseCreate('bakgrunnForest1', sceneKey);
         this.resetPlayer(gameState.player, 0.37, 360, 360); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
         this.addEndOfTurnButton() 
         this.addRedrawButton()
@@ -38,8 +39,8 @@ class Level2Fight1 extends BaseScene {self
         gameState.enemy1.name = 'Timbermaw\nLoses Armor when attacked\nTakes +50% damage from Fire';
         gameState.enemy1.cardKey = 'rooted'
         gameState.enemy1.sprite = this.add.sprite(680, 315, 'tree1').setScale(0.32).setFlipX(false).setInteractive(); //690 / 350 / .33
-        gameState.enemy1.health = 55;
-        gameState.enemy1.healthMax = 55;
+        gameState.enemy1.health = 50;
+        gameState.enemy1.healthMax = 50;
         gameState.enemy.armor = 15;
             
         gameState.enemy2  = Object.create(gameState.enemy);
@@ -568,7 +569,7 @@ class Level2Fight1 extends BaseScene {self
                 gameState.costPlayed = typeof card.cost === 'function' ? card.cost() : card.cost;   
             }
 
-            const goldCostCondition = !card.goldCost || card.goldCost < gameState.player.gold;
+            const goldCostCondition = !card.goldCost || card.goldCost <= gameState.player.gold;
             const manaCostCondition = gameState.player.mana >= gameState.costPlayed
             const otherConditions = gameState.playingCard === false && !card.usedOneShot
 
@@ -787,7 +788,6 @@ class Level2Fight1 extends BaseScene {self
             }
             if (card.key === 'zenZine') {
                 gameState.player.healthMax += 2 * costPlayed;
-                gameState.player.health += 2 * costPlayed;
                 gameConfig.powerUpSound.play({ volume: 0.15 });
                 self.updateHealthBar(gameState.player);
                 self.powerUpTweens(gameState.player);
@@ -1400,7 +1400,7 @@ class Level2Fight1 extends BaseScene {self
             }
 
             await self.delay(zaibatsuDelay);
-            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.10)) : 0;
+            const zaibatsuIncome = gameState.zaibatsuMax ? Math.min(gameState.zaibatsuMax, Math.floor(gameState.player.gold * 0.15)) : 0;
             if (zaibatsuIncome) {
                 earnGold(zaibatsuIncome);
                 self.animatePermanent('zaibatsuU');
@@ -1976,9 +1976,6 @@ class Level2Fight1 extends BaseScene {self
             }
 
             if (card.key === 'steelToe2') {
-                gameState.permanents.forEach(p => {
-                    console.log(p.card.key);
-                });
                 const depletedToken = gameState.permanents.find(p => p.card.key === 'steelToe');
                 if (depletedToken) {
                     console.log('depletedToken found');
@@ -2117,7 +2114,7 @@ class Level2Fight1 extends BaseScene {self
                 
             } else if (card.key === 'steelToe' || card.key === 'steelToe2') {
                 gameState.steelToeCount = card.key === 'steelToe' ? 1 : 2;
-                if (gameState.steelToeCards.lenght) {
+                if (gameState.steelToeCards.length) {
                     gameState.extraCards.push(gameState.steelToeCards.shift());
                 }
                 
@@ -2390,6 +2387,7 @@ class Level2Fight1 extends BaseScene {self
                     if (gameConfig.tokenCardNames.includes(card.key)) {
                         gameState.currentCards.push(card); 
                         card.slot.available = false;
+                        gameState.player.mana += card.cost;
                     } else {
                         console.log(`Unknown card key: ${card.key}`);
                     }
@@ -2476,11 +2474,13 @@ class Level2Fight1 extends BaseScene {self
                         if (enemy.health < 30 && functionActive) {
                             enemy.health = 0;
                             gameConfig.attackSound.play({ volume: 1 });
-                            self.cameras.main.shake(120, .025, false);    
+                            self.cameras.main.shake(120, .025, false);
+                            gameConfig.targetingCursor.setVisible(false);   
                             
                             if (card.tokenSlot) {
                                 card.tokenSlot.available = true;
-                                gameState.player.strengthMax -= 5
+                                gameState.player.strengthMax -= 5;
+                                gameState.player.strengt = Math.min(gameState.player.strengt, gameState.player.strengthMax);
                             }
 
                             if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely

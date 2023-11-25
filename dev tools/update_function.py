@@ -1,13 +1,8 @@
-old_code = """gameConfig.music.stop();
-            self.updateManaBar(gameState.player);
-            addHandtoDeck();"""
+old_code = """if (gameState.steelToeCards.lenght) {"""
 
 
 
-new_code = """gameConfig.music.stop();
-            self.updateManaBar(gameState.player);
-            addHandtoDeck();
-            let zaibatsuDelay = 0;"""
+new_code = """if (gameState.steelToeCards.length) {"""
 
 
 levels = [
