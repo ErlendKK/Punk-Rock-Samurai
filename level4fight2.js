@@ -513,10 +513,11 @@ class Level4Fight2 extends BaseScene {self
             }
 
             const goldCostCondition = !card.goldCost || card.goldCost <= gameState.player.gold;
-            const manaCostCondition = gameState.player.mana >= gameState.costPlayed
-            const otherConditions = gameState.playingCard === false && !card.usedOneShot
+            const manaCostCondition = gameState.player.mana >= gameState.costPlayed;
+            const tokenCondition = !gameConfig.tokenCardNames.includes(card.key) || gameState.permanentSlots.some(slot => slot.available === true);
+            const otherConditions = gameState.playingCard === false && !card.usedOneShot;
 
-            if (goldCostCondition && manaCostCondition && otherConditions) {
+            if (goldCostCondition && manaCostCondition && tokenCondition && otherConditions) {
                 gameState.player.mana -= gameState.costPlayed;
                 if (card.goldCost) spendGold(card.goldCost);
                 self.updateManaBar(gameState.player);
@@ -529,6 +530,7 @@ class Level4Fight2 extends BaseScene {self
                 
                 if (card.slot) card.slot.available = true;
                 if (card.oneShot) card.usedOneShot = true;
+                if (card.usesTillDepletion) card.usesTillDepletion -= 1;
 
                 // Select mode of activation based on card type
                 if (gameState.typePlayed === 'targetSelected') {
@@ -536,8 +538,10 @@ class Level4Fight2 extends BaseScene {self
                     targetEnemy(card, gameState.currentCards);
 
                 } else if (gameState.typePlayed === 'targetAll') {
-                    gameState.discardPile.push(card);
-                    gameState.discardPileText.setText(gameState.discardPile.length);
+                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                        gameState.discardPile.push(card);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
+                    }
 
                     // Makes a shallow copy to ensure that playCard() continues for enemy2 even if enemy1
                     // gets killed and thus removed from gameState.enemies by removeIfDead().
@@ -558,8 +562,10 @@ class Level4Fight2 extends BaseScene {self
                     playCard(card, gameState.player);
 
                 } else {
-                    gameState.discardPile.push(card);
-                    gameState.discardPileText.setText(gameState.discardPile.length);
+                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                        gameState.discardPile.push(card);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
+                    }
                     playCard(card, gameState.player);
                 };    
 
@@ -589,10 +595,13 @@ class Level4Fight2 extends BaseScene {self
                 });
         
                 enemy.sprite.on('pointerup', function() {
+                    enemy.sprite.off('pointerup'); // Remove any existing pointerup listeners to prevent stacking
                     if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
                         card.isBeingPlayed = false;
-                        gameState.discardPile.push(card);
-                        gameState.discardPileText.setText(gameState.discardPile.length);
+                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                            gameState.discardPile.push(card);
+                            gameState.discardPileText.setText(gameState.discardPile.length);
+                        }
                         playCard(card, enemy);
                     }
                 
@@ -765,6 +774,35 @@ class Level4Fight2 extends BaseScene {self
                 gameState.player.health -= 2;
                 self.updateHealthBar(gameState.player);
             }
+
+            if ('usesTillDepletion' in card) activateUsesTillDepletion(card);
+        }
+
+        function activateUsesTillDepletion(card) {
+            gameState.usesTillDepletionElements.forEach(element => {
+                if (element) element.destroy();
+            })
+            gameState.usesTillDepletionElements = [];
+        
+            const textConfig = { fontSize: '20px', fill: '#000000' };
+            const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
+            
+            let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
+            let usesTillDepletionTextBackground = self.add.graphics();
+            self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
+            gameState.usesTillDepletionElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
+            
+            // Cancel the previous timer event if it exists
+            if (gameState.usesTillDepletionTimer) {
+                gameState.usesTillDepletionTimer.remove();
+            }
+        
+            gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
+                gameState.usesTillDepletionElements.forEach(element => {
+                    if (element) element.destroy();
+                });
+                gameState.usesTillDepletionTimer = null;
+            });
         }
 
         function addTextAndTweens(damageTotal, poisonPlayed, strengthPlayed, armorPlayed, poisonRemovePlayed) {
@@ -2255,10 +2293,10 @@ class Level4Fight2 extends BaseScene {self
 
             } else if (card.key === 'enduringSpirit') {
                 if (!gameState.fightStarted) {
-                    gameState.player.healthMax += 5;
+                    gameState.player.healthMax += 4;
                     self.updateHealthBar(gameState.player);
                     gameState.enduringSpiritCounter +=1;
-                    if (gameState.enduringSpiritCounter >= 7) {
+                    if (gameState.enduringSpiritCounter >= 8) {
                         depleteEnduringSpirit(card)
                     }; 
                 };

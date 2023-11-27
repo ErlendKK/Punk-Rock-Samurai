@@ -6,53 +6,34 @@
 
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
-class Level4Fight1 extends BaseScene {self
+class Level1Fight1 extends BaseScene {self
     constructor() {
-        super('Level4Fight1');
+        super('Level1Fight1');
     }
 
     preload() {
-        this.load.image('bakgrunnFortress1', 'assets/images/bakgrunnFortress1.jpg');
-        this.load.image('theFortress', 'assets/images/theFortress.jpg');
-        this.load.image('monster1', 'assets/images/sprites/monster1.png');
-        this.load.image('monster2', 'assets/images/sprites/monster2.png');
-        this.load.image('monstrosity', 'assets/images/cards/monstrosity.jpg');
+        this.load.image('theCity', 'assets/images/theCity.jpg');
+        this.load.image('bakgrunnCity1', 'assets/images/bakgrunnCity1.jpg');
+        this.load.image('nazi', 'assets/images/sprites/nazi.png');
     }; 
 
     create() {
         const self = this;
         const sceneKey = self.scene.key
         this.saveGameState(sceneKey);    
-        this.baseCreate('bakgrunnFortress1', sceneKey);
-        this.resetPlayer(gameState.player, 0.31, 360, 375); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
-        this.addEndOfTurnButton() 
-        this.addRedrawButton()
+        this.baseCreate('bakgrunnCity1', sceneKey);
+        this.resetPlayer(gameState.player, 0.465, 370, 352); //l1f1:0.28 -- l1f2: 0.24, 360, 300 (liten:0.48, 360, 280)
+        this.addEndOfTurnButton();
+        this.addRedrawButton();
         this.addGoldCoin(); //must be called after resetPlayer()
 
-        gameState.drawPile = [...gameState.deck];
-        displayDrawPile();
-        displayDiscardPile();
-
-        gameState.player.health = gameState.player.healthMax; // NB! Only for the first fight in each level
-
         gameState.enemy1 = Object.create(gameState.enemy);
-        gameState.enemy1.name = 'Mong\nSteals Strength and Armor';
-        gameState.enemy1.sprite = this.add.sprite(600, 365, 'monster1').setScale(0.23).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy1.cardKey = 'monstrosity'
-        gameState.enemy1.health = 60;
-        gameState.enemy1.healthMax = 60;
-        gameState.enemy1.armor = 0;
-            
-        gameState.enemy2 = Object.create(gameState.enemy);
-        gameState.enemy2.name = 'Goh\nSteals Strength and Armor';
-        gameState.enemy2.sprite = this.add.sprite(780, 370, 'monster2').setScale(0.35).setFlipX(false).setInteractive(); //710 / 350 / .33
-        gameState.enemy2.cardKey = 'monstrosity'
-        gameState.enemy2.health = 70;
-        gameState.enemy2.healthMax = 70;
-        gameState.enemy2.armor = 0;
-       
+        gameState.enemy1.name = 'Nazi Punk';
+        gameState.enemy1.sprite = this.add.image(740, 357, 'nazi').setScale(0.415).setFlipX(false).setInteractive();
+        gameState.enemy1.health = 50;
+        gameState.enemy1.healthMax = 50;
 
-        gameState.enemies = [gameState.enemy1, gameState.enemy2]; //NB! Add all enemies!
+        gameState.enemies = [gameState.enemy1]; //NB! Add all enemies!
         gameState.characters = [...gameState.enemies, gameState.player];
 
         gameState.characters.forEach( character => {
@@ -61,55 +42,54 @@ class Level4Fight1 extends BaseScene {self
             character.x = character.sprite.x;
             character.y = character.sprite.y;
             this.addHealthBar(character, character.healthBarColor);
-            this.addStatsDisplay(character, 450);
+            this.addStatsDisplay(character, 470);
         });
 
+
+        // ------------- NB! Only for Level1Fight1 ---------------
+        gameState.player.name = gameState.playerName ? gameState.playerName : "Punk Rock Samurai";      
+        this.definePermanentSlots()
+        gameState.deck.forEach(card => {
+            if (card.freePermanent) addPermanent(card);
+        }) 
+        gameState.drawPile = [...gameState.deck];
+        displayDrawPile();
+        displayDiscardPile();
+        // ------------- NB! Only for Level1Fight1 ---------------
+
+
         this.addManaBar(gameState.player);
-        this.addStanceBar(gameState.player, '#d1d1d1'); // v.light:#d1d1d1 - light:#a9a9a9 - medium:#808080 - dark:#696969
+        this.addStanceBar(gameState.player, '#303030'); // light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         this.updateManaBar(gameState.player);
         this.updateHealthBar(gameState.player);
         
         if (gameState.lustForLifeCounter) {
             self.addHealButton();
             activateHealButton();
-        };
-
-        gameState.permanents.forEach(permanent => {
-            const card = permanent.card;
-            const slot = permanent.slot;
-
-            if (gameConfig.tokenCardNames.includes(card.key)) {
-                slot.available = true;
-
-            } else { 
-                card.tokenSprite = self.add.sprite(slot.x, slot.y, card.token).setScale(1).setDepth(210).setInteractive(); 
-                slot.available = false; 
-                card.tokenSlot = slot;
-                console.log(`Recreated permanent: ${card.key}\nfor slot ${slot.index}`);
-                displayTokenCard(card);  
-                activatePermanentFromToken(card);
-            }
-        });
+        }
+        
+        
+        // self.scene.start('Level1Fight2');
 
 
     // ---------------------------------- INTRO -------------------------------------    
-        
 
+    
         const levelTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };   
-        const levelimage = this.add.image(0,0, 'theFortress').setScale(0.87).setOrigin(0.02,0).setDepth(300);
-        const leveltextTop = this.add.text(550, 270, 'Level 4:', levelTextConfig).setDepth(301).setOrigin(0.5);
-        const leveltextBottom = this.add.text(550, 430, `The Fortress`, levelTextConfig).setDepth(301).setOrigin(0.5); 
+        const levelimage = this.add.image(0,0, 'theCity').setScale(0.87).setOrigin(0.02,0).setDepth(300);
+        const leveltextTop = this.add.text(550, 270, 'Level 1:', levelTextConfig).setDepth(301).setOrigin(0.5);
+        const leveltextBottom = this.add.text(550, 430, 'On City Streets', levelTextConfig).setDepth(301).setOrigin(0.5); 
         let levelStarting = false;
 
         self.time.delayedCall(4000, () => { //timer: 4000
             if (!levelStarting) {
-                levelStarting = true
+                levelStarting = true;
                 fadeOutGameObject(levelimage, 2000); 
                 fadeOutGameObject(leveltextTop, 2000);
                 fadeOutGameObject(leveltextBottom, 2000);
-                self.time.delayedCall(2200, startFight());
+                self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
         self.input.on('pointerup', () => {
             if (!levelStarting) {
@@ -117,9 +97,9 @@ class Level4Fight1 extends BaseScene {self
                 fadeOutGameObject(levelimage, 2000);
                 fadeOutGameObject(leveltextTop, 2000);
                 fadeOutGameObject(leveltextBottom, 2000);
-                self.time.delayedCall(2200, startFight());
+                self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
         self.input.keyboard.on('keydown', () => {
             if (!levelStarting) {
@@ -129,7 +109,7 @@ class Level4Fight1 extends BaseScene {self
                 fadeOutGameObject(leveltextBottom, 2000);
                 self.time.delayedCall( 2200, startFight() );
             }
-        })
+        });
 
         function startFight() {
             gameState.turn = 0;
@@ -213,7 +193,7 @@ class Level4Fight1 extends BaseScene {self
             await displaySpeech(enemyTauntText, enemyTauntBackground, enemyTaunt, 301);
             if (gameState.skipIntro) return;
             
-            await self.delay(1000);
+            await self.delay(800);
             if (gameState.skipIntro) return;
             fadeOutGameObject(enemyTauntText, fadeOutTime);
             fadeOutGameObject(enemyTauntBackground, fadeOutTime);
@@ -236,7 +216,6 @@ class Level4Fight1 extends BaseScene {self
             
             if (!gameState.skipIntro) {
                 await self.delay(fadeOutTime);
-                // gameState.skipIntro = false;
                 self.input.keyboard.off('keydown', skipIntro, this);
                 self.time.removeAllEvents();
 
@@ -272,9 +251,9 @@ class Level4Fight1 extends BaseScene {self
                 addNextLetter();
             });
         }
-
+        
         function activateRedrawButton() {
-            gameState.redrawButton.on('pointerup', () => {
+            gameState.redrawButton.on('pointerup', async function() {
                 if (gameState.player.gold >= gameState.redrawPrice && gameState.redrawEnabled) {
                     gameState.redrawEnabled = false;
                     gameState.healButtonEnabled = false;
@@ -305,6 +284,7 @@ class Level4Fight1 extends BaseScene {self
                 } else {
                     self.cameras.main.shake(70, .002, false);
                 }
+                
             })
         }
 
@@ -350,19 +330,17 @@ class Level4Fight1 extends BaseScene {self
                 objectsToDestroy.forEach(object => fadeOutGameObject(object, 200));
 
                 if (gameState.turn === 1) {
-                    initiateTurnOne(numCards);
-                    
-                } else {
-                    
-                    // NB! These functions should run after gameState.turn has been increased
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                    
-                    drawCards(numCards);
+                    gameState.characters.forEach( character => self.describeCharacter(character, character.sprite)); 
                 }
+                    
+                // NB! These functions should run after gameState.turn has been increased
+                gameState.enemies.forEach( enemy => {
+                    updateEnemyActions();  
+                    selectEnemyAction(enemy);
+                    displayEnemyIntention(enemy);
+                });
+                
+                drawCards(numCards);
             });                  
         }
 
@@ -374,7 +352,7 @@ class Level4Fight1 extends BaseScene {self
             if (gameState.rebelSpirit && gameState.turn % 3 === 0) {
                 gameState.player.manaMax = manaMax + 1;
                 self.animatePermanent('rebelSpirit');
-                
+
             } else {
                 gameState.player.manaMax = manaMax;
             }
@@ -418,32 +396,6 @@ class Level4Fight1 extends BaseScene {self
             });
         }
 
-        function initiateTurnOne(numCards) {
-            self.time.delayedCall(300, () => {
-                const textConfig = { fontSize: '38px', fill: '#ff0000', fontWeight: 'bold' };
-                let introTextContent = `Heads up: Monsters steal\nStrength and Armor!`;
-                const introText  = self.add.text(550, 300, "", textConfig).setOrigin(0.5).setDepth(201);
-                const introTextBackground = self.add.graphics();
-                self.updateTextAndBackground(introText, introTextBackground, introTextContent);
-                    
-                self.time.delayedCall(3000, () => {
-                    fadeOutGameObject(introText, 200);
-                    fadeOutGameObject(introTextBackground, 200);
-
-                    gameState.characters.forEach(character => {
-                        self.describeCharacter(character, character.sprite);
-                    }); 
-                    drawCards(numCards);
-                
-                    gameState.enemies.forEach( enemy => {
-                        updateEnemyActions();  
-                        selectEnemyAction(enemy);
-                        displayEnemyIntention(enemy);
-                    });
-                })
-            })
-        };
-
         // Create grid for cards
         const x = 250;
         const y = 580;
@@ -464,9 +416,10 @@ class Level4Fight1 extends BaseScene {self
         
         async function drawCards(numCards) {
             const startSlotIndex = Math.floor((gameState.slots.length - numCards) / 2);
-            const tweensDuration = 120;
+            const tweensDuration = 110;
             const delay = 7;
             const scale = 0.35
+
             
             for (let i = 0; i < numCards; i++) {
                 
@@ -518,7 +471,7 @@ class Level4Fight1 extends BaseScene {self
                     });
                 }
                     
-                gameConfig.cardsDealtSound.play({ volume: 2.2, seek: 0.10 });
+                gameConfig.cardsDealtSound.play({ volume: 2, seek: 0.10 });
                 gameState.drawPileText.setText(gameState.drawPile.length);
                 self.animateCard(card, cardDepth);
 
@@ -536,7 +489,7 @@ class Level4Fight1 extends BaseScene {self
                         activateCard(card);
                     }
                 })
-                
+
                 if (i === numCards -1) {
                     activateButtons(tweensDuration, delay, numCards);
                     gameState.playersTurn = true; // Sets tokens interactive
@@ -566,15 +519,15 @@ class Level4Fight1 extends BaseScene {self
                 gameState.costPlayed = 0;
 
             } else {
-                gameState.costPlayed = typeof card.cost === 'function' ? card.cost() : card.cost;   
+                gameState.costPlayed = typeof card.cost === 'function' ? card.cost() : card.cost;
+                console.log(`gameState.costPlayed: ${gameState.costPlayed}`);
             }
 
             const goldCostCondition = !card.goldCost || card.goldCost <= gameState.player.gold;
-            const manaCostCondition = gameState.player.mana >= gameState.costPlayed;
-            const tokenCondition = !gameConfig.tokenCardNames.includes(card.key) || gameState.permanentSlots.some(slot => slot.available === true);
-            const otherConditions = gameState.playingCard === false && !card.usedOneShot;
+            const manaCostCondition = gameState.player.mana >= gameState.costPlayed
+            const otherConditions = gameState.playingCard === false && !card.usedOneShot
 
-            if (goldCostCondition && manaCostCondition && tokenCondition && otherConditions) {
+            if (goldCostCondition && manaCostCondition && otherConditions) {
                 gameState.player.mana -= gameState.costPlayed;
                 if (card.goldCost) spendGold(card.goldCost);
                 self.updateManaBar(gameState.player);
@@ -587,7 +540,6 @@ class Level4Fight1 extends BaseScene {self
                 
                 if (card.slot) card.slot.available = true;
                 if (card.oneShot) card.usedOneShot = true;
-                if (card.usesTillDepletion) card.usesTillDepletion -= 1;
 
                 // Select mode of activation based on card type
                 if (gameState.typePlayed === 'targetSelected') {
@@ -595,10 +547,8 @@ class Level4Fight1 extends BaseScene {self
                     targetEnemy(card, gameState.currentCards);
 
                 } else if (gameState.typePlayed === 'targetAll') {
-                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
-                        gameState.discardPile.push(card);
-                        gameState.discardPileText.setText(gameState.discardPile.length);
-                    }
+                    gameState.discardPile.push(card);
+                    gameState.discardPileText.setText(gameState.discardPile.length);
 
                     // Makes a shallow copy to ensure that playCard() continues for enemy2 even if enemy1
                     // gets killed and thus removed from gameState.enemies by removeIfDead().
@@ -613,16 +563,10 @@ class Level4Fight1 extends BaseScene {self
 
                 } else if (gameState.typePlayed === 'permanent') {
                     addPermanent(card);
-                    
-                } else if (gameState.typePlayed === 'debuff') {
-                    if (card.reUseable) gameState.discardPile.push(card);
-                    playCard(card, gameState.player);
 
                 } else {
-                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
-                        gameState.discardPile.push(card);
-                        gameState.discardPileText.setText(gameState.discardPile.length);
-                    }
+                    gameState.discardPile.push(card);
+                    gameState.discardPileText.setText(gameState.discardPile.length);
                     playCard(card, gameState.player);
                 };    
 
@@ -652,13 +596,10 @@ class Level4Fight1 extends BaseScene {self
                 });
         
                 enemy.sprite.on('pointerup', function() {
-                    enemy.sprite.off('pointerup'); // Remove any existing pointerup listeners to prevent stacking
                     if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
                         card.isBeingPlayed = false;
-                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
-                            gameState.discardPile.push(card);
-                            gameState.discardPileText.setText(gameState.discardPile.length);
-                        }
+                        gameState.discardPile.push(card);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
                         playCard(card, enemy);
                     }
                 
@@ -699,7 +640,7 @@ class Level4Fight1 extends BaseScene {self
             // regardless of whether card.type = target or buff.  
             const damageModifyer = (1 + 0.10 * gameState.player.strength) * (1 - target.armor / 20);
             const damageTotal = Math.round( Math.max(0, firePlayed + damagePlayed * damageModifyer));  
-            if (lifeStealPlayed) gameState.player.lifeStealCounter += damagePlayed * damageModifyer * lifeStealPlayed;   
+            if (lifeStealPlayed) gameState.player.lifeStealCounter += damagePlayed * damageModifyer * lifeStealPlayed;
 
             if (target != gameState.player) {
                 gameState.score.damageDealt += damageTotal;
@@ -709,9 +650,7 @@ class Level4Fight1 extends BaseScene {self
                 target.armor -= reduceTargetArmorPlayed;
                 target.poison += poisonPlayed;
                 target.health -= damageTotal;
-            } 
-            //NB! Dont use "else" here
-
+            } // NB! Dont use "else" here
 
             // ADD all cards that increase strength for the rest of the fight
             if (card.key === 'seppuku' || card.key === 'boneShredder') { 
@@ -759,10 +698,6 @@ class Level4Fight1 extends BaseScene {self
                 });
             }
 
-            gameState.enemies.forEach( enemy => {
-                self.updateEnemyIntention(enemy);
-            })
-
             //Give time for tweens to finnish before the next card is played
             self.time.delayedCall(260, () => {  
                 gameState.playingCard = false;
@@ -800,7 +735,7 @@ class Level4Fight1 extends BaseScene {self
             if (card.key === 'bloodOath') {
                 gameState.player.manaMax += 1;
                 gameState.player.manaBase += 1;
-                gameState.player.health -= 6;
+                gameState.player.health -= 6
                 self.updateManaBar(gameState.player);
 
                 if (gameState.player.alive) {
@@ -831,35 +766,6 @@ class Level4Fight1 extends BaseScene {self
                 gameState.player.health -= 2;
                 self.updateHealthBar(gameState.player);
             }
-
-            if ('usesTillDepletion' in card) activateUsesTillDepletion(card);
-        }
-
-        function activateUsesTillDepletion(card) {
-            gameState.usesTillDepletionElements.forEach(element => {
-                if (element) element.destroy();
-            })
-            gameState.usesTillDepletionElements = [];
-        
-            const textConfig = { fontSize: '20px', fill: '#000000' };
-            const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
-            
-            let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
-            let usesTillDepletionTextBackground = self.add.graphics();
-            self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
-            gameState.usesTillDepletionElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
-            
-            // Cancel the previous timer event if it exists
-            if (gameState.usesTillDepletionTimer) {
-                gameState.usesTillDepletionTimer.remove();
-            }
-        
-            gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
-                gameState.usesTillDepletionElements.forEach(element => {
-                    if (element) element.destroy();
-                });
-                gameState.usesTillDepletionTimer = null;
-            });
         }
 
         function addTextAndTweens(damageTotal, poisonPlayed, strengthPlayed, armorPlayed, poisonRemovePlayed) {
@@ -902,7 +808,7 @@ class Level4Fight1 extends BaseScene {self
         }
         
         function normalizeCard(card, target, isLastEnemy = false) {
-            const stancePoints = gameState.player.stancePoints
+            const stancePoints = gameState.player.stancePoints;
 
             const moshpitMassacreCondition = (card.key === 'moshpitMassacre' && stancePoints > 0 && target.poison > 0);
             const scorchedSoulCondition = (card.key === 'scorchedSoul' && target.poison > 0);
@@ -919,7 +825,7 @@ class Level4Fight1 extends BaseScene {self
             const rottenResonanceOutcome = rottenResonanceCondition ? 1 : 0;
 
             if (knuckleFistEdoCondition || kabutuEdoCondition) self.animatePermanent('edoEruption');
-            if (steelToeCondition) self.animatePermanent('steelToe');    
+            if (steelToeCondition) self.animatePermanent('steelToe');
 
             return {
                 damagePlayed: moshpitMassacreCondition ? 11 : getValueOrInvoke(card.damage),
@@ -975,7 +881,7 @@ class Level4Fight1 extends BaseScene {self
             const randomCard = gameState.currentCards[randomIndex];
             fadeOutGameObject(randomCard.sprite, 250);
             gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            if (randomCard.type !== 'debuff' && card.key != "monstrosity") gameState.discardPile.push(randomCard);
+            if (randomCard.type !== 'debuff') gameState.discardPile.push(randomCard);
         }
         
         gameState.endOfTurnButton.on('pointerup', function () {
@@ -1039,6 +945,7 @@ class Level4Fight1 extends BaseScene {self
     
     // ---------------------------------- ENEMY'S TURN -------------------------------------      
      
+
         function startEnemyTurn(enemy) {
 
             // The conditional ensures that "Enemy turn" is only declared when the first enemy starts their turn.
@@ -1073,53 +980,16 @@ class Level4Fight1 extends BaseScene {self
                     enemyTurnTexts.forEach( text => {
                         fadeOutGameObject(text, 100);
                     })
-                }) 
+                });
             }
             
             enemy.turnComplete = false;
             performEnemyAction(enemy);           
         }
 
-        function summonEnemy2() {
-            gameState.enemy2 = Object.create(gameState.enemy);
-            const enemy = gameState.enemy2
-            enemy.name = 'Voidling';
-            enemy.cardKey = 'hellFire'
-            enemy.sprite = self.add.sprite(630, 370, 'voidling')
-            enemy.sprite.setScale(0.30).setFlipX(false).setAlpha(0).setInteractive();
-            enemy.health = 25;
-            enemy.healthMax = 25;
-            enemy.armor = 0;
-            enemy.height = enemy.sprite.displayHeight;
-            enemy.width = enemy.sprite.displayWidth;
-            enemy.x = enemy.sprite.x;
-            enemy.y = enemy.sprite.y;
+        async function performEnemyAction(enemy) {
 
-            let actionTextContent = `Summons a Voidling`;
-            self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
-
-            fadeInEnemy(enemy, 500);
-        }
-
-        function fadeInEnemy(enemy, duration) {
-            self.tweens.add({
-                targets: enemy.sprite,
-                alpha: 1, 
-                ease: 'Power1',
-                duration: duration,
-                onComplete: function () {
-                    console.log("fade-in complete");
-                    self.addHealthBar(enemy, enemy.healthBarColor);
-                    self.addStatsDisplay(enemy, 450);
-                    self.describeCharacter(enemy);
-                    gameState.summonedEnemies.push(enemy);
-                },
-            }, self);
-        }
-
-        function performEnemyAction(enemy) {
-
-            const poisonTextY = enemy.lifeStealText ? 450 : 380
+            const poisonTextY = enemy.lifeStealText ? 430 : 380
             enemy.poisonText = self.add.text(550, poisonTextY, '', {fontSize: '30px', fill: '#ff0000'}).setOrigin(0.5).setDepth(21);
             enemy.poisonTextBackground = self.add.graphics();
             updatePoison(enemy);
@@ -1128,78 +998,60 @@ class Level4Fight1 extends BaseScene {self
                 updateStats(enemy);
             };
         
-            let delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 500 : 1500;
-            if (gameState.debuffCardPlayed) {
-                delaytime += 1000;
-                gameState.debuffCardPlayed = false;
+            const delaytime = (enemy.poisonText._text === '' && !enemy.turnText) ? 500 : 1500;
+        
+            await self.delay(delaytime);
+            fadeOutGameObject(enemy.poisonText, 100);
+            fadeOutGameObject(enemy.poisonTextBackground, 100);
+
+            await self.delay(100);
+            // Perform the chosen action
+            const chosenAction = enemy.chosenAction;
+            const actionTextConfig = {fontSize: '32px', fill: '#ff0000'};
+            gameState.actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
+            gameState.actionTextBackground = self.add.graphics();
+            
+            gameState.player.poison += chosenAction.poison;
+            enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
+            enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
+            updateStats(enemy);
+            enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);    
+    
+            if (chosenAction.damage > 0 || chosenAction.fire > 0 || chosenAction.poison > 0) {
+                const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
+                self.cameras.main.shake(120, .005, false);
+                gameConfig.attackSound.play({ volume: 0.8 });
+                console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
+
+                enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
+                gameState.player.health -= enemy.damageTotal;
+                gameState.score.damageTaken += enemy.damageTotal;
+                let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
+                self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
+                
+                self.tweens.add({
+                    targets: enemy.sprite,
+                    x: enemy.sprite.x - 60,
+                    duration: 120,
+                    ease: 'Cubic',
+                    yoyo: true
+                })
+    
+            } else if (chosenAction.heal > 0) {
+                gameConfig.healSound.play({ volume: 0.5 });
+                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
+                self.powerUpTweens(enemy);
+                
+    
+            } else if (chosenAction.strength > 0 || chosenAction.armor > 0)  {
+                gameConfig.powerUpSound.play({ volume: 0.2 });
+                self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
+                self.powerUpTweens(enemy);
             }
-        
-            self.time.delayedCall(delaytime, () => {
-                fadeOutGameObject(enemy.poisonText);
-                fadeOutGameObject(enemy.poisonTextBackground);
-
-                // Perform the chosen action
-                const chosenAction = enemy.chosenAction;
-                const actionTextConfig = {fontSize: '32px', fill: '#ff0000'};
-                gameState.actionText = self.add.text(550, 300, "", actionTextConfig).setOrigin(0.5).setDepth(21);
-                gameState.actionTextBackground = self.add.graphics();
-                
-                gameState.player.poison += chosenAction.poison;
-                enemy.health = Math.min(enemy.health + chosenAction.heal, enemy.healthMax);
-                enemy.strengthBase = Math.min(enemy.strengthBase + chosenAction.strength, enemy.strengthMax);
-                updateStats(enemy);
-                enemy.armor = Math.min(enemy.armor + chosenAction.armor, enemy.armorMax);
-
-                if (chosenAction.reduceTargetArmor || chosenAction.reduceTargetStrength) {
-                    gameState.player.armorBase = Math.max(-15, gameState.player.armorBase - chosenAction.reduceTargetArmor);
-                    gameState.player.strengthBase = Math.max(-15, gameState.player.strengthBase - chosenAction.reduceTargetStrength);
-                    updateStrengthAndArmor(gameState.player);
-                }
-                
-                if (chosenAction.debuffCard) {
-                    insertDebuffCard(enemy, chosenAction);
-                } else {
-                    gameState.debuffCardPlayed = false;
-                }
-
-                if (chosenAction.summonEnemy == 2) summonEnemy2();
-        
-                if (chosenAction.damage > 0 || chosenAction.fire > 0 || chosenAction.poison > 0) {
-                    const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
-                    self.cameras.main.shake(120, .005, false);
-                    gameConfig.attackSound.play({ volume: 0.8 });
-                    console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
-
-                    enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
-                    gameState.player.health -= enemy.damageTotal;
-                    gameState.score.damageTaken += enemy.damageTotal;
-                    let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
-                    self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
-                    
-                    self.tweens.add({
-                        targets: enemy.sprite,
-                        x: enemy.sprite.x - 60,
-                        duration: 120,
-                        ease: 'Cubic',
-                        yoyo: true
-                    })
-        
-                } else if (chosenAction.heal > 0) {
-                    gameConfig.healSound.play({ volume: 0.5 });
-                    self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
-                    self.powerUpTweens(enemy);
-                    
-        
-                } else if (chosenAction.strength > 0 || chosenAction.armor > 0)  {
-                    gameConfig.powerUpSound.play({ volume: 0.2 });
-                    self.updateTextAndBackground(gameState.actionText, gameState.actionTextBackground, chosenAction.text);
-                    self.powerUpTweens(enemy);
-                }
-        
-                // NB! enemy.strengthTurn must be reset before concludeEnemyAction() (or an extra call to updateStats() will be required)
-                enemy.strengthTurn = 0; 
-                concludeEnemyAction(enemy, chosenAction);
-            })
+    
+            // NB! enemy.strengthTurn must be reset before concludeEnemyAction() (or an extra call to updateStats() will be required)
+            enemy.strengthTurn = 0; 
+            concludeEnemyAction(enemy, chosenAction);
         }
 
         async function concludeEnemyAction(enemy, chosenAction) {
@@ -1207,9 +1059,9 @@ class Level4Fight1 extends BaseScene {self
                 self.updateHealthBar(character);
                 removeIfDead(character);
                 updateStats(character);
-            });
+            })
 
-            let delaytime = gameState.debuffCardPlayed ? 1500 : 1200;
+            const delaytime = 1300;
             
             await self.delay(delaytime);
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
@@ -1225,178 +1077,49 @@ class Level4Fight1 extends BaseScene {self
                         initiateEnemiesTurn();
                     } else {
                         gameState.currentEnemyIndex = 0;
-
-                        gameState.summonedEnemies.forEach( enemy => {
-                            if (enemy.alive && !gameState.enemies.includes(enemy)) {
-                                gameState.enemies.unshift(enemy);
-                                gameState.characters.unshift(enemy);
-                            }
-                        });
-
-                        delaytime = gameState.debuffCardPlayed ? 500 : 150;
-                        await self.delay(delaytime);
+                        await self.delay(150);
                         startPlayerTurn();
                     }
                 }
             }
         };
 
-        function insertDebuffCard(enemy, chosenAction ) {
-            return new Promise((resolve) => { 
-                gameState.debuffCardPlayed = true; 
-                let completedTweens = 0;          
-                const cardKey = enemy.cardKey;
-                const x = 450;
-                const gap = 200;
-                const y = 450;
-                let scale = 0.45;
-                const delay = 2300;
-                const pile = chosenAction.debuffCard === 'draw' ? gameState.drawPile : gameState.discardPile;
-                const pileName = chosenAction.debuffCard === 'draw' ? 'Draw pile' : 'Discard Pile';
-                const endXCoord = chosenAction.debuffCard === 'draw' ? 120 : 980;
-                
-                const cardNames = {
-                    ratCard: 'Infectious',
-                    hellFire: 'Hell Fire',
-                    rooted: "Rooted",
-                    monstrosity: "Monstrosity"
-                };
-
-                self.attackTweens(enemy, 60);
-                gameConfig.attackSound.play({ volume: 0.8 });
-                console.log(enemy.actions.debuffCard)
-
-                const debuffCards = [ 
-                    {key: cardKey, type: 'debuff', cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: -1, armor: -2, reduceTargetArmor: 0, reduceTargetStrength: 0, reUseable: true, drawCard: () => gameState.player.stancePoints > 0 ? 1 : 0},
-                    {key: cardKey, type: 'debuff', cost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: -1, armor: -2, reduceTargetArmor: 0, reduceTargetStrength: 0, reUseable: true, drawCard: () => gameState.player.stancePoints > 0 ? 1 : 0},
-                ];
-
-                pile.push( ...debuffCards);
-            
-                const cardSpriteOne = self.add.image(x, y, cardKey).setScale(scale).setOrigin(0.5).setDepth(300);
-                const cardSpriteTwo = self.add.image(x+gap, y, cardKey).setScale(scale).setOrigin(0.5).setDepth(300);
-                const cardSprites = [cardSpriteOne, cardSpriteTwo];
-
-                let actionTextContent = `Adds 2 ${cardNames[cardKey]} to your ${pileName}`;
-                gameState.actionText.y = y-200;
-                self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
-            
-                self.time.delayedCall(delay, () => {
-                    cardSprites.forEach((cardSprite) => {
-                        self.tweens.add({
-                            targets: cardSprite,
-                            x: endXCoord,
-                            y: 600,
-                            scaleX: 0,
-                            scaleY: 0,
-                            ease: 'Cubic',
-                            duration: 600,
-                            onComplete: function () {
-                                cardSprite.destroy();
-                                gameState.discardPileText.setText(gameState.discardPile.length);
-                                gameState.drawPileText.setText(gameState.drawPile.length);
-                                completedTweens++;
-                                if (completedTweens === cardSprites.length) {
-                                    resolve();
-                                }
-                            },
-                        });
-                    });
-                });
-
-            });
-        }  
-
         function updateEnemyActions() {
 
             if (gameState.turn === 1) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 2, text: 'Steals 2 armor', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 2, reduceTargetArmor: 0, text: 'Steals 2 Strength', probability: 1},
-                ];
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 5, text: 'Heals 10 HP\nGains 5 armor', probability: 1},
+                ] 
 
             } else if (gameState.turn === 2) {
                 gameState.enemy1.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 1},
                 ]
-                gameState.enemy2.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ]
-                
+
             } else if (gameState.turn === 3) {
                 gameState.enemy1.actions = [
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 1},
-                ];
-
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 3, armor: 0, text: 'Heals 10 HP\nGains 3 Strength', probability: 1},
+                ] 
+                
             } else if (gameState.turn === 4) {
                 gameState.enemy1.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
-
-            } else if (gameState.turn === 5) {
-                gameState.enemy1.actions = [
-                    {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, reduceTargetStrength: 0, reduceTargetArmor: 2, text: 'Steals 2 armor', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Steals 1 Strength', probability: 1},
-                ];
-                
-            } else if (gameState.turn === 6) {
-                gameState.enemy1.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
-
-            } else if (gameState.turn === 7) {
-                gameState.enemy1.actions = [
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 1},
-                ];
-
-            } else if (gameState.turn === 8) {
-                gameState.enemy1.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
-                gameState.enemy2.actions = [
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 1},
-                ];
+                    {key: () => `Intends to\nDeal ${Math.round(15 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 15, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 15 damage', probability: 1},
+                ]
         
             } else {
-    
+
                 gameState.enemy1.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 12 damage', probability: 0.33 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 16 damage', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Heals 10 HP\nSteals 1 Armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.16},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Heals 20 HP', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.04},
-                    {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Steals 1 Strenght', probability: 0.11 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Steals 1 Armor', probability: 0.11 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.20 : 0) / 5},
-                ];
-        
-                gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: ' Deals 14 damage', probability: 0.33 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: ' Heals 10 HP\nSteals 1 Armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.16},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 20, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: '  Heals 20 HP', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.04},
-                    {key: `Intends to\nSteal Strength`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 1, armor: 0, reduceTargetStrength: 1, reduceTargetArmor: 0, text: 'Steals 1 Strenght', probability: 0.11 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nSteal Armor`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 1, reduceTargetStrength: 0, reduceTargetArmor: 1, text: 'Steals 1 Armor', probability: 0.11 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                    {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.20 : 0) / 5},
-                ];
-            }
-    
-        };
+                    {key: `Intends to\nDeal 5 fire damage`, damage: 0, fire: 5, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: `Deals 5 fire damage`, probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.27 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(17 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 17, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 17 damage', probability: 0.18 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 15, poisonRemove: 0, strength: 0, armor: 2, text: 'Heals 15 HP\nGains 2 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.17},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 25, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 25 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.06},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 4, armor: 0, text: 'Gains 4 strenght', probability: 0.12 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, text: 'Gains 5 armor', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.22 : 0) / 5},
+                    {key: `Intends to\nPoison you`, damage: 0, fire: 0, poison: 5, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 5 poison', probability: 0.00}
+                ]
+            }  
+        }
 
         function normalizeProbabilities(enemy) {
             const totalProbability = enemy.actions.reduce((sum, action) => sum + action.probability, 0);
@@ -1516,7 +1239,8 @@ class Level4Fight1 extends BaseScene {self
             if (zaibatsuIncome) {
                 earnGold(zaibatsuIncome);
                 self.animatePermanent('zaibatsuU');
-            } 
+            }
+            
             gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
 
             const victoryTextConfig = { fontSize: '100px', fill: '#ff0000', fontFamily: 'Rock Kapak' };
@@ -1614,7 +1338,7 @@ class Level4Fight1 extends BaseScene {self
             self.shuffleDeck(gameState.bonusCards);
             let bonusCards = gameState.bonusCards.splice(0, 3);
 
-            if (gameState.latestDraw) {
+            if (gameState.latestDraw) { 
                 gameState.latestDraw.forEach(card => {
                     gameState.bonusCards.push(card);
                 });
@@ -1773,8 +1497,7 @@ class Level4Fight1 extends BaseScene {self
 
             redrawCardsButton.on('pointerup', function() {
                 if (gameState.player.gold >= redrawCost) {
-                    console.log(`rewardAddCardsButton activated`);
-                    spendGold(redrawCost);
+                    spendGold(redrawCost)
                     gameState.redrawButtonObjects.forEach(object => {
                         object.destroy();
                     })
@@ -1960,7 +1683,7 @@ class Level4Fight1 extends BaseScene {self
                 } else {
                     self.cameras.main.shake(50, .0015, false);
                 };
-            });              
+            });           
 
             // Buy New Card
             shopAddCardButton.on('pointerup', function() {
@@ -2072,6 +1795,7 @@ class Level4Fight1 extends BaseScene {self
                 }
         }
 
+
     // ---------------------------------- PERMANENTS-------------------------------------      
 
         
@@ -2101,7 +1825,7 @@ class Level4Fight1 extends BaseScene {self
             // The conditional avoids error if no slots are available.
             if (slot) { 
 
-                if (card != gameState.freePermanent) { // Only relevant for Level1Fight1
+                if (!card.freePermanent) { // Only relevant for Level1Fight1
                     card.slot.available = true;
                     card.sprite.destroy();
                 }
@@ -2263,6 +1987,7 @@ class Level4Fight1 extends BaseScene {self
             } else if (card.key === 'lustForLife') {
                 gameState.lustForLifeCounter += 1;
                 if (gameState.fightStarted) {
+                    console.log('adding heal shop');
                     self.addHealButton();
                     activateHealButton();
                 };
@@ -2278,7 +2003,7 @@ class Level4Fight1 extends BaseScene {self
                         self.cameras.main.shake(70, .002, false);
                     };
                 })
-                
+
             } else if (card.key === 'punksNotDead') {
                 gameState.punksNotDeadCondition = true;
                 gameState.punksNotDeadCard = card;
@@ -2315,10 +2040,10 @@ class Level4Fight1 extends BaseScene {self
 
             } else if (card.key === 'enduringSpirit') {
                 if (!gameState.fightStarted) {
-                    gameState.player.healthMax += 4;
+                    gameState.player.healthMax += 5;
                     self.updateHealthBar(gameState.player);
                     gameState.enduringSpiritCounter +=1;
-                    if (gameState.enduringSpiritCounter >= 8) {
+                    if (gameState.enduringSpiritCounter >= 7) {
                         depleteEnduringSpirit(card)
                     }; 
                 };
@@ -2355,6 +2080,7 @@ class Level4Fight1 extends BaseScene {self
                         self.cameras.main.shake(70, .002, false);
                     }
                 })
+
             
             // -------------- NON-DEPLETED TOKEN-CARDS -----------------------------------
             // For non-depleted cards, store current references to tokenSprite and tokenSlot in local variables. 
@@ -2423,8 +2149,8 @@ class Level4Fight1 extends BaseScene {self
                             self.cameras.main.shake(70, .002, false);
                         }
                     })
-                }  
-            } 
+                } 
+            }
         
         function activatePermanentFromHand(card) {
             // No slots available => direct activation of deplete effect
@@ -2492,8 +2218,8 @@ class Level4Fight1 extends BaseScene {self
                     break;
                 case 'zaibatsuU':
                     depleteZaibatsuUnderground(card);
-                    break;    
-                    
+                    break;
+                
                 // Token-cards are non-depletable from hand
                 default:
                     if (gameConfig.tokenCardNames.includes(card.key)) {
@@ -2770,8 +2496,9 @@ class Level4Fight1 extends BaseScene {self
             if (gameState.bonusPermanentSlots.length) {
                 gameState.permanentSlots.push(gameState.bonusPermanentSlots.shift());
             }
-            if (gameState.bouncingSolesCards.lenght) {
+            if (gameState.bouncingSolesCards.length) {
                 gameState.extraCards.push(gameState.bouncingSolesCards.shift());
+                gameState.extraCards.forEach(c => console.log(c.key))
             }    
             destroyToken(card);
         }
@@ -2791,6 +2518,7 @@ class Level4Fight1 extends BaseScene {self
             gameState.zaibatsuMax = 0;
             destroyToken(card);
         }
+
         
         // Non-depleted cards
         function depleteKamishimoUberAlles(card, tokenSprite, tokenSlot) {
@@ -2828,9 +2556,10 @@ class Level4Fight1 extends BaseScene {self
             gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
             gameState.zaibatsuMax = Math.max(0, gameState.zaibatsuMax - 1);
         }
-    
+
     
     // ---------------------------------- UTILITIES-------------------------------------      
+
 
         // NB! Should only be used for character = player. The argument is keept in place for a future revision to multiple player characters.
         function updateStrengthAndArmor(character) { 
@@ -2858,13 +2587,13 @@ class Level4Fight1 extends BaseScene {self
                 character.armor = Math.min(character.armorMax, character.armor - gameState.player.stancePoints * gameState.shogunsShellCounter);
             }
 
-            updateStats(character)
+            updateStats(character);
         }
 
         function updateStats(character) {
             
             if (character != gameState.player) { 
-                character.strength = character.strengthBase + character.strengthTurn
+                character.strength = character.strengthBase + character.strengthTurn;
                 
                 if (gameState.toxicAvenger && character.poison > 0) { 
                     character.strength -= 4; // Account for Toxic Avenger
@@ -2873,6 +2602,7 @@ class Level4Fight1 extends BaseScene {self
             
             character.armorText.setText(`${character.armor}/${character.armorMax}`);
             character.strengthText.setText(`${character.strength}/${character.strengthMax}`);
+
         }
 
         function removeIfDead(character) {
@@ -2881,13 +2611,13 @@ class Level4Fight1 extends BaseScene {self
                 character.alive = false;
 
                 if (character === gameState.player && gameState.punksNotDeadCondition) {
-                    depletePunksNotDead(gameState.punksNotDeadCard);
-                    return;
+                    depletePunksNotDead(gameState.punksNotDeadCard)
+                    return
                 }
 
                 character.sprite.removeInteractive();
-                
                 character.turnComplete = true;
+                fadeOutGameObject(character.sprite, 500);
 
                 if (character != gameState.player) {
                     const indexEnemies = gameState.enemies.indexOf(character);
@@ -2906,9 +2636,8 @@ class Level4Fight1 extends BaseScene {self
                         gameState.troopsOfTakamoriCondition = false
                     }
                 }
-
+                
                 const characterObjects = [
-                    character.sprite, 
                     character.healthBarBackground,
                     character.healthBarFrame,
                     character.healthBar,
@@ -2927,7 +2656,7 @@ class Level4Fight1 extends BaseScene {self
                 ];
 
                 characterObjects.forEach( object => {
-                    fadeOutGameObject(object, 500);
+                    if(object) object.destroy();
                 })
             }
         };
@@ -2939,7 +2668,7 @@ class Level4Fight1 extends BaseScene {self
 
                 if (gameState.player.gold >= healCost && gameState.playersTurn && gameState.player.health < gameState.player.healthMax) {
                     spendGold(healCost);
-                    gameState.lustForLifeCost++;
+                    gameState.lustForLifeCost += 1;
                     gameState.player.health = Math.min(gameState.player.healthMax, gameState.player.health + healAmount);
                     self.updateHealthBar(gameState.player);
 
@@ -3172,9 +2901,6 @@ class Level4Fight1 extends BaseScene {self
                 character.poison -= 1;
             }
         };
-
-        
-
 
         function addAdminTools() {
             if (gameState.playerName === 'admin') { // For testing purposes

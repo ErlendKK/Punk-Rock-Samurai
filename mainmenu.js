@@ -14,16 +14,26 @@ class Mainmenu extends Phaser.Scene {
     }
 
     async getTopScores() {
-        const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
-        const data = await response.json();
-        let scores = data.dreamlo.leaderboard.entry;
-        
-        if (scores.length > 1) {
-            scores.sort((a, b) => b.score - a.score);
+        try {
+            const response = await fetch('https://www.dreamlo.com/lb/64c442f28f40bb8380e27ce7/json');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const data = await response.json();
+            let scores = data.dreamlo.leaderboard.entry || [];
+    
+            if (scores.length > 1) {
+                scores.sort((a, b) => b.score - a.score);
+            }
+    
+            return scores.slice(0, 5);
+        } catch (error) {
+            console.error('Error fetching top scores:', error);
+            return []; // Return an empty array or handle the error as appropriate
         }
-
-        return scores.slice(0, 5);
     }
+    
 
     preload() {
         this.load.image('player', 'assets/images/sprites/punkrock.png');
@@ -215,12 +225,10 @@ class Mainmenu extends Phaser.Scene {
                     gameState.isEnteringName = true;
                     console.log('isEnteringName has been activated');
 
-                    // Reset name form
                     if (gameState.name === 'Enter your name...') {
                         gameState.name = '';
                     }
 
-                    // Add blinking cursor
                     sceneState.formCursor.setAlpha(0);
                     sceneState.cursorTween.resume();
 
@@ -340,7 +348,6 @@ class Mainmenu extends Phaser.Scene {
     
             bonusCards.forEach( (bonusCard, index) => {
                 bonusCard.sprite = self.add.sprite(x + index * spacing, y, bonusCard.key).setScale(0.45).setInteractive();
-                console.log(`bonusCardsprite added for: ${bonusCard.key}`);
         
                 bonusCard.sprite.on('pointerover', function() {
                     sceneState.cardsDealtSound.play({ volume: 0.8, seek: 0.12 });
@@ -387,7 +394,7 @@ class Mainmenu extends Phaser.Scene {
                         }    
                     });
         
-                    self.input.on('pointerup', () => { // IMPLEMENT: Or pressed enter!
+                    self.input.on('pointerup', () => {
                         if (!nextlevelstarting) {
                             nextlevelstarting = true;
                             startNextLevel();
@@ -409,10 +416,10 @@ class Mainmenu extends Phaser.Scene {
             textObj.setText(newText);
             
             const bounds = textObj.getBounds();
-            const backgroundWidth = bounds.width + 10; // 5px padding on each side
-            const backgroundHeight = bounds.height + 10; // 5px padding on each side
-            const backgroundX = bounds.x - 5; // 5px padding on the left
-            const backgroundY = bounds.y - 5; // 5px padding on the top
+            const backgroundWidth = bounds.width + 10; 
+            const backgroundHeight = bounds.height + 10; 
+            const backgroundX = bounds.x - 5; 
+            const backgroundY = bounds.y - 5; 
             
             backgroundObj.clear();
             backgroundObj.fillStyle(0xFFFFFF, 1).setAlpha(0.4).setDepth(20);
@@ -529,10 +536,10 @@ class Mainmenu extends Phaser.Scene {
             const noSaveText = self.add.text(620, 350, textContent, textConfig).setOrigin(0.5).setDepth(21);
             
             const bounds = noSaveText.getBounds();
-            const backgroundWidth = bounds.width + 10; // 5px padding on each side
-            const backgroundHeight = bounds.height + 10; // 5px padding on each side
-            const backgroundX = bounds.x - 10; // 5px padding on the left
-            const backgroundY = bounds.y - 5; // 5px padding on the top
+            const backgroundWidth = bounds.width + 10;
+            const backgroundHeight = bounds.height + 10;
+            const backgroundX = bounds.x - 10;
+            const backgroundY = bounds.y - 5;
             
             const textBackground = self.add.graphics();
             textBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(20);
@@ -568,13 +575,20 @@ class Mainmenu extends Phaser.Scene {
                 
                 sceneState.displayedScoreArray = [];
 
-                for(let i = 0; i < topScores.length; i++) {
-                    const dateOnly = topScores[i].date.split(' ')[0];  // Splitting the date string and keeping only the first part
-                    const scoreText = `${i + 1}. Name: ${topScores[i].name}, Score: ${topScores[i].score}, Date: ${dateOnly}`;
-                    const displayedScore = this.add.text(x + 30, y + 80, scoreText, textConfig).setOrigin(0);
-                    
+                if (!topScores.length) {
+                    const scoreText = `Failed to access leaderboard`;
+                    const displayedScore = this.add.text(x + 30, y + 80, scoreText, textConfig).setOrigin(0);  
                     sceneState.displayedScoreArray.push(displayedScore);
-                    y += 20;
+                } else {
+
+                    for(let i = 0; i < topScores.length; i++) {
+                        const dateOnly = topScores[i].date.split(' ')[0];  // Splitting the date string and keeping only the first part
+                        const scoreText = `${i + 1}. Name: ${topScores[i].name}, Score: ${topScores[i].score}, Date: ${dateOnly}`;
+                        const displayedScore = this.add.text(x + 30, y + 80, scoreText, textConfig).setOrigin(0);
+                        
+                        sceneState.displayedScoreArray.push(displayedScore);
+                        y += 20;
+                    }
                 }
 
                 sceneState.leaderboardElements = [

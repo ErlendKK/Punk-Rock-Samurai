@@ -1,8 +1,21 @@
-old_code = """if (gameState.steelToeCards.lenght) {"""
+old_code = """if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
+                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                            gameState.discardPile.push(card);
+                            gameState.discardPileText.setText(gameState.discardPile.length);
+                        }
+                        playCard(card, enemy);
+                    }"""
 
 
 
-new_code = """if (gameState.steelToeCards.length) {"""
+new_code = """if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
+                        card.isBeingPlayed = false;
+                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                            gameState.discardPile.push(card);
+                            gameState.discardPileText.setText(gameState.discardPile.length);
+                        }
+                        playCard(card, enemy);
+                    }"""
 
 
 levels = [

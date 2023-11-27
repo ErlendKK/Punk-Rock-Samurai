@@ -34,6 +34,7 @@ class BaseScene extends Phaser.Scene {
         gameState.actionTextObjects = [];
         gameState.redrawButtonObjects = [];
         gameState.healButtonTextObjects = [];
+        gameState.usesTillDepletionElements = [];
 
         // Reset Permanent effects
         gameState.kamishimoUberAlles = 0;
@@ -62,10 +63,6 @@ class BaseScene extends Phaser.Scene {
         gameConfig.music = this.sound.add('bossTune');
         gameConfig.coinSound = this.sound.add('coinSound');
         gameConfig.keyboardSound = this.sound.add('keyboardSound');
-
-        gameState.extraCards.forEach(card => {
-            console.log(card.key);
-        })
 
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
@@ -335,7 +332,7 @@ class BaseScene extends Phaser.Scene {
         
         gameState.stanceText.on('pointerover', () => {
 
-            const stanceText = `Stance represents the balance\nbetween Discipline and Freedom.\n\n` +
+            const stanceText = `Stance represents the balance between\nDiscipline and Freedom.\n\n` +
                 `Positive Discipline during your turn:\n+3 Strength\n\n` +
                 `Positive Discipline at the end of your turn:\n+3 Armor\n\nMax Discipline at the end of your turn:\n` +
                 `-1 card next turn\n\nPositive Freedom during your turn:\n+1 mana\n\nPositive Freedom at the end of your turn:\n` + 

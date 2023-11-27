@@ -394,6 +394,8 @@ class Level2Fight1 extends BaseScene {self
             gameState.permanents.forEach(p => {
                 if (p.card.key === 'chemicalWarfare') {
                     p.card.turnsToDepletion -= 1;
+                    console.log(`p.card.turnsToDepletion: ${p.card.turnsToDepletion}`)
+
                     if (p.card.turnsToDepletion === 0) {
                         depleteChemicalWarfare(p.card, p.card.tokenSprite, p.card.tokenSlot);
                     }
@@ -570,10 +572,11 @@ class Level2Fight1 extends BaseScene {self
             }
 
             const goldCostCondition = !card.goldCost || card.goldCost <= gameState.player.gold;
-            const manaCostCondition = gameState.player.mana >= gameState.costPlayed
-            const otherConditions = gameState.playingCard === false && !card.usedOneShot
+            const manaCostCondition = gameState.player.mana >= gameState.costPlayed;
+            const tokenCondition = !gameConfig.tokenCardNames.includes(card.key) || gameState.permanentSlots.some(slot => slot.available === true);
+            const otherConditions = gameState.playingCard === false && !card.usedOneShot;
 
-            if (goldCostCondition && manaCostCondition && otherConditions) {
+            if (goldCostCondition && manaCostCondition && tokenCondition && otherConditions) {
                 gameState.player.mana -= gameState.costPlayed;
                 if (card.goldCost) spendGold(card.goldCost);
                 self.updateManaBar(gameState.player);
@@ -586,6 +589,7 @@ class Level2Fight1 extends BaseScene {self
                 
                 if (card.slot) card.slot.available = true;
                 if (card.oneShot) card.usedOneShot = true;
+                if (card.usesTillDepletion) card.usesTillDepletion -= 1;
 
                 // Select mode of activation based on card type
                 if (gameState.typePlayed === 'targetSelected') {
@@ -593,8 +597,10 @@ class Level2Fight1 extends BaseScene {self
                     targetEnemy(card, gameState.currentCards);
 
                 } else if (gameState.typePlayed === 'targetAll') {
-                    gameState.discardPile.push(card);
-                    gameState.discardPileText.setText(gameState.discardPile.length);
+                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                        gameState.discardPile.push(card);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
+                    }
 
                     // Makes a shallow copy to ensure that playCard() continues for enemy2 even if enemy1
                     // gets killed and thus removed from gameState.enemies by removeIfDead().
@@ -614,8 +620,10 @@ class Level2Fight1 extends BaseScene {self
                     playCard(card, gameState.player);
 
                 } else {
-                    gameState.discardPile.push(card);
-                    gameState.discardPileText.setText(gameState.discardPile.length);
+                    if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                        gameState.discardPile.push(card);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
+                    }
                     playCard(card, gameState.player);
                 };    
 
@@ -645,10 +653,13 @@ class Level2Fight1 extends BaseScene {self
                 });
         
                 enemy.sprite.on('pointerup', function() {
+                    enemy.sprite.off('pointerup'); // Remove any existing pointerup listeners to prevent stacking
                     if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
                         card.isBeingPlayed = false;
-                        gameState.discardPile.push(card);
-                        gameState.discardPileText.setText(gameState.discardPile.length);
+                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
+                            gameState.discardPile.push(card);
+                            gameState.discardPileText.setText(gameState.discardPile.length);
+                        }
                         playCard(card, enemy);
                     }
                 
@@ -826,6 +837,35 @@ class Level2Fight1 extends BaseScene {self
                 gameState.player.health -= 2;
                 self.updateHealthBar(gameState.player);
             }
+
+            if ('usesTillDepletion' in card) activateUsesTillDepletion(card);
+        }
+
+        function activateUsesTillDepletion(card) {
+            gameState.usesTillDepletionElements.forEach(element => {
+                if (element) element.destroy();
+            })
+            gameState.usesTillDepletionElements = [];
+        
+            const textConfig = { fontSize: '20px', fill: '#000000' };
+            const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
+            
+            let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
+            let usesTillDepletionTextBackground = self.add.graphics();
+            self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
+            gameState.usesTillDepletionElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
+            
+            // Cancel the previous timer event if it exists
+            if (gameState.usesTillDepletionTimer) {
+                gameState.usesTillDepletionTimer.remove();
+            }
+        
+            gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
+                gameState.usesTillDepletionElements.forEach(element => {
+                    if (element) element.destroy();
+                });
+                gameState.usesTillDepletionTimer = null;
+            });
         }
 
         function addTextAndTweens(damageTotal, poisonPlayed, strengthPlayed, armorPlayed, poisonRemovePlayed) {
@@ -1266,20 +1306,20 @@ class Level2Fight1 extends BaseScene {self
             } else {
     
                 gameState.enemy1.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.26 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(12 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 12 damage', probability: 0.28 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                     {key: () => `Intends to\nDeal ${Math.round(16 * (1 + 0.10 * gameState.enemy1.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 16, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 16 damage', probability: 0.17 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                     {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0 : 0.18},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.09 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, text: 'Gains 2 armor', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                     {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.14 + ((gameState.enemy1.health >= gameState.enemy1.healthMax) ? 0.18 : 0) / 5},
                 ]
             
                 gameState.enemy2.actions = [ 
-                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.30 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: () => `Intends to\nDeal ${Math.round(14 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 14, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 14 damage', probability: 0.32 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
                     {key: () => `Intends to\nDeal ${Math.round(18 * (1 + 0.10 * gameState.enemy2.strength) * (1 - gameState.player.armor / 20))} damage`, damage: 18, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, text: 'Deals 18 damage', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
                     {key: `Intends\nto Rest`, damage: 0, fire: 0, poison: 0, heal: 10, poisonRemove: 0, strength: 0, armor: 1, text: 'Heals 10 HP\nGains 1 armor', probability: (gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0 : 0.18},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.10 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
-                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 3, text: 'Gains 3 armor', probability: 0.15 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 2, armor: 0, text: 'Gains 2 strenght', probability: 0.09 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
+                    {key: `Intends to\nApply a buff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 2, text: 'Gains 2 armor', probability: 0.14 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
                     {key: `Intends to\nApply a debuff`, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetStrength: 0, reduceTargetArmor: 0, text: 'Applies a debuff', debuffCard: 'draw', probability: 0.12 + ((gameState.enemy2.health >= gameState.enemy2.healthMax) ? 0.18 : 0) / 5},
                 ]
             }
@@ -2203,10 +2243,10 @@ class Level2Fight1 extends BaseScene {self
 
             } else if (card.key === 'enduringSpirit') {
                 if (!gameState.fightStarted) {
-                    gameState.player.healthMax += 5;
+                    gameState.player.healthMax += 4;
                     self.updateHealthBar(gameState.player);
                     gameState.enduringSpiritCounter +=1;
-                    if (gameState.enduringSpiritCounter >= 7) {
+                    if (gameState.enduringSpiritCounter >= 8) {
                         depleteEnduringSpirit(card)
                     }; 
                 };

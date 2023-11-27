@@ -271,7 +271,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0, damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-            
+
         ]; 
             
         gameState.bonusCards = [
@@ -288,7 +288,7 @@ class Preload extends Phaser.Scene {
             {key: 'bouncingSoles',      type: 'permanent',      cost: 3, goldCost: 3, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'bouncingSolesToken'},
             {key: 'shogunsShell',       type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'shogunsShellToken'},
             {key: 'steelToe',           type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'steelToeToken'},
-            {key: 'chemicalWarfare',    type: 'permanent',      cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, turnsToDepletion: 4, token: 'chemicalWarfareToken'},
+            {key: 'chemicalWarfare',    type: 'permanent',      cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, turnsToDepletion: 3, token: 'chemicalWarfareToken'},
             {key: 'zaibatsuU',          type: 'permanent',      cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, token: 'zaibatsuUndergroundToken'},
            
             {key: 'studdedLeather',     type: 'buff',           cost: 1, stancePoints: 2, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 5, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
@@ -303,7 +303,7 @@ class Preload extends Phaser.Scene {
             {key: 'bloodOath',          type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'kabutuOverdrive',    type: 'buff',           cost: 1, stancePoints: -3, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 15, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'nenguStyle',         type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
-            {key: 'zenZine',            type: 'buff',           cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
+            {key: 'zenZine',            type: 'buff',           cost: () => gameState.player.mana, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true, usesTillDepletion: 4},
             {key: 'gutterGeisha',       type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: () => Math.floor((gameState.player.healthMax - gameState.player.health) * 0.1), reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'noFuture',           type: 'buff',           cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
             {key: 'coverCharge',        type: 'buff',           cost: 1, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, oneShot: true},
@@ -408,9 +408,8 @@ class Preload extends Phaser.Scene {
 
         gameState.taunts = [
             {key: 1, enemy: `A punk rock samurai?\nWhat's next?\nA disco knight?`, player: `What's next, is me\nusing your bones\nas my drumsticks!`},
-            {key: 2, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here\nwill be your attempt to\nsurvive this encounter!` },
+            {key: 2, enemy: `A Samurai punk rocker?\nIs this some kind of joke?`, player: `The only joke here will be\nyour attempt to survive!` },
             {key: 3, enemy: `You must be lost, samurai boy.\nThe cosplay convention is\ndown the street.`, player: `The only thing lost today\nwill be your head\nfrom your shoulders!`},
-            {key: 4, enemy: `You look like a kid who\nfound his grandpa's armor.`, player: `And you'll look like\nyour grandpa's corpse\nwhen I'm done with you!` },
             {key: 5, enemy: `Nice samurai outfit, punk!\nWhen does the\ncostume party begin?`, player: `The only party you'll\nbe attending today\nis your own funeral!` },
             {key: 6, enemy: `A Samurai punk rocker?\nHow's that midlife\ncrisis going for you?`, player: `The only crisis happening\ntoday is for the janitor\nwho has to clean up\nwhat's left of you.` }, 
             {key: 7, enemy: `Samurai and punk rocker?\nSchizophrenia's a bitch, huh?`, player: `The only bitch here is\nthe one whose about to\nbe begging me for mercy!` },
@@ -431,23 +430,21 @@ class Preload extends Phaser.Scene {
         
         gameState.extraTaunts = [
             {key: 101, enemy: `You really believe\nyou're a samurai, huh?`, player: `You believe in ghosts?\nBecause you're\nabout to become one!` },
-            {key: 102, enemy: `Childish music\nand childish fantasies.\nGrow up!`, player: `I'll make sure you\nnever grow old!` },
             {key: 103, enemy: `Must be hard, living\na deluded fantasy.`, player: `Not as hard as what's\ncoming for you!` },
             {key: 104, enemy: `Punk and Samurai?\nTwo failures in one!`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
-            {key: 105, enemy: `Chasing fantasies while\nthe world laughs at you?`, player: `I'll silence that laughter\nwith the sound of\nyour gurgling blood!`},
             {key: 106, enemy: `You're a relic in a world that's moved on.`, player: `You won't be moving much soon!` },
-            {key: 107, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the pain\nyou're about to feel!` },
+            {key: 107, enemy: `Is that sword real,\nor are you just cosplaying hard?`, player: `It's as real as the pain\nyou're about to experience!` },
             {key: 108, enemy: `Hey, Samurai punk,\nthe circus called,\nthey want their clown back`, player: `Sorry, I'm booked up\nmopping your entrails\noff the floor!` },   
             {key: 109, enemy: `Still holding onto\npunk's corpse, I see`, player: `The only corpse here\nwill be the one\nI leave behind!` },
             {key: 110, enemy: `Your delusions of grandeur\nare quite entertaining.`, player: `The only entertainment tonight\nwill be your cries of agony!` },
             {key: 111, enemy: `I've seen better costumes\nat a kid's party.`, player: `And I've seen better\nfighters in a retirement home!` },
-            {key: 112, enemy: `That haircut's\na cry for help.`, player: `The only one crying\nfor help will be you,\nsoon enough!` },      
-            {key: 113, enemy: `Whats with the outfit?\nAre you auditioning for\na bad action movie?`, player: `No movie could capture\nthe reality of the suffering\nyour about to experience!` },
+            {key: 112, enemy: `That haircut's\na cry for help.`, player: `The only one crying\nfor help will be you!` },      
             {key: 16, enemy: `What's with the\nsilly haircut,\nsamurai wannabe?`, player: `Not as silly as your\nentrails will look\nsprawled all over the ground!` },
             {key: 15, enemy: `You take this Samurai gig\npretty seriously, huh??`, player: `As serious as the grave\nyou're about to fill!` },
             {key: 17, enemy: `Whats with the outfit?\nYou look like you\nraided a costume store`, player: `And you look like\nsomeone whose about to\nhave a very bad day!` },
             {key: 13, enemy: `Nice cosplay.\nWhere's the convention?`, player: `No time for conventions.\nI'm' booked up\nmopping whats left of\nyou off the floor!` },
             {key: 14, enemy: `Trying to be a samurai\nor just lost a bet?`, player: `The only thing worth\nbetting on today is\nwhich part of you\nhits the ground first!` },
+            {key: 4, enemy: `You look like a kid who\nfound his grandpa's armor.`, player: `And you'll look like\nyour grandpa's corpse\nwhen I'm done here!` },
             {key: 18, enemy: `You look like an\nantagonist from a bad\nMad Max movie`, player: `And you look like\nthe first stunt\nto get taken out!` },
         ];  
 
