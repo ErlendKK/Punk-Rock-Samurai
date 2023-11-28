@@ -69,7 +69,7 @@ class Level1Fight1 extends BaseScene {self
         }
         
         
-        // self.scene.start('Level1Fight2');
+        // self.scene.start('Level2Fight2');
 
 
     // ---------------------------------- INTRO -------------------------------------    

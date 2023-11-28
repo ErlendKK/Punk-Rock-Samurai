@@ -1116,7 +1116,11 @@ class Level2Fight3 extends BaseScene {self
                     enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
                     gameState.player.health -= enemy.damageTotal;
                     gameState.score.damageTaken += enemy.damageTotal;
-                    let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
+                    
+                    const damageText = `Deals ${enemy.damageTotal} damage`;
+                    const poisonText = `Deals ${chosenAction.poison} Poison`;
+                    const damageAndPoisonText = damageText + `\n` + poisonText; 
+                    let actionTextContent = !enemy.damageTotal ? poisonText : !chosenAction.poison ? damageText : damageAndPoisonText;
                     self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
                     
                     self.tweens.add({

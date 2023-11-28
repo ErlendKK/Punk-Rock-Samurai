@@ -448,10 +448,6 @@ class Preload extends Phaser.Scene {
             {key: 18, enemy: `You look like an\nantagonist from a bad\nMad Max movie`, player: `And you look like\nthe first stunt\nto get taken out!` },
         ];  
 
-
-        
-
-
         if (gameState.restartGame) self.scene.start('Mainmenu');
              
         let bgLoadingScreen = this.add.image(550,480, 'bgLoadingScreen').setScale(1.40).setInteractive();

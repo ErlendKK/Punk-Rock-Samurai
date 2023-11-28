@@ -293,14 +293,14 @@ class Level2Fight2 extends BaseScene {self
             let numCards = gameState.player.numCardsBase + gameState.player.numCardsStance;
 
             if (countdownTimer > 0) countdownTimer -= 1;
-            if (gameState.turn === 2) displayCountdownBox() // NB! Level-specific function
-            if (gameState.turn > 2) gameState.countdownText.setText(`${countdownTimer}`)
+            if (gameState.turn === 2) displayCountdownBox(); // NB! Level-specific function
+            if (countdownTimer && gameState.turn > 2) gameState.countdownText.setText(`${countdownTimer}`);
             
             if (countdownTimer === 0) {
                 gameState.countdownTextBox.destroy();
                 gameState.countdownText.destroy();
                 self.cameras.main.shake(800, .005, false);
-                countdownTimer = -1;
+                countdownTimer = null;
             }
 
             const yourTurnTextContent = 'Your turn!'
@@ -1122,12 +1122,15 @@ class Level2Fight2 extends BaseScene {self
                     const damageModifyer = (1 + 0.1 * enemy.strength) * (1 - gameState.player.armor / 20);
                     self.cameras.main.shake(120, .005, false);
                     gameConfig.attackSound.play({ volume: 0.8 });
-                    console.log(`enemy.damageTotal: ${enemy.damageTotal}`);
 
                     enemy.damageTotal = Math.round( Math.max(0, chosenAction.fire + chosenAction.damage * damageModifyer) );
                     gameState.player.health -= enemy.damageTotal;
                     gameState.score.damageTaken += enemy.damageTotal;
-                    let actionTextContent = chosenAction.poison > 0 ? chosenAction.text : `Deals ${enemy.damageTotal} damage`
+
+                    const damageText = `Deals ${enemy.damageTotal} damage`;
+                    const poisonText = `Deals ${chosenAction.poison} Poison`;
+                    const damageAndPoisonText = damageText + `\n` + poisonText; 
+                    let actionTextContent = !enemy.damageTotal ? poisonText : !chosenAction.poison ? damageText : damageAndPoisonText;
                     self.updateTextAndBackground(gameState.actionText , gameState.actionTextBackground, actionTextContent);
                     
                     self.tweens.add({
@@ -1376,6 +1379,7 @@ class Level2Fight2 extends BaseScene {self
             await self.delay(600);
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
             if (countdownTimer && gameState.countdownText) {
+                console.log(`earngoblingold called`);
                 await earnGoblinGold();
             }
 
