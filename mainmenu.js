@@ -755,7 +755,7 @@ class Mainmenu extends Phaser.Scene {
         };
 
     // ----   USED TO SKIP MENU WHEN TESTING ----
-    // gameState.playerName = 'Punk Rock Samurai';
+    // gameState.playerName = 'Admin';
     // const bonusCard = gameState.extraCards[0];
     // bonusCard.freePermanent = true;
     // gameState.deck.push(bonusCard);

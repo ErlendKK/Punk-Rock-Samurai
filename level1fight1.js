@@ -30,8 +30,8 @@ class Level1Fight1 extends BaseScene {self
         gameState.enemy1 = Object.create(gameState.enemy);
         gameState.enemy1.name = 'Nazi Punk';
         gameState.enemy1.sprite = this.add.image(740, 357, 'nazi').setScale(0.415).setFlipX(false).setInteractive();
-        gameState.enemy1.health = 50;
-        gameState.enemy1.healthMax = 50;
+        gameState.enemy1.health = 500;
+        gameState.enemy1.healthMax = 500;
 
         gameState.enemies = [gameState.enemy1]; //NB! Add all enemies!
         gameState.characters = [...gameState.enemies, gameState.player];
@@ -372,15 +372,6 @@ class Level1Fight1 extends BaseScene {self
         function activateChemicalWarfare() {
             gameState.enemies.forEach(enemy => {
                 enemy.poison += gameState.chemicalWarfare;
-            });
-
-            gameState.permanents.forEach(p => {
-                if (p.card.key === 'chemicalWarfare') {
-                    p.card.turnsToDepletion -= 1;
-                    if (p.card.turnsToDepletion === 0) {
-                        depleteChemicalWarfare(p.card, p.card.tokenSprite, p.card.tokenSlot);
-                    }
-                }
             });
 
             const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
@@ -941,7 +932,7 @@ class Level1Fight1 extends BaseScene {self
                 if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
                 if (gameState.bassSoloPlayed) gameState.bassSoloPlayed = false;
                 if (gameState.player.lifeStealThisTurn) gameState.player.lifeStealThisTurn = 0;
-                addHandtoDeck();
+                addHandtoDiscardPile();
                 updateStrengthAndArmor(gameState.player);
                 updateEnemyActions();
 
@@ -1210,7 +1201,7 @@ class Level1Fight1 extends BaseScene {self
         function initiateDefeat() {
             gameState.player.health = 0; // Avoids negative life
             self.updateManaBar(gameState.player);
-            addHandtoDeck();
+            addHandtoDiscardPile();
             fadeOutGameObject(gameState.actionText, 200);
             fadeOutGameObject(gameState.actionTextBackground, 200);
             gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
@@ -1245,7 +1236,8 @@ class Level1Fight1 extends BaseScene {self
             gameState.score.levelsCompleted += 1;
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
-            addHandtoDeck();
+            self.addTokensToDeck();
+            addHandtoDiscardPile();
             let zaibatsuDelay = 0;
             
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
@@ -1844,13 +1836,16 @@ class Level1Fight1 extends BaseScene {self
             let slot = gameState.permanentSlots.find(slot => slot.available);
 
             // For token-cards: add a shallow copy back to discardPile
-            if (gameConfig.tokenCardNames.includes(card.key)) {
+            if (card.key === 'ChemicalWarfare') {
+                gameState.discardPile.push(Object.assign({}, gameConfig.chemicalWarfareCard));
+                gameState.discardPileText.setText(gameState.discardPile.length);
+            
+            } else if (gameConfig.tokenCardNames.includes(card.key)) {
                 gameState.discardPile.push(Object.assign({}, card));
                 gameState.discardPileText.setText(gameState.discardPile.length);
-
-            } else {
-                    gameState.deck = gameState.deck.filter(c => c !== card);
             }
+
+            gameState.deck = gameState.deck.filter(c => c !== card);
 
             if (card.key === 'steelToe2') {
                 const depletedToken = gameState.permanents.find(p => p.card.key === 'steelToe');
@@ -1874,10 +1869,11 @@ class Level1Fight1 extends BaseScene {self
                 card.tokenSprite = self.add.image(slot.x, slot.y, card.token).setScale(1).setDepth(210).setInteractive();
                 slot.available = false;
                 card.tokenSlot = slot;
-                gameState.permanents.push({ card: card, slot: slot, tokenSprite: card.tokenSprite }); 
+                const permanent = { card: card, slot: slot, tokenSprite: card.tokenSprite }
+                gameState.permanents.push(permanent); 
 
                 displayTokenCard(card);
-                activatePermanentFromToken(card);
+                activatePermanentFromToken(card, permanent);
             
             } else {
                 activatePermanentFromHand(card);
@@ -2167,9 +2163,16 @@ class Level1Fight1 extends BaseScene {self
                     const tokenSlot = card.tokenSlot;
                     gameState.chemicalWarfare += 2;
 
+                    gameState.activeChemicalWarfares.push({
+                        card: card,
+                        turnPlayed: gameState.turn,
+                        tokenSprite: card.tokenSprite,
+                        tokenSlot: card.tokenSlot
+                    });
+
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
-                            depleteChemicalWarfare(card, tokenSprite,tokenSlot); 
+                            depleteChemicalWarfare(card, tokenSprite, tokenSlot); 
                         } else {
                             self.cameras.main.shake(70, .002, false);
                         }
@@ -2583,12 +2586,16 @@ class Level1Fight1 extends BaseScene {self
         }
 
         function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (card.isDepleted) return;
+            card.isDepleted = true;
+
             if (tokenSlot) tokenSlot.available = true;
             if (tokenSprite) tokenSprite.destroy();
             if (card.permanentCardSprite) card.permanentCardSprite.destroy();
             gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
             gameState.chemicalWarfare -= 2;
-        }
+            console.log(`depleteChemicalWarfare called`);
+        }      
 
         function depleteChintaiShunyu(card, tokenSprite, tokenSlot) {
             if (tokenSlot) tokenSlot.available = true;
@@ -2720,7 +2727,7 @@ class Level1Fight1 extends BaseScene {self
             })
         }
 
-        function addHandtoDeck() {    
+        function addHandtoDiscardPile() {    
             while(gameState.currentCards.length > 0) {
                 let card = gameState.currentCards.pop();
                 if (!card.slot.available) card.slot.available = true;
@@ -2992,6 +2999,25 @@ class Level1Fight1 extends BaseScene {self
         if (gameConfig.targetingCursor.visible) {
             gameConfig.targetingCursor.x = this.input.mousePointer.x;
             gameConfig.targetingCursor.y = this.input.mousePointer.y;
+        }
+        
+        gameState.activeChemicalWarfares.forEach((cw, index) => {
+            if (gameState.turn === cw.turnPlayed + 3) {
+                depleteChemicalWarfare(cw.card, cw.tokenSprite, cw.tokenSlot);
+                gameState.activeChemicalWarfares.splice(index, 1); // Remove from the array
+            }
+        });
+
+        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (card.isDepleted) return;
+            card.isDepleted = true;
+
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.chemicalWarfare -= 2;
+            console.log(`depleteChemicalWarfare called`);
         }
     }
 } //end of scene

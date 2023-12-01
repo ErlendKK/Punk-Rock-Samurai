@@ -1,21 +1,11 @@
-old_code = """if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
-                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
-                            gameState.discardPile.push(card);
-                            gameState.discardPileText.setText(gameState.discardPile.length);
-                        }
-                        playCard(card, enemy);
-                    }"""
+old_code = """self.shuffleDeck(gameState.drawPile);
+            console.log(`gameState.chemicalWarfare: ${gameState.chemicalWarfare}`)
+            if (gameState.chemicalWarfare) activateChemicalWarfare();"""
 
 
 
-new_code = """if (card.isBeingPlayed && gameState.playersTurn && gameState.thisTurn === gameState.turn) {
-                        card.isBeingPlayed = false;
-                        if (!('usesTillDepletion' in card) || card.usesTillDepletion > 0) {
-                            gameState.discardPile.push(card);
-                            gameState.discardPileText.setText(gameState.discardPile.length);
-                        }
-                        playCard(card, enemy);
-                    }"""
+new_code = """self.shuffleDeck(gameState.drawPile);
+            if (gameState.chemicalWarfare) activateChemicalWarfare();"""
 
 
 levels = [

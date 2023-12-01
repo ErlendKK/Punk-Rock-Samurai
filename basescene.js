@@ -71,21 +71,11 @@ class BaseScene extends Phaser.Scene {
             gameState.taunts.push(gameState.taunts2.pop());
         };
 
-        const tokenCardIndexes = [];
-        gameState.permanents.forEach(p => {
-            if (gameConfig.tokenCardNames.includes(p.card.key)) {
-                tokenCardIndexes.push(p.slot.index);
-            }
-        });
-
         if (gameState.permanentSlots) {
             gameState.permanentSlots.forEach(slot =>{
-                if (tokenCardIndexes.includes(slot.index)) {
-                    slot.available = true;
-                }
+                slot.available = true;
             });
         }
-
     }
 
     resetPlayer(player, scale, x=360, y=350) {
@@ -711,6 +701,36 @@ class BaseScene extends Phaser.Scene {
         backgroundObj.clear();
         backgroundObj.fillStyle(0xFFFFFF, 1).setAlpha(alpha).setDepth(depth);
         backgroundObj.fillRoundedRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, cornerRadius);
+    }
+
+    addTokensToDeck() {
+        gameState.permanents.forEach(p => {
+            console.log(p.card.key)
+            if (p.card.key === 'ChemicalWarfare') {
+                if (p.tokenSlot) p.tokenSlot.available = true;
+                if (p.tokenSprite) p.tokenSprite.destroy();
+                if (p.permanentCardSprite) p.card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                gameState.chemicalWarfare = 0;
+            }
+        })
+
+        const deckList = [gameState.drawPile, gameState.discardPile, gameState.currentCards];
+        deckList.forEach(deck => {
+            deck.forEach(card => {
+                if (card.key === 'ChemicalWarfare') {
+                    gameState.deck.push(Object.assign({}, gameConfig.chemicalWarfareCard))
+                    console.log(`ChemicalWarfare' in deck ${deck}`)
+                } else if (gameConfig.tokenCardNames.includes(card.key)) {
+                    gameState.deck.push(Object.assign({}, card));
+                }
+                
+            })
+        })
+
+        if (gameState.deck.some(card => card.key === 'ChemicalWarfare')) {
+            console.log('ChemicalWarfare in deck');
+        }
     }
 
     // Helper function to create a delay using a Promise
