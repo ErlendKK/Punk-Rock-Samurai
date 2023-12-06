@@ -138,6 +138,7 @@ class BaseScene extends Phaser.Scene {
                 zaibatsuCards: gameState.zaibatsuCards,
                 bouncingSolesCards: gameState.bouncingSolesCards,
                 lustForLifeCost: gameState.lustForLifeCost,
+                activeChemicalWarfares: gameState.activeChemicalWarfares,
 
                 permanentSlots: gameState.permanentSlots,
                 bonusPermanentSlots: gameState.bonusPermanentSlots,
@@ -728,9 +729,6 @@ class BaseScene extends Phaser.Scene {
             })
         })
 
-        if (gameState.deck.some(card => card.key === 'ChemicalWarfare')) {
-            console.log('ChemicalWarfare in deck');
-        }
     }
 
     // Helper function to create a delay using a Promise
