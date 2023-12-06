@@ -271,8 +271,7 @@ class Preload extends Phaser.Scene {
             {key: 'combatBoots', type: 'targetAll',      cost: 2, stancePoints: 0, damage: 5, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1, reduceTargetStrength: 0, drawCard: 0},
             {key: 'tantoBlade',  type: 'targetSelected', cost: 2, stancePoints: 0, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},
             {key: 'discontent',  type: 'buff',           cost: 1, stancePoints: () => (gameState.player.stancePoints > 0) ? -2 : (gameState.player.stancePoints < 0) ? 2 : 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0},     
-            {key: 'chemicalWarfare',    type: 'permanent',      cost: 2, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, reduceTargetStrength: 0, drawCard: 0, turnsToDepletion: 3, token: 'chemicalWarfareToken'},
-  
+
         ]; 
             
         gameState.bonusCards = [
