@@ -374,15 +374,6 @@ class Level1Fight1 extends BaseScene {self
                 enemy.poison += gameState.chemicalWarfare;
             });
 
-            gameState.permanents.forEach(p => {
-                if (p.card.key === 'chemicalWarfare') {
-                    p.card.turnsToDepletion -= 1;
-                    if (p.card.turnsToDepletion === 0) {
-                        depleteChemicalWarfare(p.card, p.card.tokenSprite, p.card.tokenSlot);
-                    }
-                }
-            });
-
             const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
             const textConfig = { fontSize: '30px', fill: '#ff0000' };
             const chemicalWarText = self.add.text(540, 450, '', textConfig).setOrigin(0.5);
@@ -779,22 +770,23 @@ class Level1Fight1 extends BaseScene {self
                 self.updateHealthBar(gameState.player);
             }
 
-            if ('usesTillDepletion' in card) activateUsesTillDepletion(card);
+            if ('usesTillDepletion' in card) {
+                const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
+                addInfoTextBox(textContent);
+            }
         }
 
-        function activateUsesTillDepletion(card) {
-            gameState.usesTillDepletionElements.forEach(element => {
+        function addInfoTextBox(textContent) {
+            gameState.infoBoxElements.forEach(element => {
                 if (element) element.destroy();
             })
-            gameState.usesTillDepletionElements = [];
-        
+            gameState.infoBoxElements = [];
             const textConfig = { fontSize: '20px', fill: '#000000' };
-            const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
             
             let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
             let usesTillDepletionTextBackground = self.add.graphics();
             self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
-            gameState.usesTillDepletionElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
+            gameState.infoBoxElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
             
             // Cancel the previous timer event if it exists
             if (gameState.usesTillDepletionTimer) {
@@ -802,7 +794,7 @@ class Level1Fight1 extends BaseScene {self
             }
         
             gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
-                gameState.usesTillDepletionElements.forEach(element => {
+                gameState.infoBoxElements.forEach(element => {
                     if (element) element.destroy();
                 });
                 gameState.usesTillDepletionTimer = null;
@@ -941,7 +933,7 @@ class Level1Fight1 extends BaseScene {self
                 if (gameState.lustForLifeCounter) gameState.healButton.setTexture('rectangularButtonPressed');
                 if (gameState.bassSoloPlayed) gameState.bassSoloPlayed = false;
                 if (gameState.player.lifeStealThisTurn) gameState.player.lifeStealThisTurn = 0;
-                addHandtoDeck();
+                addHandtoDiscardPile();
                 updateStrengthAndArmor(gameState.player);
                 updateEnemyActions();
 
@@ -1210,7 +1202,7 @@ class Level1Fight1 extends BaseScene {self
         function initiateDefeat() {
             gameState.player.health = 0; // Avoids negative life
             self.updateManaBar(gameState.player);
-            addHandtoDeck();
+            addHandtoDiscardPile();
             fadeOutGameObject(gameState.actionText, 200);
             fadeOutGameObject(gameState.actionTextBackground, 200);
             gameState.actionTextObjects.forEach(obj => fadeOutGameObject(obj, 200));
@@ -1245,7 +1237,8 @@ class Level1Fight1 extends BaseScene {self
             gameState.score.levelsCompleted += 1;
             gameConfig.music.stop();
             self.updateManaBar(gameState.player);
-            addHandtoDeck();
+            self.addTokensToDeck();
+            addHandtoDiscardPile();
             let zaibatsuDelay = 0;
             
             if (gameState.actionText) fadeOutGameObject(gameState.actionText, 200);
@@ -1844,20 +1837,23 @@ class Level1Fight1 extends BaseScene {self
             let slot = gameState.permanentSlots.find(slot => slot.available);
 
             // For token-cards: add a shallow copy back to discardPile
-            if (gameConfig.tokenCardNames.includes(card.key)) {
+            if (card.key === 'ChemicalWarfare') {
+                gameState.discardPile.push(Object.assign({}, gameConfig.chemicalWarfareCard));
+                gameState.discardPileText.setText(gameState.discardPile.length);
+            
+            } else if (gameConfig.tokenCardNames.includes(card.key)) {
                 gameState.discardPile.push(Object.assign({}, card));
                 gameState.discardPileText.setText(gameState.discardPile.length);
-
-            } else {
-                    gameState.deck = gameState.deck.filter(c => c !== card);
             }
+
+            gameState.deck = gameState.deck.filter(c => c !== card);
 
             if (card.key === 'steelToe2') {
                 const depletedToken = gameState.permanents.find(p => p.card.key === 'steelToe');
                 if (depletedToken) {
                     console.log('depletedToken found');
                     slot = depletedToken.slot;
-                    depleteSteelToe(depletedToken, false);
+                    depleteFunctionRegistry.depleteSteelToe(depletedToken, false);
                 } else {
                     console.error('Error: steelToe token not found for depletion.');
                 }
@@ -1874,10 +1870,11 @@ class Level1Fight1 extends BaseScene {self
                 card.tokenSprite = self.add.image(slot.x, slot.y, card.token).setScale(1).setDepth(210).setInteractive();
                 slot.available = false;
                 card.tokenSlot = slot;
-                gameState.permanents.push({ card: card, slot: slot, tokenSprite: card.tokenSprite }); 
+                const permanent = { card: card, slot: slot, tokenSprite: card.tokenSprite }
+                gameState.permanents.push(permanent); 
 
                 displayTokenCard(card);
-                activatePermanentFromToken(card);
+                activatePermanentFromToken(card, permanent);
             
             } else {
                 activatePermanentFromHand(card);
@@ -1892,7 +1889,7 @@ class Level1Fight1 extends BaseScene {self
                 card.tokenSprite.on( 'pointerup', () => {
                     // Deactivate tokens during the enemys turn
                     if (gameState.playersTurn) {
-                        depleteForeverTrue(card); 
+                        depleteFunctionRegistry.depleteForeverTrue(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1903,7 +1900,7 @@ class Level1Fight1 extends BaseScene {self
                 gameState.rebelSpirit = true;
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteRebelSpirit(card); 
+                        depleteFunctionRegistry.depleteRebelSpirit(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1914,7 +1911,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteRebelHeart(card);
+                        depleteFunctionRegistry.depleteRebelHeart(card);
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1926,7 +1923,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteBushido(card);
+                        depleteFunctionRegistry.depleteBushido(card);
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1938,7 +1935,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) { 
-                        depleteToxicAvenger(card); 
+                        depleteFunctionRegistry.depleteToxicAvenger(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1950,7 +1947,7 @@ class Level1Fight1 extends BaseScene {self
             
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn && gameState.enemies.some(enemy => enemy.health < 30)) { 
-                        depleteKirisuteGomen(card); 
+                        depleteFunctionRegistry.depleteKirisuteGomen(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1961,7 +1958,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteToxicFrets(card); 
+                        depleteFunctionRegistry.depleteToxicFrets(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1972,7 +1969,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteAshenEncore(card); 
+                        depleteFunctionRegistry.depleteAshenEncore(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1983,7 +1980,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteEdoEruption(card); 
+                        depleteFunctionRegistry.depleteEdoEruption(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -1997,7 +1994,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteSteelToe(card); 
+                        depleteFunctionRegistry.depleteSteelToe(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2008,7 +2005,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteGundanSeizai(card); 
+                        depleteFunctionRegistry.depleteGundanSeizai(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2019,7 +2016,7 @@ class Level1Fight1 extends BaseScene {self
                 
                 card.tokenSprite.on( 'pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteDeadTokugawas(card); 
+                        depleteFunctionRegistry.depleteDeadTokugawas(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2034,12 +2031,12 @@ class Level1Fight1 extends BaseScene {self
                 };
 
                 if (gameState.lustForLifeCounter >= 5) {
-                    depleteLustForLife(card); 
+                    depleteFunctionRegistry.depleteLustForLife(card); 
                 };
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteLustForLife(card); 
+                        depleteFunctionRegistry.depleteLustForLife(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     };
@@ -2051,7 +2048,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depletePunksNotDead(card); 
+                        depleteFunctionRegistry.depletePunksNotDead(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2062,7 +2059,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteSoulSquatter(card); 
+                        depleteFunctionRegistry.depleteSoulSquatter(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2073,7 +2070,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteBouncingSoles(card); 
+                        depleteFunctionRegistry.depleteBouncingSoles(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2085,13 +2082,13 @@ class Level1Fight1 extends BaseScene {self
                     self.updateHealthBar(gameState.player);
                     gameState.enduringSpiritCounter +=1;
                     if (gameState.enduringSpiritCounter >= 8) {
-                        depleteEnduringSpirit(card)
+                        depleteFunctionRegistry.depleteEnduringSpirit(card)
                     }; 
                 };
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteEnduringSpirit(card); 
+                        depleteFunctionRegistry.depleteEnduringSpirit(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2102,7 +2099,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteShogunsShell(card); 
+                        depleteFunctionRegistry.depleteShogunsShell(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2116,7 +2113,7 @@ class Level1Fight1 extends BaseScene {self
 
                 card.tokenSprite.on('pointerup', () => {
                     if (gameState.playersTurn) {
-                        depleteZaibatsuUnderground(card); 
+                        depleteFunctionRegistry.depleteZaibatsuU(card); 
                     } else {
                         self.cameras.main.shake(70, .002, false);
                     }
@@ -2138,7 +2135,7 @@ class Level1Fight1 extends BaseScene {self
 
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
-                            depleteKamishimoUberAlles(card, tokenSprite,tokenSlot); 
+                            depleteFunctionRegistry.depleteKamishimoUberAlles(card, tokenSprite,tokenSlot); 
                         } else {
                             self.cameras.main.shake(70, .002, false);
                         }
@@ -2156,7 +2153,7 @@ class Level1Fight1 extends BaseScene {self
                         const depletedDifferentTurn = (turnplayed != gameState.turn || fightplayed != gameState.score.levelsCompleted)
                         console.log(`depletedDifferentTurn: ${depletedDifferentTurn}\nturnplayed: ${turnplayed}\ngameState.turn: ${gameState.turn }\nfightplayed: ${fightplayed}\ngameState.score.levelsCompleted: ${gameState.score.levelsCompleted}\ngameState.playersTurn: ${gameState.playersTurn}`)
                         if (gameState.playersTurn && depletedDifferentTurn) {
-                            depleteHollidayInKamakura(card, tokenSprite, tokenSlot);
+                            depleteFunctionRegistry.depleteHollidayInKamakura(card, tokenSprite, tokenSlot);
                         } else {
                             self.cameras.main.shake(70, .002, false);
                         }
@@ -2167,9 +2164,16 @@ class Level1Fight1 extends BaseScene {self
                     const tokenSlot = card.tokenSlot;
                     gameState.chemicalWarfare += 2;
 
+                    gameState.activeChemicalWarfares.push({
+                        card: card,
+                        turnPlayed: gameState.turn,
+                        tokenSprite: card.tokenSprite,
+                        tokenSlot: card.tokenSlot
+                    });
+
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
-                            depleteChemicalWarfare(card, tokenSprite,tokenSlot); 
+                            depleteFunctionRegistry.depleteChemicalWarfare(card, tokenSprite, tokenSlot); 
                         } else {
                             self.cameras.main.shake(70, .002, false);
                         }
@@ -2185,7 +2189,7 @@ class Level1Fight1 extends BaseScene {self
 
                     tokenSprite.on( 'pointerup', () => {
                         if (gameState.playersTurn) {
-                            depleteChintaiShunyu(card, tokenSprite,tokenSlot); 
+                            depleteFunctionRegistry.depleteChintaiShunyu(card, tokenSprite,tokenSlot); 
                         } else {
                             self.cameras.main.shake(70, .002, false);
                         }
@@ -2197,82 +2201,21 @@ class Level1Fight1 extends BaseScene {self
             // No slots available => direct activation of deplete effect
             self.cameras.main.shake(70, .002, false);
             card.isBeingPlayed = false;
-            console.log(`No available slot for permanent card ${card.key}`);
 
-            switch(card.key) {
-                case 'foreverTrue':
-                    depleteForeverTrue(card);
-                    break;
-                case 'rebelSpirit':
-                    depleteRebelSpirit(card);
-                    break;
-                case 'rebelHeart':
-                    depleteRebelHeart(card);
-                    break;
-                case 'bushido':
-                    depleteBushido(card);
-                    break;
-                case 'toxicAvenger':
-                    depleteToxicAvenger(card);
-                    break;
-                case 'kirisuteGomen':
-                    depleteKirisuteGomen(card);    
-                case 'toxicFrets':
-                    depleteToxicFrets(card);
-                    break;
-                case 'ashenEncore':
-                    depleteAshenEncore(card);
-                    break;
-                case 'edoEruption':
-                    depleteEdoEruption(card); 
-                    break;
-                case 'steelToe':
-                case 'steelToe2':
-                    depleteSteelToe(card); 
-                    break; 
-                case 'deadTokugawas':
-                    depleteDeadTokugawas(card); 
-                    break;
-                case 'gundanSeizai':
-                    depleteGundanSeizai(card); 
-                    break;
-                case 'LustForLife':
-                    depleteLustForLife(card); 
-                    break;
-                case 'PunksNotDead':
-                    depletePunksNotDead(card);
-                    break;
-                case 'soulSquatter':
-                    depleteSoulSquatter(card);
-                    break;
-                case 'bouncingSoles':
-                case 'bouncingSoles2':
-                case 'bouncingSoles3':
-                case 'bouncingSoles3':    
-                    depleteBouncingSoles(card);
-                    break;
-                case 'enduringSpirit':
-                    depleteEnduringSpirit(card);
-                    break;                     
-                case 'shogunsShell':
-                    depleteShogunsShell(card);
-                    break;
-                case 'zaibatsuU':
-                    depleteZaibatsuUnderground(card);
-                    break;
-                
-                // Token-cards are non-depletable from hand
-                default:
-                    if (gameConfig.tokenCardNames.includes(card.key)) {
-                        gameState.currentCards.push(card); 
-                        card.slot.available = false;
-                        gameState.player.mana += card.cost;
-                    } else {
-                        console.log(`Unknown card key: ${card.key}`);
-                    }
-                    break;
+            const textContent = `No available slot. ${card.key} is activated for its depletion effect`
+            console.log(textContent);
+            addInfoTextBox(textContent);
+
+            let functionName = 'deplete' + card.key.charAt(0).toUpperCase() + card.key.slice(1);
+            functionName = functionName.replace(/\d+$/, ''); // Remove trailing numbers
+        
+            // Check if the function exists in the registry and call it
+            if (typeof depleteFunctionRegistry[functionName] === 'function') {
+                depleteFunctionRegistry[functionName](card);
+            } else {
+                console.log(`Unknown card key: ${card.key}`);
             }
-        }    
+        }
 
         function displayTokenCard(card) {
             card.tokenSprite.on('pointerover', function() {
@@ -2285,318 +2228,325 @@ class Level1Fight1 extends BaseScene {self
         }
 
         function destroyToken(card) {
-            if (card.tokenSlot) card.tokenSlot.available = true;
-            if (card.sprite) card.sprite.destroy(); // Removes the card sprite if deplete was played from hand
-            if (card.tokenSprite) card.tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(c => c.card !== card);
-            gameState.deck = gameState.deck.filter(c => c !== card); 
+                if (card.tokenSlot) card.tokenSlot.available = true;
+                if (card.sprite) card.sprite.destroy(); // Removes the card sprite if deplete was played from hand
+                if (card.tokenSprite) card.tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+                gameState.deck = gameState.deck.filter(c => c !== card); 
         }
 
-        function depleteForeverTrue(card) { 
-            gameState.foreverTrue = false;
-            destroyToken(card);
-            drawNewCards(8);
-        }
+        const depleteFunctionRegistry = {
 
-        function depleteRebelSpirit(card) {
-            gameState.rebelSpirit = false;
-            destroyToken(card);
-            gameState.player.mana += 3;
-            gameState.player.manaMax += 3;
-            self.updateManaBar(gameState.player);
-        }
+            depleteForeverTrue: function(card) { 
+                gameState.foreverTrue = false;
+                destroyToken(card);
+                drawNewCards(8);
+            },
 
-        function depleteRebelHeart(card) {
-            gameState.rebelHeart = false;
-            destroyToken(card);
-            const player = gameState.player;        
-            player.health = Math.min(player.healthMax, player.health + 12);
-            gameConfig.healSound.play({ volume: 0.5 });
-            self.updateHealthBar(player);
-            self.powerUpTweens(player); 
-        }
+            depleteRebelSpirit: function(card)  {
+                gameState.rebelSpirit = false;
+                destroyToken(card);
+                gameState.player.mana += 3;
+                gameState.player.manaMax += 3;
+                self.updateManaBar(gameState.player);
+            },
 
-        function depleteBushido(card) {
-            gameState.bushido = false;
-            destroyToken(card);               
-            gameState.player.strengthBase += 6;
-            updateStrengthAndArmor(gameState.player);
-        }
+            depleteRebelHeart: function(card) {
+                gameState.rebelHeart = false;
+                destroyToken(card);
+                const player = gameState.player;        
+                player.health = Math.min(player.healthMax, player.health + 12);
+                gameConfig.healSound.play({ volume: 0.5 });
+                self.updateHealthBar(player);
+                self.powerUpTweens(player); 
+            },
 
-        function depleteToxicAvenger(card) {
-            gameState.toxicAvenger = false;
-            destroyToken(card);     
+            depleteBushido: function(card) {
+                gameState.bushido = false;
+                destroyToken(card);               
+                gameState.player.strengthBase += 6;
+                updateStrengthAndArmor(gameState.player);
+            },
 
-            gameState.enemies.forEach(enemy => {
-                enemy.poison += 4;
-                updateStats(enemy);
-            });
-        }
+            depleteToxicAvenger: function(card) {
+                gameState.toxicAvenger = false;
+                destroyToken(card);     
 
-        function depleteKirisuteGomen(card) { 
-            if (gameState.enemies.some(enemy => enemy.health < 30)) {
-                gameState.deck = gameState.deck.filter(c => c !== card);
-                gameConfig.targetingCursor.setVisible(true);
-                let functionActive = true;
+                gameState.enemies.forEach(enemy => {
+                    enemy.poison += 4;
+                    updateStats(enemy);
+                });
+            },
 
-                gameState.enemies.forEach (enemy => {
-                    enemy.sprite.on('pointerover', function() {
-                        gameConfig.targetingCursor.setTexture('targetingCursorReady');
-                    });
+            depleteKirisuteGomen: function(card) { 
+                if (gameState.enemies.some(enemy => enemy.health < 30)) {
+                    gameState.deck = gameState.deck.filter(c => c !== card);
+                    gameConfig.targetingCursor.setVisible(true);
+                    let functionActive = true;
 
-                    enemy.sprite.on('pointerout', function() {
-                        gameConfig.targetingCursor.setTexture('targetingCursor');
-                    });
+                    gameState.enemies.forEach (enemy => {
+                        enemy.sprite.on('pointerover', function() {
+                            gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                        });
 
-                    enemy.sprite.on('pointerup', function() {
-                        if (enemy.health < 30 && functionActive) {
-                            enemy.health = 0;
-                            gameConfig.attackSound.play({ volume: 1 });
-                            self.cameras.main.shake(120, .025, false);
-                            gameConfig.targetingCursor.setVisible(false);   
-                            
-                            if (card.tokenSlot) {
-                                card.tokenSlot.available = true;
-                                gameState.player.strengthMax -= 5;
-                                gameState.player.strengt = Math.min(gameState.player.strengt, gameState.player.strengthMax);
+                        enemy.sprite.on('pointerout', function() {
+                            gameConfig.targetingCursor.setTexture('targetingCursor');
+                        });
+
+                        enemy.sprite.on('pointerup', function() {
+                            if (enemy.health < 30 && functionActive) {
+                                enemy.health = 0;
+                                gameConfig.attackSound.play({ volume: 1 });
+                                self.cameras.main.shake(120, .025, false);
+                                gameConfig.targetingCursor.setVisible(false);   
+                                
+                                if (card.tokenSlot) {
+                                    card.tokenSlot.available = true;
+                                    gameState.player.strengthMax -= 5;
+                                    gameState.player.strengt = Math.min(gameState.player.strengt, gameState.player.strengthMax);
+                                }
+
+                                if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
+                                if (card.tokenSprite) card.tokenSprite.destroy();
+                                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                                gameState.permanents = gameState.permanents.filter(c => c.card !== card);
+
+                                removeIfDead(enemy);
+                                checkGameOver();
+                                updateStrengthAndArmor(gameState.player);
+
+                            } else {
+                                self.cameras.main.shake(70, .002, false);
+                                functionActive = false;
                             }
-
-                            if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
-                            if (card.tokenSprite) card.tokenSprite.destroy();
-                            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-                            gameState.permanents = gameState.permanents.filter(c => c.card !== card);
-
-                            removeIfDead(enemy);
-                            checkGameOver();
-                            updateStrengthAndArmor(gameState.player);
-
-                        } else {
-                            self.cameras.main.shake(70, .002, false);
-                            functionActive = false;
-                        }
+                        
+                        gameConfig.targetingCursor.setVisible(false);    
                     
-                    gameConfig.targetingCursor.setVisible(false);    
-                
-                    });
-                })
+                        });
+                    })
 
-            } else {
-                self.cameras.main.shake(70, .002, false);
-                card.slot.available = false
+                } else {
+                    self.cameras.main.shake(70, .002, false);
+                    card.slot.available = false
 
-                // The condition prevents multiple copies if the card is clicked repeatedly
-                if ( !gameState.currentCards.some( card => card.key === 'kirisuteGomen') ) {
-                    gameState.currentCards.push(card)
-                    gameState.player.mana += 1;
-                    self.updateManaBar(gameState.player);
+                    // The condition prevents multiple copies if the card is clicked repeatedly
+                    if ( !gameState.currentCards.some( card => card.key === 'kirisuteGomen') ) {
+                        gameState.currentCards.push(card)
+                        gameState.player.mana += 1;
+                        self.updateManaBar(gameState.player);
+                    }
                 }
-            }
-        }
+            },
 
-        function depleteToxicFrets(card) {
-            gameState.toxicFrets = false;
-            destroyToken(card);
-            
-            gameState.enemies.forEach( enemy => {
-                if (enemy.poison > 0) {
-                    enemy.health -= enemy.poison * 2;
+            depleteToxicFrets: function(card) {
+                gameState.toxicFrets = false;
+                destroyToken(card);
+                
+                gameState.enemies.forEach( enemy => {
+                    if (enemy.poison > 0) {
+                        enemy.health -= enemy.poison * 2;
+                        self.updateHealthBar(enemy);
+                        removeIfDead(enemy);
+                        checkGameOver();
+                    };
+                })
+            },
+
+            depleteAshenEncore: function(card) {
+                gameState.ashenEncore = false;
+                destroyToken(card);
+
+                const ashenEncoreConfig = { fontSize: '32px', fill: '#ff0000' };
+                const ashenEncoreDepleteText = self.add.text(550, 350, 'Deals 12 firedamage\n to all enemies', ashenEncoreConfig).setOrigin(0.5);
+                self.cameras.main.shake(100, .003, false);
+                gameConfig.attackSound.play({ volume: 0.8 });
+                
+                self.time.delayedCall(1500, () => {   
+                    ashenEncoreDepleteText.destroy();
+                });
+                
+                gameState.enemies.forEach( enemy => {
+                    enemy.health -= 12;
                     self.updateHealthBar(enemy);
                     removeIfDead(enemy);
                     checkGameOver();
-                };
-            })
-        }
+                })
+            },
 
-        function depleteAshenEncore(card) {
-            gameState.ashenEncore = false;
-            destroyToken(card);
+            depleteEdoEruption: function(card) {
+                gameState.edoEruption = false;
+                destroyToken(card);
+            }, 
 
-            const ashenEncoreConfig = { fontSize: '32px', fill: '#ff0000' };
-            const ashenEncoreDepleteText = self.add.text(550, 350, 'Deals 12 firedamage\n to all enemies', ashenEncoreConfig).setOrigin(0.5);
-            self.cameras.main.shake(100, .003, false);
-            gameConfig.attackSound.play({ volume: 0.8 });
-            
-            self.time.delayedCall(1500, () => {   
-                ashenEncoreDepleteText.destroy();
-            });
-            
-            gameState.enemies.forEach( enemy => {
-                enemy.health -= 12;
-                self.updateHealthBar(enemy);
-                removeIfDead(enemy);
-                checkGameOver();
-            })
-        }
+            depleteSteelToe: function(card, depletionTriggeredByActivation=true) {
+                destroyToken(card);
 
-        function depleteEdoEruption(card) {
-            gameState.edoEruption = false;
-            destroyToken(card);
-        } 
+                // Reduce target's armor if depletion was triggered by clicking the token or playing the card from hand
+                if (depletionTriggeredByActivation) {
+                    gameState.steelToeCount = 0;
+                    gameConfig.targetingCursor.setVisible(true);
+                    let depleteSteelToeActive = true;
 
-        function depleteSteelToe(card, depletionTriggeredByActivation=true) {
-            destroyToken(card);
+                    gameState.enemies.forEach(enemy => {
+                        enemy.sprite.on('pointerover', function() {
+                            gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                        });
 
-            // Reduce target's armor if depletion was triggered by clicking the token or playing the card from hand
-            if (depletionTriggeredByActivation) {
-                gameState.steelToeCount = 0;
-                gameConfig.targetingCursor.setVisible(true);
-                let depleteSteelToeActive = true;
+                        enemy.sprite.on('pointerout', function() {
+                            gameConfig.targetingCursor.setTexture('targetingCursor');
+                        });
 
-                gameState.enemies.forEach(enemy => {
-                    enemy.sprite.on('pointerover', function() {
-                        gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                        enemy.sprite.on('pointerup', function() {
+                            if (depleteSteelToeActive) {
+                                const armorReduction = card.key === 'steelToe' ? 7 : 9;
+                                enemy.armor -= armorReduction;
+                                updateStats(enemy);
+                                gameConfig.attackSound.play({ volume: 0.6 });
+                                self.cameras.main.shake(100, .012, false);
+                                gameConfig.targetingCursor.setVisible(false);   
+                                depleteSteelToeActive = false; 
+                            }
+                        });
                     });
 
-                    enemy.sprite.on('pointerout', function() {
-                        gameConfig.targetingCursor.setTexture('targetingCursor');
-                    });
-
-                    enemy.sprite.on('pointerup', function() {
-                        if (depleteSteelToeActive) {
-                            const armorReduction = card.key === 'steelToe' ? 7 : 9;
-                            enemy.armor -= armorReduction;
-                            updateStats(enemy);
-                            gameConfig.attackSound.play({ volume: 0.6 });
-                            self.cameras.main.shake(100, .012, false);
-                            gameConfig.targetingCursor.setVisible(false);   
-                            depleteSteelToeActive = false; 
-                        }
-                    });
-                });
-
-                // Remove SteelToe2 from the game
-                if (gameState.currentCards.some(c => c.key === 'steelToe2')) {
-                    gameState.currentCards = gameState.currentCards.filter(c => {
-                        if (c.key === 'steelToe2') {
-                            fadeOutGameObject(c.sprite);
-                            return false;
-                        }
-                        return true;
-                    });
-                    gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
-                
-                } else if (gameState.deck.some(c => c.key === 'steelToe2')) {
-                    gameState.drawPile = gameState.drawPile.filter(c => c.key !== 'steelToe2');
-                    gameState.discardPile = gameState.discardPile.filter(c => c.key !== 'steelToe2');
-                    gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
+                    // Remove SteelToe2 from the game
+                    if (gameState.currentCards.some(c => c.key === 'steelToe2')) {
+                        gameState.currentCards = gameState.currentCards.filter(c => {
+                            if (c.key === 'steelToe2') {
+                                fadeOutGameObject(c.sprite);
+                                return false;
+                            }
+                            return true;
+                        });
+                        gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
                     
-                    gameState.drawPileText.setText(gameState.drawPile.length);
-                    gameState.discardPileText.setText(gameState.discardPile.length);
-                
-                } else {
-                    [gameState.bonusCards, gameState.extraCards].forEach(deck => {
-                        const index = deck.findIndex(c => c.key === 'steelToe2');
-                        if (index !== -1) {
-                            deck.splice(index, 1);
-                        }
+                    } else if (gameState.deck.some(c => c.key === 'steelToe2')) {
+                        gameState.drawPile = gameState.drawPile.filter(c => c.key !== 'steelToe2');
+                        gameState.discardPile = gameState.discardPile.filter(c => c.key !== 'steelToe2');
+                        gameState.deck = gameState.deck.filter(c => c.key !== 'steelToe2');
+                        
+                        gameState.drawPileText.setText(gameState.drawPile.length);
+                        gameState.discardPileText.setText(gameState.discardPile.length);
+                    
+                    } else {
+                        [gameState.bonusCards, gameState.extraCards].forEach(deck => {
+                            const index = deck.findIndex(c => c.key === 'steelToe2');
+                            if (index !== -1) {
+                                deck.splice(index, 1);
+                            }
+                        });
+                    }
+                }
+            },
+
+            depleteDeadTokugawas: function(card) {
+                gameState.redrawPrice += 1;
+                destroyToken(card);
+            }, 
+
+            depleteGundanSeizai: function(card) {
+                gameState.gundanSeizai = false;
+                earnGold(3)
+                destroyToken(card);
+            },
+
+            depleteLustForLife: function(card) {
+                if (gameState.lustForLifeCounter < 5) {
+                    gameState.lustForLifeCounter = 0;
+                    gameState.healButtonObjects.forEach(object => {
+                        fadeOutGameObject(object, 200);
                     });
                 }
+                destroyToken(card);
+            },
+
+            depletePunksNotDead: function(card) {
+                gameState.punksNotDeadCondition = false;
+                if (!gameState.player.alive) {
+                    gameState.player.alive = true;
+                    gameState.player.health = Math.round(gameState.player.healthMax * 0.2);
+                    gameConfig.healSound.play({ volume: 0.5 });
+                    self.updateHealthBar(gameState.player);
+                }
+                destroyToken(card);
+            },
+
+            depleteSoulSquatter: function(card) {
+                gameState.player.lifeStealBase -= 0.1;
+                gameState.player.lifeStealThisTurn += 0.3;
+                destroyToken(card);
+            },
+
+            depleteBouncingSoles(card) {
+                if (gameState.bonusPermanentSlots.length) {
+                    gameState.permanentSlots.push(gameState.bonusPermanentSlots.shift());
+                }
+                if (gameState.bouncingSolesCards.length) {
+                    gameState.extraCards.push(gameState.bouncingSolesCards.shift());
+                    gameState.extraCards.forEach(c => console.log(c.key))
+                }    
+                destroyToken(card);
+            },
+
+            depleteEnduringSpirit: function(card) {
+                destroyToken(card);
+            },
+
+            depleteShogunsShell: function(card) {
+                gameState.shogunsShellCounter = 0;
+                gameState.player.armorCard  = 15;
+                updateStrengthAndArmor(gameState.player);
+                destroyToken(card);
+            },
+
+            depleteZaibatsuU: function(card) {
+                gameState.zaibatsuMax = 0;
+                destroyToken(card);
+            },
+
+            
+            // Non-depleted cards
+            depleteKamishimoUberAlles: function(card, tokenSprite, tokenSlot) {
+                if (tokenSlot) tokenSlot.available = true;
+                if (tokenSprite) tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                gameState.kamishimoUberAlles -= 1;
+                updateStrengthAndArmor(gameState.player);
+            },
+
+            depleteHollidayInKamakura: function(card, tokenSprite, tokenSlot) {
+                if (tokenSlot) tokenSlot.available = true;
+                if (tokenSprite) tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                gameState.player.manaMax += 1;
+                gameState.player.mana += 1;
+                self.updateManaBar(gameState.player);
+                drawNewCards(1);
+            },
+
+            depleteChemicalWarfare: function(card, tokenSprite, tokenSlot) {
+                if (card.isDepleted) return;
+                card.isDepleted = true;
+
+                if (tokenSlot) tokenSlot.available = true;
+                if (tokenSprite) tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                gameState.chemicalWarfare -= 2;
+                console.log(`depleteChemicalWarfare called`);
+            },
+
+            depleteChintaiShunyu: function(card, tokenSprite, tokenSlot) {
+                if (tokenSlot) tokenSlot.available = true;
+                if (tokenSprite) tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                gameState.zaibatsuMax = Math.max(0, gameState.zaibatsuMax - 1);
             }
-        }
-
-        function depleteDeadTokugawas(card) {
-            gameState.redrawPrice += 1;
-            destroyToken(card);
-        } 
-
-        function depleteGundanSeizai(card) {
-            gameState.gundanSeizai = false;
-            earnGold(3)
-            destroyToken(card);
-        }
-
-        function depleteLustForLife(card) {
-            if (gameState.lustForLifeCounter < 5) {
-                gameState.lustForLifeCounter = 0;
-                gameState.healButtonObjects.forEach(object => {
-                    fadeOutGameObject(object, 200);
-                });
-            }
-            destroyToken(card);
-        }
-
-        function depletePunksNotDead(card) {
-            gameState.punksNotDeadCondition = false;
-            if (!gameState.player.alive) {
-                gameState.player.alive = true;
-                gameState.player.health = Math.round(gameState.player.healthMax * 0.2);
-                gameConfig.healSound.play({ volume: 0.5 });
-                self.updateHealthBar(gameState.player);
-            }
-            destroyToken(card);
-        }
-
-        function depleteSoulSquatter(card) {
-            gameState.player.lifeStealBase -= 0.1;
-            gameState.player.lifeStealThisTurn += 0.3;
-            destroyToken(card);
-        }
-
-        function depleteBouncingSoles(card) {
-            if (gameState.bonusPermanentSlots.length) {
-                gameState.permanentSlots.push(gameState.bonusPermanentSlots.shift());
-            }
-            if (gameState.bouncingSolesCards.length) {
-                gameState.extraCards.push(gameState.bouncingSolesCards.shift());
-                gameState.extraCards.forEach(c => console.log(c.key))
-            }    
-            destroyToken(card);
-        }
-
-        function depleteEnduringSpirit(card) {
-            destroyToken(card);
-        }
-
-        function depleteShogunsShell(card) {
-            gameState.shogunsShellCounter = 0;
-            gameState.player.armorCard  = 15;
-            updateStrengthAndArmor(gameState.player);
-            destroyToken(card);
-        }
-
-        function depleteZaibatsuUnderground(card) {
-            gameState.zaibatsuMax = 0;
-            destroyToken(card);
-        }
-
-        
-        // Non-depleted cards
-        function depleteKamishimoUberAlles(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.kamishimoUberAlles -= 1;
-            updateStrengthAndArmor(gameState.player);
-        }
-
-        function depleteHollidayInKamakura(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.player.manaMax += 1;
-            gameState.player.mana += 1;
-            self.updateManaBar(gameState.player);
-            drawNewCards(1);
-        }
-
-        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.chemicalWarfare -= 2;
-        }
-
-        function depleteChintaiShunyu(card, tokenSprite, tokenSlot) {
-            if (tokenSlot) tokenSlot.available = true;
-            if (tokenSprite) tokenSprite.destroy();
-            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
-            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
-            gameState.zaibatsuMax = Math.max(0, gameState.zaibatsuMax - 1);
-        }
+        };
 
     
     // ---------------------------------- UTILITIES-------------------------------------      
@@ -2720,7 +2670,7 @@ class Level1Fight1 extends BaseScene {self
             })
         }
 
-        function addHandtoDeck() {    
+        function addHandtoDiscardPile() {    
             while(gameState.currentCards.length > 0) {
                 let card = gameState.currentCards.pop();
                 if (!card.slot.available) card.slot.available = true;
@@ -2992,6 +2942,26 @@ class Level1Fight1 extends BaseScene {self
         if (gameConfig.targetingCursor.visible) {
             gameConfig.targetingCursor.x = this.input.mousePointer.x;
             gameConfig.targetingCursor.y = this.input.mousePointer.y;
+        }
+        
+        for (let i = gameState.activeChemicalWarfares.length - 1; i >= 0; i--) {
+            const cw = gameState.activeChemicalWarfares[i];
+            if (gameState.turn === cw.turnPlayed + 3) {
+                depleteChemicalWarfare(cw.card, cw.tokenSprite, cw.tokenSlot);
+                gameState.activeChemicalWarfares.splice(i, 1); // Remove from the array
+            }
+        }
+
+        function depleteChemicalWarfare(card, tokenSprite, tokenSlot) {
+            if (card.isDepleted) return;
+            card.isDepleted = true;
+
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+            gameState.chemicalWarfare -= 2;
+            console.log(`depleteChemicalWarfare called`);
         }
     }
 } //end of scene
