@@ -1441,15 +1441,14 @@ class Level1Fight3 extends BaseScene {
             let bonusCards = gameState.bonusCards.splice(0, 3);
 
             // latestDraw ensures that the same card does not appear twice in a row
-            if (gameState.latestDraw) { 
-                gameState.latestDraw.forEach(card => {
+            gameState.latestDraw?.forEach(card => {
                     gameState.bonusCards.push(card);
-                });
-            };
+            });
             gameState.latestDraw = [...bonusCards];
        
             // animate card sprites and initiate selection upon pointerup
             bonusCards.forEach((bonusCard, idx) => {
+                console.log('bonusCard.key: ' + bonusCard.key)
                 bonusCard.sprite = self.add.image(x + idx * spacing, y, bonusCard.key);
                 configureBonusCard(bonusCards, bonusCard, depth);
             })

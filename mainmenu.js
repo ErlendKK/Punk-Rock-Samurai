@@ -414,6 +414,7 @@ class Mainmenu extends Phaser.Scene {
                     loadedState.deck, 
                     loadedState.bonusCards,
                     loadedState.extraCards,
+                    loadedState.latestDraw
                 ];
 
                 deckList.forEach(deck => refreshDeck(deck));

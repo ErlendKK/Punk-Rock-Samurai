@@ -1,21 +1,11 @@
-old_code = """// Check if the theme is playing. If so, stop it. Then start the fight music after a short delay
-        async function handleMusicTransition() {
-            const musicThemePlaying = () => gameConfig.musicTheme && gameConfig.musicTheme.isPlaying;
-
-            if (musicThemePlaying()) gameConfig.musicTheme.stop();
-            await self.delay(300);
-
-            if (musicThemePlaying()) return;
-            gameConfig.music.play({ loop: true, volume: 0.35 });
-        }"""
+old_code = """gameState.latestDraw?.forEach(card => {
+                    gameState.bonusCards.push(card);
+                });"""
 
 
-new_code = """// Stop the theme music. Then start the fight music after a short delay
-        async function handleMusicTransition() {
-            self.sound.stopAll();
-            await self.delay(300);
-            gameConfig.music.play({ loop: true, volume: 0.35 });
-        }"""
+new_code = """gameState.latestDraw?.forEach(card => {
+                    gameState.bonusCards.push(card);
+            });"""
 
 
 levels = [

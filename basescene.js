@@ -143,7 +143,6 @@ class BaseScene extends Phaser.Scene {
                 playerName: gameState.playerName,
                 version: gameState.version,
                 score: gameState.score,
-                latestDraw: gameState.latestDraw,
                 savedScene: currentScene,
                 loadedGame: true,
 
@@ -151,6 +150,7 @@ class BaseScene extends Phaser.Scene {
                 bonusCards: gameState.bonusCards,
                 extraCards: gameState.extraCards,
                 latestDraw: gameState.latestDraw,
+
                 permanents: gameState.permanents,
                 steelToeCards: gameState.steelToeCards,
                 zaibatsuCards: gameState.zaibatsuCards,
