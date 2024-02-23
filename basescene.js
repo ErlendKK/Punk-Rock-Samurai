@@ -6,31 +6,37 @@
                                                                                           
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
+"use strict";
+
 class BaseScene extends Phaser.Scene {
 
     create() {
+        console.log('BaseScene loaded');
         this.scene.start('Preload');
     }
 
     // Initiaiate level
-
-    baseCreate(backgoundImage, sceneKey, scale = 0.75) {
-        this.add.image(0,0, backgoundImage).setScale(scale).setOrigin(0.02,0); 
+    baseCreate(backgroundImage, sceneKey, scale = 1.13) {
+        this.add.image(0,0, backgroundImage).setScale(scale).setOrigin(0.02,0); 
         this.cameras.main.fadeIn(600, 0, 0, 0);   
         this.input.keyboard.createCursorKeys();
         
+        // Reset State
         gameConfig.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameState.turn = 0;
         gameState.redrawPrice = 1;
         gameState.endGameMenyExited = false;
         gameState.playingCard = false;
         gameState.skipIntro = false;
         gameState.fightStarted = false;
 
-        gameState.discardPile = [];
+        // Reset arrays
         gameState.drawPile = [];
+        gameState.discardPile = [];
         gameState.currentCards = [];
         gameState.cardImages = [];
         gameState.summonedEnemies = [];
+        gameState.infoBoxElements = [];
         gameState.actionTextObjects = [];
         gameState.redrawButtonObjects = [];
         gameState.healButtonTextObjects = [];
@@ -51,7 +57,6 @@ class BaseScene extends Phaser.Scene {
         gameState.gundanSeizai = false;
         gameState.noFutureCondition = false;
         
-        
         // Initiate sounds
         gameConfig.cardsDealtSound = this.sound.add('cardsDealtSound');
         gameConfig.victorySound = this.sound.add('victorySound');
@@ -64,21 +69,30 @@ class BaseScene extends Phaser.Scene {
         gameConfig.coinSound = this.sound.add('coinSound');
         gameConfig.keyboardSound = this.sound.add('keyboardSound');
 
+        // Update lists of gameobjects if appropriate
         if (gameState.extraCards.length) {
             gameState.bonusCards.push(gameState.extraCards.pop());
         };
         if (gameState.taunts2.length && sceneKey !== 'Level1Fight1') {
             gameState.taunts.push(gameState.taunts2.pop());
         };
-
+        if (!gameState.taunts) {
+            gameState.taunts = gameState.extraTaunts 
+        }
         if (gameState.permanentSlots) {
             gameState.permanentSlots.forEach(slot =>{
                 slot.available = true;
             });
         }
+
+        if (sceneKey.charAt(sceneKey.length - 1) === '1') {
+            gameState.player.health = gameState.player.healthMax;
+        }
     }
 
-    resetPlayer(player, scale, x=360, y=350) {
+    resetPlayer(scale, x=360, y=350) {
+        const player = gameState.player;
+
         player.sprite = this.add.image(x, y, 'player').setScale(scale).setFlipX(false).setInteractive(); // change to sprite when implementing sprite sheet
         player.stance = 'Neutral'; 
         player.poison = 0;
@@ -90,6 +104,7 @@ class BaseScene extends Phaser.Scene {
         player.manaStance = 0;
         player.manaCard = 0;
         player.mana = 3;
+        player.manaMax = 3;
         player.strengthMax = 3;
         player.strength = 0;
         player.strengthBase = 0;
@@ -104,6 +119,8 @@ class BaseScene extends Phaser.Scene {
         player.lifeStealBase = 0;
         player.lifeStealThisTurn = 0;
         player.lifeStealCounter = 0;
+
+        player.name = gameState.playerName ? gameState.playerName : "Punk Rock Samurai";
     };
 
     saveGameState(currentScene) {
@@ -111,17 +128,18 @@ class BaseScene extends Phaser.Scene {
             const saveData = {
 
                 player: {
-                    health: gameState.player.health,
                     healthMax: gameState.player.healthMax,
-                    mana: gameState.player.mana,
+                    health: gameState.player.health,
                     manaMax: gameState.player.manaMax,
                     gold: gameState.player.gold,
-                    goldMax: gameState.player.goldMax,
                     name: gameState.player.name,
-                    alive: gameState.player.alive
+                    playerNamename: gameState.player.playerName,
+                    strengthBase: gameState.player.strengthBase,
+                    armorBase: gameState.player.armorBase,
+                    manaBase: gameState.player.manaBase
                 },
 
-                enemy: gameState.enemy,
+                difficulty: gameState.difficulty,
                 playerName: gameState.playerName,
                 version: gameState.version,
                 score: gameState.score,
@@ -139,6 +157,7 @@ class BaseScene extends Phaser.Scene {
                 bouncingSolesCards: gameState.bouncingSolesCards,
                 lustForLifeCost: gameState.lustForLifeCost,
                 activeChemicalWarfares: gameState.activeChemicalWarfares,
+                punksNotDeadCard: gameState.punksNotDeadCard,
 
                 permanentSlots: gameState.permanentSlots,
                 bonusPermanentSlots: gameState.bonusPermanentSlots,
@@ -160,12 +179,31 @@ class BaseScene extends Phaser.Scene {
             console.error('Failed to save the game state.', e);
         }
     }
-    
+
+    // Create grid for cards
+    defineCardSlots() {
+        const x = 480; // 375
+        const y = 870;
+        const spacing = 115;
+        const cardAngle = 4;
+        const hightAdjustment = 10
+
+        gameState.slots = [
+            { available: true, x: x + 0 * spacing, y: y + 6 * hightAdjustment, index: 0, angle: -3 * cardAngle },
+            { available: true, x: x + 1 * spacing, y: y + 3 * hightAdjustment, index: 1, angle: -2 * cardAngle },
+            { available: true, x: x + 2 * spacing, y: y + 1 * hightAdjustment, index: 2, angle: -1 * cardAngle },
+            { available: true, x: x + 3 * spacing, y: y + 0 * hightAdjustment, index: 3, angle: 0 * cardAngle  },
+            { available: true, x: x + 4 * spacing, y: y + 1 * hightAdjustment, index: 4, angle: 1 * cardAngle },
+            { available: true, x: x + 5 * spacing, y: y + 3 * hightAdjustment, index: 5, angle: 2 * cardAngle },
+            { available: true, x: x + 6 * spacing, y: y + 6 * hightAdjustment, index: 6, angle: 3 * cardAngle },
+            { available: true, x: x + 7 * spacing, y: y + 9 * hightAdjustment, index: 7, angle: 4 * cardAngle },
+        ];
+    }
 
     definePermanentSlots() {
-        const permanentX = 50;
-        const permanentY = 50;
-        const permanentSpacing = 75;
+        const permanentX = 75;
+        const permanentY = 65;
+        const permanentSpacing = 113;
 
         gameState.permanentSlots = [
             { available: true, x: permanentX + 0 * permanentSpacing, y: permanentY, index: 0 },
@@ -175,72 +213,19 @@ class BaseScene extends Phaser.Scene {
         ];
     }
 
-    addHealthBar(character, color) {
-        const textConfig = { fontSize: '11px', fill: '#000000' };
-        const x = character.x;
-        const y = character.y;
-        const height = character.height;
-       
-        character.healthBarBackground = this.add.graphics();
-        character.healthBarBackground.fillStyle(0xFFFFFF, 0.5);
-        character.healthBarBackground.fillRect(x - 40, y - height / 2 - 30, 100, 10);
-        character.healthBarBackground.setDepth(12);
-
-        character.healthBarFrame = this.add.graphics();
-        character.healthBarFrame.lineStyle(3, 0x000000, 1);
-        character.healthBarFrame.strokeRect(x - 40, y - height / 2 - 30, 100, 10);
-        character.healthBarFrame.setDepth(13);
-        
-        character.healthBar = this.add.graphics();
-        character.healthBar.fillStyle(color, 1);
-        character.healthBar.fillRect(x - 40, y - height / 2 - 30, 100 * (character.health / character.healthMax), 10);
-        character.healthBar.setDepth(14);
-        
-        character.healthBarText = this.add.text(x - 18, y - height / 2 - 25, `${character.health}/${character.healthMax}`, textConfig);
-        character.healthBarText.setOrigin(0.5).setDepth(15);  
-    };
-
-    addManaBar(character) {
-        const textConfig = { fontSize: '11px', fill: '#000000' };
-        const x = character.x;
-        const y = character.y;
-        const height = character.height; 
-
-        character.manaBarBackground = this.add.graphics();
-        character.manaBarBackground.lineStyle(3, 0x000000, 1);
-        character.manaBarBackground.strokeRect(x - 40, y - height / 2 - 45, 100, 10);
-
-        character.manaBarFrame = this.add.graphics();
-        character.manaBarFrame.lineStyle(3, 0x000000, 1);
-        character.manaBarFrame.strokeRect( character.x - 40,  character.y - height / 2 - 45, 100, 10); 
-        
-        character.manaBar = this.add.graphics();
-        character.manaBar.fillStyle(0x0000ff, 1); 
-        character.manaBar.fillRect( x - 40,  y - height / 2 - 45, 100 * (character.mana / character.manaMax), 10);
-        
-        character.manaBarText = this.add.text( x - 27,  y - height / 2 - 40, `${character.mana}/${character.manaMax}`, textConfig).setOrigin(0.5);
-    };
-
-    addStatsDisplay(character, y=420) {
-        const textConfig = { fontSize: '11px', fill: '#FFFFFF' };
-        const x = character.sprite.x;
-
-        character.strengthAndArmorImage = this.add.image(x-20, y, 'strengthAndArmor').setScale(0.4).setInteractive().setDepth(20);
-        character.armorText = this.add.text(x+13, y, `${character.armor}/${character.armorMax}`, textConfig).setDepth(25);
-        character.strengthText = this.add.text(x-40, y, `${character.strength}/${character.strengthMax}`, textConfig).setDepth(25);
-    };
-
-    addGoldCoin() {
-        const goldCoin = this.add.image(1040, 50, 'goldCoin').setScale(0.10).setDepth(220).setOrigin(0.5).setInteractive();
-        gameState.goldCounter = this.add.text(1040, 50, gameState.player.gold, { fontSize: '60px', fill: '#000000'}).setDepth(221).setOrigin(0.5);
+    // Display the amount of gold the player has
+    addGoldCounter() {
+        const goldCoin = this.add.image(1565, 65, 'goldCoin').setScale(.13).setDepth(220).setOrigin(.5).setInteractive();
+        gameState.goldCounter = this.add.text(1565, 66, gameState.player.gold, { fontSize: '75px', fill: '#000000'}).setDepth(221).setOrigin(.5);
         let currentInput = "";
 
         goldCoin.on('pointerover', () => {
-            gameState.goldCard = this.add.image(550, 300, 'goldCard').setScale(0.55).setDepth(220);
+            gameState.goldCard = this.add.image(825, 450, 'goldCard').setScale(0.83).setDepth(220);
             
             this.input.keyboard.on('keydown', function (event) {
                 currentInput += event.key; // appends the latest key pressed to currentInput
 
+                // Cheat code for testing purpooses -> get 99 Gold.
                 if (currentInput === "showmethemoney") {
                     console.log("showmethemoney");
                     gameState.player.gold = 99;
@@ -267,31 +252,27 @@ class BaseScene extends Phaser.Scene {
     
 
     describeCharacter(character) {
-        if (!gameConfig.targetingCursor.visible && character.alive === true) {
-            character.sprite.on('pointerover', () => {
-                const armorText = character.armor < 0 ? 'more' : 'less';
-                const strengthText = character.strength < 0 ? 'less' : 'more';
+        character.sprite.on('pointerover', () => {
+            const isDescribable = !gameConfig.targetingCursor.visible && character.alive && character.activeStatsDisplay;
+            if (!isDescribable) return;
+
+            const armorText = character.armor < 0 ? 'more' : 'less';
+            const strengthText = character.strength < 0 ? 'less' : 'more';
+            
+            const fullText = `${character.name}\n\n${character.armor} armor: Take ${Math.round(Math.abs((character.armor / 20) * 100) )} %\n` + 
+            `${armorText} physical damage\n\nMax armor: Take 75 %\nless physical damage \n\n${character.strength} Strength: Deal ` + 
+            `${Math.abs(character.strength) * 10} %\n${strengthText} physical damage\n\nMax strength: Deal 150 %\nmore physical ` +
+            `damage\n\nPoison: ${character.poison}\nPoison change per turn: ${character.poison > 0 ? -1 : 0}`;
                 
-                const fullText = `${character.name}\n\n${character.armor} armor: Take ${Math.round(Math.abs((character.armor / 20) * 100) )} %\n` + 
-                `${armorText} physical damage\n\nMax armor: Take 75 %\nless physical damage \n\n${character.strength} Strength: Deal ` + 
-                `${Math.abs(character.strength) * 10} %\n${strengthText} physical damage\n\nMax strength: Deal 150 %\nmore physical ` +
-                `damage\n\nPoison: ${character.poison}\nPoison change per turn: ${character.poison > 0 ? -1 : 0}`;
-                
-                const x = character.sprite.x - character.width / 2;
-                const y = 330;
-        
-                character.descriptionBackground = this.add.graphics({x: x - 200, y: y - 120});
-                character.descriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.9).setInteractive().setDepth(30);
-                character.descriptionBackground.fillRoundedRect(0, 0, 215, 250, 10);
-                
-                const textConfig = { fontSize: '12px', fill: '#000000' };
-                character.descriptionText = this.add.text(x + 10 , y + 5, fullText, textConfig).setDepth(35).setOrigin(1, 0.5);
-            })
-        }
+            const textCoordinates = { x: character.sprite.x - character.width / 2 - 100, y: 490, z: 30 };
+            const textConfig = { fontSize: '18px', fill: '#000000' };
+            const backgroundAlpha = 0.9
+            character.descriptionText = new TextBox(this, fullText, textCoordinates, textConfig, backgroundAlpha);
+
+        })
 
         character.sprite.on('pointerout', function() {
             // The conditional is needed incase the player points the cursor over a sprite before describeCharacter() is called
-            if (character.descriptionBackground) character.descriptionBackground.destroy();
             if (character.descriptionText) character.descriptionText.destroy();
         });
     };
@@ -300,9 +281,9 @@ class BaseScene extends Phaser.Scene {
         character.stancePoints = 0;
 
         let screenCenterX = this.cameras.main.width / 2;
-        let barWidth = 440;
-        gameState.stanceBarHeight = 20;
-        gameState.stanceBarMargin = 60;
+        let barWidth = 660;
+        gameState.stanceBarHeight = 30;
+        gameState.stanceBarMargin = 90;
         gameState.stanceBarStartX = screenCenterX - barWidth / 2;
 
         gameState.stanceBarBackground = this.add.graphics();
@@ -310,16 +291,16 @@ class BaseScene extends Phaser.Scene {
         gameState.stanceBarBackground.strokeRect(gameState.stanceBarStartX, gameState.stanceBarMargin, barWidth, gameState.stanceBarHeight).setDepth(20);
 
         for(let i = 1; i < 6; i++) { // draw internal lines
-            gameState.stanceBarBackground.moveTo(gameState.stanceBarStartX + i * 73.33, gameState.stanceBarMargin);
-            gameState.stanceBarBackground.lineTo(gameState.stanceBarStartX + i * 73.33, gameState.stanceBarMargin + 20);
+            gameState.stanceBarBackground.moveTo(gameState.stanceBarStartX + i *110, gameState.stanceBarMargin);
+            gameState.stanceBarBackground.lineTo(gameState.stanceBarStartX + i * 110, gameState.stanceBarMargin + 30);
             gameState.stanceBarBackground.strokePath();
         }
 
         gameState.stanceBar = this.add.graphics();
         gameState.stanceBar.fillStyle(0x00ff00, 1);
         
-        let stanceTextConfig = { fontSize: '28px', fill: textColor }; 
-        gameState.stanceText = this.add.text(550, gameState.stanceBarMargin - 25, `Stance: ${gameState.player.stance}`, stanceTextConfig).setOrigin(0.5).setInteractive();      
+        let stanceTextConfig = { fontSize: '40px', fill: textColor, fontWeight: 'bold' }; 
+        gameState.stanceText = this.add.text(825, gameState.stanceBarMargin - 45, `Stance: ${gameState.player.stance}`, stanceTextConfig).setOrigin(0.5).setInteractive();      
         
         gameState.stanceText.on('pointerover', () => {
 
@@ -329,14 +310,14 @@ class BaseScene extends Phaser.Scene {
                 `-1 card next turn\n\nPositive Freedom during your turn:\n+1 mana\n\nPositive Freedom at the end of your turn:\n` + 
                 `50% chance of +1 card next turn\n50% chance of +1 mana next turn\n\nMax Freedom at the end of your turn:\n-2 Armor`;
             
-            const stanceTextConfig = { fontSize: '14px', fill: '#000000' };
-            gameState.stanceDescriptionText = this.add.text(550, gameState.stanceBarBackground.y + 105, stanceText, stanceTextConfig).setDepth(25).setOrigin(0.5, 0);
+            const stanceTextConfig = { fontSize: '20px', fill: '#000000' };
+            gameState.stanceDescriptionText = this.add.text(825, gameState.stanceBarBackground.y + 105, stanceText, stanceTextConfig).setDepth(25).setOrigin(0.5, 0);
         
             const bounds = gameState.stanceDescriptionText.getBounds();
-            const backgroundWidth = bounds.width + 10; // 5px padding on each side
-            const backgroundHeight = bounds.height + 10; // 5px padding on each side
-            const backgroundX = bounds.x - 5; // 5px padding on the left
-            const backgroundY = bounds.y - 5; // 5px padding on the top
+            const backgroundWidth = bounds.width + 15; // 7.5px padding on each side
+            const backgroundHeight = bounds.height + 15; // 7.5px padding on each side
+            const backgroundX = bounds.x - 7.5; // 7.5px padding on the left
+            const backgroundY = bounds.y - 7.5; // 7.5px padding on the top
 
             gameState.stanceTextBackground = this.add.graphics();
             gameState.stanceTextBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.90).setDepth(24);
@@ -360,34 +341,7 @@ class BaseScene extends Phaser.Scene {
         return { level: null, fight: null };
     };
 
-    // Tweens Animations
-
-    powerUpTweens(character) {
-        this.tweens.add({
-            targets: character.sprite,
-            scaleY: character.sprite.scaleX * 1.125,
-            scaleX: character.sprite.scaleY * 1.125,
-            duration: 120,
-            ease: 'Cubic',
-            yoyo: true
-        }, this);
-    };
-
-    attackTweens(character, distance) {
-        if (typeof attackTweenStarted === "undefined" || !attackTweenStarted) {   
-            let attackTweenStarted = true;
-            
-            this.tweens.add({
-                targets: character.sprite,
-                x: character.x + distance,
-                duration: 120,
-                ease: 'Cubic',
-                yoyo: true,
-                onComplete: () => attackTweenStarted = false
-            }, this);
-        }
-    }
-
+    // Tweens Animations for cards and permanents
     cardTweens(target, scale, duration) {
         this.tweens.add({
             targets: target,
@@ -400,140 +354,18 @@ class BaseScene extends Phaser.Scene {
 
     animatePermanent(permanentKey) {
         gameState.permanents.forEach(p => {
-            if (p.card.key === permanentKey) {  
+            if (p.card.key === permanentKey && !p.card.isPermanentAnimated) {  
                 this.tweens.add({
                     targets: p.card.tokenSprite,
                     scaleY: p.card.tokenSprite.scaleX * 1.125,
                     scaleX: p.card.tokenSprite.scaleY * 1.125,
                     duration: 120,
                     ease: 'Cubic',
-                    yoyo: true
+                    yoyo: true,
+                    onStart: () => p.card.isPermanentAnimated = true,
+                    onComplete: () => p.card.isPermanentAnimated = false
                 }, this);
             }
-        });
-    }
-
-    animateCard(card, depth) {
-        card.sprite.on('pointerover', () => {
-            gameConfig.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
-            this.tweens.add({
-                targets: card.sprite,
-                y: 470,
-                angle: 0,
-                scaleX: 0.46, // 0.5
-                scaleY: 0.46,
-                duration: 300,
-                ease: 'Cubic'
-            });
-            card.sprite.setDepth(100);
-        }, this);
-
-        card.sprite.on('pointerout', () => {
-            if (!card.isBeingPlayed) {
-                this.tweens.add({
-                    targets: card.sprite,
-                    y: card.startHeight,
-                    angle: card.angle,
-                    scaleX: 0.35, // 0.35
-                    scaleY: 0.35,
-                    duration: 300,
-                    ease: 'Cubic'
-                });
-                card.sprite.setDepth(depth);
-            }
-        }, this);
-    }
-
-    // Support functions
-
-    addEndOfTurnButton(y=500) {
-        gameState.endOfTurnButton = this.add.image(900, y, 'rectangularButtonPressed').setScale(0.45).setOrigin(0.5);
-        gameState.endOfTurnText = this.add.text(900, y, 'End Turn', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
-        
-        gameState.endOfTurnButton.on('pointerover', function () {
-            if (!gameState.endOfTurnButtonPressed) {
-                this.setTexture('rectangularButtonHovered');
-            }
-        });
-        
-        gameState.endOfTurnButton.on('pointerout', function () {
-            if (!gameState.endOfTurnButtonPressed) {
-                this.setTexture('rectangularButton');
-            }
-        });
-    };
-
-    addRedrawButton() {
-        const x = 900;
-        const y = 52;
-        gameState.redrawButton = this.add.image(x, y, 'rectangularButtonPressed').setScale(0.45).setOrigin(0.5).setInteractive();
-        gameState.redrawText = this.add.text(x, y, 'Redraw', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5);
-
-        gameState.redrawButton.on('pointerover', () => {
-            gameState.redrawButtonObjects.forEach(obj => obj.destroy());
-            gameState.redrawButtonObjects = [];
-            if (gameState.redrawEnabled) gameState.redrawButton.setTexture('rectangularButtonHovered');
-            
-            gameState.redrawButtonDescriptionBackground = this.add.graphics();
-            gameState.redrawButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
-            gameState.redrawButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-            
-            const textConfig = { fontSize: '12px', fill: '#000000' };
-            const fullText = `Redraw your hand\n Cost: ${gameState.redrawPrice} gold`;
-            gameState.redrawButtonDescriptionText = this.add.text(x, y+50, fullText, textConfig).setDepth(123).setOrigin(0.5, 0.5);
-        
-            gameState.redrawButtonObjects.push(gameState.redrawButtonDescriptionText, gameState.redrawButtonDescriptionBackground);
-        });
-        
-        gameState.redrawButton.on('pointerout', () => {
-            if (gameState.redrawEnabled) gameState.redrawButton.setTexture('rectangularButton');
-            gameState.redrawButtonObjects.forEach(obj => obj.destroy());
-            gameState.redrawButtonObjects = [];
-        });
-    }
-
-    addHealButton() {
-        
-        let healCost = gameState.lustForLifeCost;
-        const healAmount = 7;
-        const x = 900;
-        const y = 130;
-        const textConfig = { fontSize: '12px', fill: '#000000' };
-        const buttonSprite = gameState.fightStarted ? 'rectangularButton' : 'rectangularButtonPressed'
-
-        gameState.healButton = this.add.image(x, y, buttonSprite).setScale(0.45).setOrigin(0.5).setDepth(8).setInteractive();
-        gameState.healText = this.add.text(x, y, 'Heal', { fontSize: '18px', fill: '#000000' }).setOrigin(0.5).setDepth(9);
-
-        gameState.healButton.on('pointerover', () => {
-            gameState.healButtonTextObjects.forEach(obj => obj.destroy());
-            gameState.healButtonTextObjects = [];
-            if (gameState.healButtonEnabled) {
-                const textContent = ` Heal ${healAmount} HP\nCost: ${healCost} gold`;
-                gameState.healButton.setTexture('rectangularButtonHovered').setDepth(122);
-                gameState.healText.setDepth(123);
-
-                gameState.healButtonDescriptionBackground = this.add.graphics();
-                gameState.healButtonDescriptionBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.8).setDepth(122);
-                gameState.healButtonDescriptionBackground.fillRoundedRect(x-65, y+30, 130, 40, 5);
-                gameState.healButtonDescriptionText = this.add.text(x, y+50, textContent, textConfig).setDepth(123).setOrigin(0.5, 0.5);
-
-                gameState.healButtonTextObjects.push(gameState.healButtonDescriptionText, gameState.healButtonDescriptionBackground);
-            }
-        });
-
-        gameState.healButtonObjects = [
-            gameState.healButton, 
-            gameState.healText
-        ];
-        
-        gameState.healButton.on('pointerout', () => {
-            gameState.healButton.setDepth(8);
-            gameState.healText.setDepth(9);
-            if (gameState.healButtonEnabled) {
-                gameState.healButton.setTexture('rectangularButton')
-            }
-            gameState.healButtonTextObjects.forEach(obj => obj.destroy());
-            gameState.healButtonTextObjects = [];
         });
     }
 
@@ -555,8 +387,6 @@ class BaseScene extends Phaser.Scene {
             gameState.player.manaBarFrame,
             gameState.player.manaBar,
             gameState.player.manaBarText,
-            gameState.endOfTurnButton,
-            gameState.endOfTurnText,
             gameState.drawPileImage,
             gameState.discardPileImage,
             gameState.drawPileText,
@@ -564,18 +394,15 @@ class BaseScene extends Phaser.Scene {
             gameState.stanceBar,
             gameState.stanceText,
             gameState.stanceBarBackground,
+            gameState.endOfTurnButton,
             gameState.redrawButton,
-            gameState.redrawText,
             gameState.healButton,
-            gameState.healText,
             gameState.actionText
         ];
         
         gameObjectsToDestroy.forEach(object => {
             if (object) object.destroy();
         });
-
-        console.log('board cleared');
     };
     
     shuffleDeck(deck) {
@@ -585,109 +412,6 @@ class BaseScene extends Phaser.Scene {
         }
         return deck;
     };
-
-    updateEnemyIntention(enemy) {
-        let actionKey = typeof enemy.chosenAction.key === 'function' ? enemy.chosenAction.key() : enemy.chosenAction.key;
-        enemy.intentionText.setText(`${actionKey}`);
-    };
-
-    updateHealthBar(character) {
-        character.health = Phaser.Math.Clamp(character.health, 0, character.healthMax);
-        // const textColor = character == gameState.player && character.health < 10 ? '#ff0000' : '#000000'; // Red if health < 10, otherwise Black
-        const textColor = '#000000';
-
-        character.healthBar.clear();
-        character.healthBar.fillStyle(character === gameState.player ? 0x00ff00 : 0xff0000, 1);
-        character.healthBar.fillRect(character.x - 40, character.y - character.height / 2 - 30, 100 * (character.health / character.healthMax), 10);
-        
-        character.healthBarText.setText(`${character.health}/${character.healthMax}`);
-        character.healthBarText.setColor(textColor);
-    };
-    
-    updateManaBar(character) {
-        character.mana = Phaser.Math.Clamp(character.mana, 0, character.manaMax);
-       
-        character.manaBar.clear();
-        character.manaBar.fillStyle(0x0000ff, 1); // Blue color for mana.
-        character.manaBar.fillRect(character.x - 40, character.y - character.height / 2 - 45, 100 * (character.mana / character.manaMax), 10);
-       
-        character.manaBarText.setText(`${character.mana}/${character.manaMax}`);
-    };
-
-    updateStanceBar(character) {       
-        const points = gameState.player.stancePoints;
-        if (points > 0) {
-            const rand = Math.random();
-            if (rand > 0.5) {
-                character.manaStance = 1;
-                character.numCardsStance = 0;
-            } else {
-                character.manaStance = 0;
-                character.numCardsStance = 1;
-            }
-        } else {
-            character.manaStance = 0;
-        }
-        
-        // Update stance and associated stats
-        switch (points) {
-            case -3:
-                character.armorStance = 3;
-                character.strengthStance = 3;
-                character.numCardsStance = -1;
-                character.stance = 'Discipline';
-                break;
-            case -2:
-            case -1:
-                character.armorStance = 3;
-                character.strengthStance = 3;
-                character.numCardsStance = 0;
-                character.stance = 'Discipline';
-                break;
-            case 0:
-                character.armorStance = 0;
-                character.strengthStance = 0;
-                character.numCardsStance = 0;
-                character.stance = 'Neutral';
-                break;
-            case 1:
-            case 2:
-                character.armorStance = 0;
-                character.strengthStance = 0;
-                character.stance = 'Freedom';
-                break;
-            case 3:
-                character.armorStance = -2;
-                character.strengthStance = 0;
-                character.stance = 'Freedom';
-                break;
-            default:
-                console.error(`Unexpected value for points: ${points}`);
-                return;
-        };
-    
-        gameState.stanceBar.clear();
-        
-        // Update stance bar and stance text
-        if (points < 0) {
-            gameState.stanceBar.fillRect(
-                gameState.stanceBarStartX + 220 + points * 73.33, 
-                gameState.stanceBarMargin, 
-                Math.abs(points) * 73.33, 
-                gameState.stanceBarHeight
-            );
-
-        } else {
-            gameState.stanceBar.fillRect(
-                gameState.stanceBarStartX + 220, 
-                gameState.stanceBarMargin, 
-                points * 73.33, 
-                gameState.stanceBarHeight
-            );
-        }
-    
-        gameState.stanceText.setText(`Stance: ${character.stance}`);
-    }
 
     updateTextAndBackground(textObj, backgroundObj, newText, cornerRadius = 7, depth=20, alpha=0.60) {
         textObj.setText(newText);
@@ -705,6 +429,7 @@ class BaseScene extends Phaser.Scene {
     }
 
     addTokensToDeck() {
+        // Remove any remant of any active chemical warfare instants
         gameState.permanents.forEach(p => {
             console.log(p.card.key)
             if (p.card.key === 'ChemicalWarfare') {
@@ -716,24 +441,52 @@ class BaseScene extends Phaser.Scene {
             }
         })
 
-        const deckList = [gameState.drawPile, gameState.discardPile, gameState.currentCards];
-        deckList.forEach(deck => {
-            deck.forEach(card => {
-                if (card.key === 'ChemicalWarfare') {
-                    gameState.deck.push(Object.assign({}, gameConfig.chemicalWarfareCard))
-                    console.log(`ChemicalWarfare' in deck ${deck}`)
-                } else if (gameConfig.tokenCardNames.includes(card.key)) {
-                    gameState.deck.push(Object.assign({}, card));
-                }
-                
-            })
+        // If any active decks contain a token card, add a new instance of this card to gameState.deck
+        const activeCards = [...gameState.drawPile, ...gameState.discardPile, ...gameState.currentCards];
+        activeCards.forEach(activeCard => {
+            // Check if deckCard.key is in gameConfig.tokenCardNames and gameState.deck
+            const tokenCardProperties = gameConfig.tokenCardNames.find(tokenCard => tokenCard.key === activeCard.key);
+            const isInDeck = gameState.deck.some(deckInstance => deckInstance.key === activeCard.key);
+    
+            // If the key is found in gameConfig.TokenCardNames but not gameState.deck, add a new instant to gameState.deck
+            if (tokenCardProperties && !isInDeck) {
+                let newCard = new Card(tokenCardProperties);
+                gameState.deck.push(newCard);
+            }
         })
+    }
 
+    addHealButton(scene, activateHealButton) {
+        const x = 900;
+        const y = 130;
+        const textContent = ` Heal 7 HP\nCost: ${gameState.lustForLifeCost} gold`;
+
+        gameState.endOfTurnButton = new Button(scene, 'Heal', activateHealButton, x, y, 8);
+        gameState.endOfTurnButton.setPointerText(textContent).disable();
+        gameState.buttons.push(gameState.endOfTurnButton);
     }
 
     // Helper function to create a delay using a Promise
     delay(time) {
         return new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    removeCardFromDeck(deckKey, cardKey) {
+        gameState[deckKey] = gameState[deckKey].filter(c => c.key !== cardKey);
+    }
+
+    // Insert a space before each uppercase letter and split into words
+    // Capitalize the first letter of each word
+    camelCaseToTitle(camelCaseStr) {
+        let words = camelCaseStr.replace(/([A-Z])/g, ' $1').trim().split(' ');
+        let title = words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        return title;
+    }
+
+    adjustForDifficulty(a, b, c) {
+        if (gameState.difficulty === 'Easy') return a;
+        if (gameState.difficulty === 'Medium') return b;
+        if (gameState.difficulty === 'HARDCORE') return c;
     }
     
 

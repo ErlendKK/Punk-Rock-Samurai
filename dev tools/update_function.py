@@ -1,64 +1,20 @@
-old_code = """if ('usesTillDepletion' in card) activateUsesTillDepletion(card);
-        }
+old_code = """// Check if the theme is playing. If so, stop it. Then start the fight music after a short delay
+        async function handleMusicTransition() {
+            const musicThemePlaying = () => gameConfig.musicTheme && gameConfig.musicTheme.isPlaying;
 
-        function activateUsesTillDepletion(card) {
-            gameState.infoBoxElements.forEach(element => {
-                if (element) element.destroy();
-            })
-            gameState.infoBoxElements = [];
-        
-            const textConfig = { fontSize: '20px', fill: '#000000' };
-            const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
-            
-            let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
-            let usesTillDepletionTextBackground = self.add.graphics();
-            self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
-            gameState.infoBoxElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
-            
-            // Cancel the previous timer event if it exists
-            if (gameState.usesTillDepletionTimer) {
-                gameState.usesTillDepletionTimer.remove();
-            }
-        
-            gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
-                gameState.infoBoxElements.forEach(element => {
-                    if (element) element.destroy();
-                });
-                gameState.usesTillDepletionTimer = null;
-            });
+            if (musicThemePlaying()) gameConfig.musicTheme.stop();
+            await self.delay(300);
+
+            if (musicThemePlaying()) return;
+            gameConfig.music.play({ loop: true, volume: 0.35 });
         }"""
 
 
-
-new_code = """if ('usesTillDepletion' in card) {
-                const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
-                addInfoTextBox(textContent);
-            }
-        }
-
-        function addInfoTextBox(textContent) {
-            gameState.infoBoxElements.forEach(element => {
-                if (element) element.destroy();
-            })
-            gameState.infoBoxElements = [];
-            const textConfig = { fontSize: '20px', fill: '#000000' };
-            
-            let usesTillDepletionText = self.add.text(550, 100, "", textConfig).setOrigin(0.5).setDepth(21);
-            let usesTillDepletionTextBackground = self.add.graphics();
-            self.updateTextAndBackground(usesTillDepletionText, usesTillDepletionTextBackground, textContent);
-            gameState.infoBoxElements.push(usesTillDepletionText, usesTillDepletionTextBackground);
-            
-            // Cancel the previous timer event if it exists
-            if (gameState.usesTillDepletionTimer) {
-                gameState.usesTillDepletionTimer.remove();
-            }
-        
-            gameState.usesTillDepletionTimer = self.time.delayedCall(1700, () => {
-                gameState.infoBoxElements.forEach(element => {
-                    if (element) element.destroy();
-                });
-                gameState.usesTillDepletionTimer = null;
-            });
+new_code = """// Stop the theme music. Then start the fight music after a short delay
+        async function handleMusicTransition() {
+            self.sound.stopAll();
+            await self.delay(300);
+            gameConfig.music.play({ loop: true, volume: 0.35 });
         }"""
 
 

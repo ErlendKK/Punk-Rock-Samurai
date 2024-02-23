@@ -6,6 +6,7 @@
 
 Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights reserved.*/
 
+"use strict";
 
 function updateLeaderboard(username, score) {
     let leaderboardUrl = `https://www.dreamlo.com/lb/CBGhFikNak2i8KjH3UPThAfGJFnWo9A0O8mjvU19hS2Q/add/${username}/${score}`;
@@ -42,16 +43,16 @@ class Endscene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('endscene', 'assets/images/endscene.jpg');
+        this.load.image('endscene', 'assets/images/backgrounds/endscene.jpg');
     }
 
     create() {
-        self = this;
-        const mainTextConfig = { fontSize: '57px', fill: '#a9a9a9', fontFamily: 'Rock Kapak' }
+        const self = this;
+        const mainTextConfig = { fontSize: '65px', fill: '#a9a9a9', fontFamily: 'Rock Kapak' }
         this.cameras.main.fadeIn(800, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
-        this.add.image(550,320, 'endscene').setScale(0.95).setOrigin(0.5, 0.5).on('pointerup', () => returnToMenu() );
-        this.add.text(550, 110, '    Thanks for playing\nPunk Rock Samurai Beta v1.3', mainTextConfig).setOrigin(0.5, 0.5);
+        this.add.image(825, 480, 'endscene').setScale(1.43).setOrigin(0.5, 0.5).on('pointerup', () => returnToMenu() );
+        this.add.text(825, 165, 'Thanks for playing\nPunk Rock Samurai', mainTextConfig).setOrigin(0.5, 0.5);
         
         gameState.score.totalScore = (
            gameState.score.levelsCompleted > 0 ? 
@@ -67,9 +68,9 @@ class Endscene extends Phaser.Scene {
             totalScore: 'Your score'
         };
         
-        let x = 250;
-        let y = 200;
-        let spacing = 20;
+        let x = 375;
+        let y = 300;
+        let spacing = 30;
         
         async function displayLeaderBoard() {
             try {
@@ -78,43 +79,44 @@ class Endscene extends Phaser.Scene {
             
                 const leaderboardBackground = self.add.graphics();
                 leaderboardBackground.fillStyle(0xFFFFFF, 1).setAlpha(0.70); 
-                leaderboardBackground.fillRect(x, y, 600, 420);
+                leaderboardBackground.fillRect(x, y, 900, 630);
 
-                self.add.text(x + 50, y + 50, 'Your Results', { fontSize: '25px', fill: '#000000' }).setOrigin(0);
+                self.add.text(x + 75, y + 75, 'Your Results', { fontSize: '40px', fill: '#000000' }).setOrigin(0);
 
                 Object.entries(gameState.score).forEach(([key, value]) => {
                     console.log(`${key}: ${value}`);
                 
                     if (labels[key]) { // if there is a matching label for the key
                         let resultsText = `${labels[key]}: ${value}`;
-                        self.add.text(x + 50, y + 90, resultsText, { color: '#000', fontSize: '16px' });
+                        self.add.text(x + 75, y + 135, resultsText, { color: '#000', fontSize: '16px' });
                         y += spacing;
                     }
                 })
 
                 const textConfig = { fontSize: '16px', fill: '#000000' };
                 
-                self.add.text(x + 50, y + 150, 'Leaderboard', { fontSize: '25px', fill: '#000000' }).setOrigin(0);
+                self.add.text(x + 75, y + 225, 'Leaderboard', { fontSize: '40px', fill: '#000000' }).setOrigin(0);
                 if (topScores) {
                     topScores.forEach((score, index) => {
                         let dateOnly = score.date.split(' ')[0];  // Splitting the date string and keeping only the first part
                         const scoreText = `${index + 1}. Name: ${score.name}, Score: ${score.score}, Date: ${dateOnly}`
-                        let displayedScore = self.add.text(x + 50, y + 190, scoreText, textConfig).setOrigin(0);
-                        sceneState.displayedScoreArray.push(displayedScore);
+                        self.add.text(x + 75, y + 285, scoreText, textConfig).setOrigin(0);
                         y += spacing;
                     });
                 } else {
-                    self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', textConfig).setOrigin(0);
+                    self.add.text(x + 75, y + 285, 'Leaderboard is down for maintenance', textConfig).setOrigin(0);
                 }
 
             }  catch (error) {
                 console.error("Error in displayLeaderBoard: ", error);
-                const errorTextConfig = { fontSize: '16px', fill: '#FF0000' }
-                self.add.text(x + 50, y + 190, 'Leaderboard is down for maintenance', errorTextConfig).setOrigin(0);
+                const errorTextConfig = { fontSize: '25px', fill: '#FF0000' }
+                self.add.text(x + 75, y + 285, 'Leaderboard is down for maintenance', errorTextConfig).setOrigin(0);
             }
         }
 
         function returnToMenu() {
+            if (returnToMenuCalled) return;
+            returnToMenuCalled = true;
             console.log(`returnto meny called`);
             gameState.name = '';
             gameState.playerName = '';
@@ -124,41 +126,30 @@ class Endscene extends Phaser.Scene {
 
             self.time.delayedCall(500, () => {
                 self.cameras.main.fadeOut(1000);
-                // location.reload();
                 gameState.restartGame = true;
-                gameConfig.levels.forEach(level => self.scene.stop(level));
-                self.scene.stop('Preload');
-                self.scene.stop('Mainmenu');
-                self.scene.start('Preload');
 
+                gameConfig.levels.forEach(level => {
+                    if (level !== "Endscene") {
+                        self.scene.stop(level);
+                    }
+                })
+                gameConfig.preLevelsScenes.forEach(level => self.scene.stop(level));
+
+                self.scene.start('Preload');
             })
         }
         
         if (gameState.playerName != 'admin' && gameState.playerName != 'Cheater') {
+            const scoreModifyer = gameState.difficulty === "Easy" ? 0.8 : gameState.difficulty === "Medium" ? 1 : 1.2;
+            gameState.score.totalScore *= scoreModifyer;
             updateLeaderboard(gameState.playerName, gameState.score.totalScore);
         }
 
+        // Give time for leaderboard to update with players score 
+        self.time.delayedCall(600, displayLeaderBoard);
         let returnToMenuCalled = false;
 
-        // Give time for leaderboard to update with players score 
-        self.time.delayedCall(600, () => {   
-            displayLeaderBoard();
-         })
-
-        self.time.delayedCall(8000, () => {
-            if (!returnToMenuCalled) {
-                returnToMenuCalled = true;
-                returnToMenu();
-            }
-        }) 
-
-        self.input.on('pointerup', () => {
-            if (!returnToMenuCalled) {
-                returnToMenuCalled = true;
-                returnToMenu();
-            }
-        })
-   
-    }; // End of create()
-    
-}; // End of scene
+        this.time.delayedCall(8000, returnToMenu);
+        this.input.on('pointerup', returnToMenu);
+    };     
+}; 
