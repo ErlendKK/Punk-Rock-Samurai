@@ -119,7 +119,6 @@ class Preload extends Phaser.Scene {
             this.load.image('powerChord', 'assets/images/cards/powerChord.jpg');
             this.load.image('rawEnergy', 'assets/images/cards/rawEnergy.jpg');
             this.load.image('pyromania', 'assets/images/cards/pyromania.jpg');
-            this.load.image('stageInvasion', 'assets/images/cards/stageInvasion.jpg');
             this.load.image('studdedLeather', 'assets/images/cards/studdedLeather.jpg'); 
             this.load.image('boneShredder', 'assets/images/cards/boneShredder.jpg');
             this.load.image('blackFumes', 'assets/images/cards/blackFumes.jpg');
@@ -210,7 +209,9 @@ class Preload extends Phaser.Scene {
             this.load.image('zaibatsuUndergroundToken', 'assets/images/tokens/zaibatsuUndergroundToken.png');
             this.load.image('zaibatsuU', 'assets/images/cards/zaibatsuUnderground.jpg');
             this.load.image('chintaiShunyuToken', 'assets/images/tokens/chintaiShunyuToken.png');
-            this.load.image('chintaiShunyu', 'assets/images/cards/chintaiShunyu.jpg');     
+            this.load.image('chintaiShunyu', 'assets/images/cards/chintaiShunyu.jpg'); 
+            this.load.image('stageInvasionToken', 'assets/images/tokens/stageInvasionToken.png');
+            this.load.image('stageInvasion', 'assets/images/cards/stageInvasion.jpg'); 
             
             // Preload basic background
             this.load.image('bgLoadingScreen', 'assets/images/backgrounds/bgLoadingScreen.jpg');
@@ -259,7 +260,8 @@ class Preload extends Phaser.Scene {
             { key: 'chemicalWarfare', type: 'permanent', cost: 2, turnsToDepletion: 3, token: 'chemicalWarfareToken' },
             { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
             { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
-            { key: 'chintaiShunyu', type: 'permanent', cost: 1, token: 'chintaiShunyuToken' }
+            { key: 'chintaiShunyu', type: 'permanent', cost: 1, token: 'chintaiShunyuToken' },
+            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' }
         ];
 
         // List of debuff cards with description to be displayed when used.

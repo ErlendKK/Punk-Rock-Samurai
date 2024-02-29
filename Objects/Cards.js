@@ -211,6 +211,7 @@ class Cards extends Phaser.Scene {
             // bonuscards: Permanents
             { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
             { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
+            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' },
             { key: 'rebelSpirit', type: 'permanent', cost: 1, token: 'rebelSpiritToken' },
             { key: 'foreverTrue', type: 'permanent', cost: 1, token: 'foreverTrueToken' },
             { key: 'toxicFrets', type: 'permanent', cost: 1, token: 'toxicFretsToken' },
@@ -250,7 +251,6 @@ class Cards extends Phaser.Scene {
             // bonuscards: Target All
             { key: 'rottenResonance', type: 'targetAll', cost: 1, poison: 1 },
             { key: 'pissDrunkBastards', type: 'targetAll', cost: 2, stancePoints: 1 },
-            { key: 'stageInvasion', type: 'targetAll', cost: 2, damage: () => 4 * (gameState.currentCards.length + 1) },
             { key: 'circlePit', type: 'targetAll', cost: () => gameState.player.mana },
             { key: 'moshpitMassacre', type: 'targetAll', cost: 2, damage: 8 },
             { key: 'blackFumes', type: () => gameState.player.stancePoints >= 0 ? 'targetAll' : 'targetSelected', cost: 2, poison: () => gameState.player.stancePoints > 0 ? 3 : gameState.player.stancePoints < 0 ? 5 : 0 },

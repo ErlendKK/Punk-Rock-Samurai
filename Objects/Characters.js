@@ -160,6 +160,14 @@ class Character {
         return this;
     }
 
+    takeDamage(hp) {
+        if (!hp) return this;
+
+        this.health -= hp;
+        this.updateHealthBar();
+        return this;
+    }
+
     sufferAttackEffect(cardEffects) {
         this.strengthBase -= cardEffects.reduceTargetStrengthPlayed;
         this.armorBase -= cardEffects.reduceTargetArmorPlayed;

@@ -356,7 +356,7 @@ class Level4Fight2 extends BaseScene {
             // Display text and let it fade out after a short delay
             const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
             const textConfig = { fontSize: '45px', fill: '#ff0000' };
-            const textCoordinates = { x: 810, y: 675, z: 20 };
+            const textCoordinates = { x: 810, y: 675, z: 35 };
             const chemicalWarText = new TextBox(self, textContent, textCoordinates, textConfig);
             self.time.delayedCall(1500, () => chemicalWarText.fadeOut());
 
@@ -2041,6 +2041,30 @@ class Level4Fight2 extends BaseScene {
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
                 gameState.zaibatsuMax = Math.max(0, gameState.zaibatsuMax - 1);
+            },
+
+            depleteStageInvasion: function(card, tokenSprite, tokenSlot) {
+                if (tokenSlot) tokenSlot.available = true;
+                if (tokenSprite) tokenSprite.destroy();
+                if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+                gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+                
+                const dmg = 3 * gameState.currentCards.length;
+                self.cameras.main.shake(100, .003, false);
+                gameConfig.attackSound.play({ volume: 0.8 });
+
+                const textConfig = { fontSize: '48px', fill: '#ff0000' };
+                const textCoordinates = { x: 825, y: 525, z: 201 };
+                const textContent =`Deals ${dmg} to all enemies`;
+                const depleteText = new TextBox(self, textContent, textCoordinates, textConfig);
+                self.time.delayedCall(1800, () => depleteText.destroy());  
+
+                gameState.enemies.forEach(enemy => {
+                    enemy.takeDamage(dmg);
+                    enemy.removeIfDead(handleTroopsOfTakamori);
+                });
+
+                endFightIfGameOver();
             }
         };
 
@@ -2419,6 +2443,7 @@ class Level4Fight2 extends BaseScene {
                 },
                 'hollidayInKamakura': () => handleHollidayInKamakura(card),
                 'chemicalWarfare': () => handleChemicalWarfare(card),
+                'stageInvasion': () => null,
                 'chintaiShunyu': () => {
                     if (gameState.zaibatsuMax) {
                         gameState.zaibatsuMax += 2;

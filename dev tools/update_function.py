@@ -1,11 +1,15 @@
-old_code = """gameState.latestDraw?.forEach(card => {
-                    gameState.bonusCards.push(card);
-                });"""
+old_code = """const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
+            const textConfig = { fontSize: '45px', fill: '#ff0000' };
+            const textCoordinates = { x: 810, y: 675, z: 20 };
+            const chemicalWarText = new TextBox(self, textContent, textCoordinates, textConfig);
+            self.time.delayedCall(1500, () => chemicalWarText.fadeOut());"""
 
 
-new_code = """gameState.latestDraw?.forEach(card => {
-                    gameState.bonusCards.push(card);
-            });"""
+new_code = """const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
+            const textConfig = { fontSize: '45px', fill: '#ff0000' };
+            const textCoordinates = { x: 810, y: 675, z: 35 };
+            const chemicalWarText = new TextBox(self, textContent, textCoordinates, textConfig);
+            self.time.delayedCall(1500, () => chemicalWarText.fadeOut());"""
 
 
 levels = [
