@@ -204,7 +204,7 @@ class Cards extends Phaser.Scene {
 
             { key: 'tantoBlade',  type: 'targetSelected', cost: 2, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12 },
             { key: 'combatBoots', type: 'targetAll', cost: 2, damage: 5, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1 },
-            { key: 'discontent',  type: 'buff', cost: 1, stancePoints: () => gameState.player.stancePoints === 0 ? 0 : -2 * gameState.player.stancePoints },
+            { key: 'discontent',  type: 'buff', cost: 1, stancePoints: () => gameState.player.stancePoints < 0 ? 2 : gameState.player.stancePoints > 0 ? -2 : 0 },
         ];
 
         const bonusCardDefinitions = [
