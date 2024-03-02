@@ -1,15 +1,34 @@
-old_code = """const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
-            const textConfig = { fontSize: '45px', fill: '#ff0000' };
-            const textCoordinates = { x: 810, y: 675, z: 20 };
-            const chemicalWarText = new TextBox(self, textContent, textCoordinates, textConfig);
-            self.time.delayedCall(1500, () => chemicalWarText.fadeOut());"""
+old_code = """function activateSatomiSubterfuge(card) {
+            if (!gameState.bonusPermanentSlots.length) {
+                addInfoTextBox('Maximum number of Permanent Slots Reached');
+                gameState.player.gold += card.goldCost;
+                return;
+            }
+            
+            card.goldCost ++;
+            const newSlot = gameState.bonusPermanentSlots.shift();
+            newSlot.singleFight = true;
+            gameState.permanentSlots.push(newSlot);
+
+            addInfoTextBox('Gained 1 Permanent Slot this fight');
+        }"""
 
 
-new_code = """const textContent = `Enemies get +${gameState.chemicalWarfare} Poison`;
-            const textConfig = { fontSize: '45px', fill: '#ff0000' };
-            const textCoordinates = { x: 810, y: 675, z: 35 };
-            const chemicalWarText = new TextBox(self, textContent, textCoordinates, textConfig);
-            self.time.delayedCall(1500, () => chemicalWarText.fadeOut());"""
+new_code = """function activateSatomiSubterfuge(card) {
+            if (!gameState.bonusPermanentSlots.length) {
+                addInfoTextBox('Maximum number of Permanent Slots Reached');
+                gameState.player.gold += card.goldCost;
+                gameState.goldCounter.setText(gameState.player.gold);
+                return;
+            }
+            
+            card.goldCost ++;
+            const newSlot = gameState.bonusPermanentSlots.shift();
+            newSlot.singleFight = true;
+            gameState.permanentSlots.push(newSlot);
+
+            addInfoTextBox('Gained 1 Permanent Slot this fight');
+        }"""
 
 
 levels = [

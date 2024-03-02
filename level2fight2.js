@@ -30,7 +30,6 @@ class Level2Fight2 extends BaseScene {
         this.resetPlayer(0.70, 540, 500);
         this.addGoldCounter();
         this.defineCardSlots();
-        this.definePermanentSlots();
 
         let countdownTimer = 5; //NB! Specific for level2fight2
         
@@ -38,7 +37,7 @@ class Level2Fight2 extends BaseScene {
         gameState.endOfTurnButton = new Button(self, 'End Turn', activateEndOfTurnButton, 1350, 750);
         gameState.endOfTurnButton.setPointerText(`Press to end your turn`);
 
-        gameState.redrawButton = new Button(self, 'Redraw', activateRedrawButton, 1350, 78);
+        gameState.redrawButton = new Button(self, 'Redraw', activateRedrawButton, 1350, 68);
         gameState.redrawButton.setPointerText(`Redraw your hand\n Cost: ${gameState.redrawPrice} gold`);
         gameState.buttons = [gameState.endOfTurnButton, gameState.redrawButton];
 
@@ -111,16 +110,7 @@ class Level2Fight2 extends BaseScene {
         // Initialize cards and permanents
         this.addStanceBar(gameState.player, '#a9a9a9'); // colors: light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         // self.scene.start('Level3Fight2'); // Keep for testing purposes!       
-        
-        gameState.permanents.forEach(permanent => {
-            const card = permanent.card;
-
-            if (!gameConfig.tokenCardNames.some(item => item.key === card.key)) {
-                console.log(`Recreated permanent: ${card.key}\nfor slot ${card.slot.index}`);
-                addPermanent(card);
-            }
-        })
-
+        this.restorePermanents(addPermanent);
         gameState.drawPile = [...gameState.deck];
         displayCardPiles();
         const levelSequenceFunction = testing ? initiatePlayerTurn : initializeFight; 
@@ -664,7 +654,8 @@ class Level2Fight2 extends BaseScene {
                 'noFuture': () => activateNoFuture(),
                 'riotRonin': () => activateRiotRonin(card, target),
                 'hellFire': () => gameState.player.sufferDebuffDamage(2),
-                'circlePit': () => { card.fire = card.costPlayed * 4 } 
+                'circlePit': () => { card.fire = card.costPlayed * 4 },
+                'satomiSubterfuge': () => activateSatomiSubterfuge(card), 
             };
         
             // Execute the function if it exists in the lookup table
@@ -677,6 +668,22 @@ class Level2Fight2 extends BaseScene {
                 const textContent = card.usesTillDepletion > 0 ? `Remaining uses: ${card.usesTillDepletion}` : `Card depleted!`;
                 addInfoTextBox(textContent);
             }
+        }
+
+        function activateSatomiSubterfuge(card) {
+            if (!gameState.bonusPermanentSlots.length) {
+                addInfoTextBox('Maximum number of Permanent Slots Reached');
+                gameState.player.gold += card.goldCost;
+                gameState.goldCounter.setText(gameState.player.gold);
+                return;
+            }
+            
+            card.goldCost ++;
+            const newSlot = gameState.bonusPermanentSlots.shift();
+            newSlot.singleFight = true;
+            gameState.permanentSlots.push(newSlot);
+
+            addInfoTextBox('Gained 1 Permanent Slot this fight');
         }
 
         function activateRiotRonin(card, target) {
@@ -1681,6 +1688,9 @@ class Level2Fight2 extends BaseScene {
         function startNextLevel() {
             if (gameState.nextlevelstarting) return;
             gameState.nextlevelstarting = true;
+
+            self.updatePermanentSlots(); // Delay this until here => no permaenents are lost during shopping etc.
+
             let nextLevel;
             for (let i = 0; i < gameConfig.levels.length; i++) {
                 if (self.scene.key === gameConfig.levels[i]) {
@@ -1982,7 +1992,7 @@ class Level2Fight2 extends BaseScene {
 
             // Display the permanent's token-sprite in the allocated permanent-slot 
             card.tokenSprite = self.add.image(slot.x, slot.y, card.token);
-            card.tokenSprite.setScale(0.9).setDepth(210).setInteractive();
+            card.tokenSprite.setScale(0.80).setDepth(210).setInteractive();
             slot.available = false;
             card.tokenSlot = slot;
 
@@ -2016,6 +2026,7 @@ class Level2Fight2 extends BaseScene {
             if (!properties) return;
     
             let newCard = new Card(properties);
+            gameState.deck.push(newCard);
             gameState.discardPile.push(newCard);
             gameState.discardPileText.setText(gameState.discardPile.length);
         }
@@ -2104,8 +2115,47 @@ class Level2Fight2 extends BaseScene {
                 });
 
                 endFightIfGameOver();
+            },
+
+            depleteLaidoSoho: function(card, tokenSprite, tokenSlot) {
+                console.log('laido soho token clicked') // Remove this
+                gameConfig.targetingCursor.setVisible(true);
+                
+                // handlers for pointerover/out/up.
+                gameState.enemies.forEach (enemy => {
+                    enemy.sprite.on('pointerover', function() {
+                        gameConfig.targetingCursor.setTexture('targetingCursorReady');
+                    });
+            
+                    enemy.sprite.on('pointerout', function() {
+                        gameConfig.targetingCursor.setTexture('targetingCursor');
+                    });
+            
+                    enemy.sprite.on('pointerup', function() {
+                        enemy.sprite.off('pointerup'); 
+                        handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
+                        return;
+                    });
+                })
             }
         };
+
+        function handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot) {
+            const dmg = gameState.player.armor * (1 + 0.10 * gameState.player.strength) * (1 - enemy.armor / 20)
+            gameConfig.targetingCursor.setVisible(false);
+            gameConfig.attackSound.play({ volume: 1 });
+            self.cameras.main.shake(120, .025, false);
+
+            if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
+            if (tokenSlot) tokenSlot.available = true;
+            if (tokenSprite) tokenSprite.destroy();
+            if (card.permanentCardSprite) card.permanentCardSprite.destroy();
+            gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
+        
+            enemy.takeDamage(dmg).removeIfDead(handleTroopsOfTakamori);
+            addInfoTextBox(`Dealt ${dmg} Physical Damage!`);   
+            if (endFightIfGameOver()) return;
+        }
 
         function depletePermanentFromToken(card, tokenSprite, tokenSlot) {
             let functionName = 'deplete' + card.key.charAt(0).toUpperCase() + card.key.slice(1);
@@ -2114,12 +2164,13 @@ class Level2Fight2 extends BaseScene {
             // Deactivate tokens during the enemys turn. Otherwise, check if the function exists in the registry and call it
             const functionCondition = typeof depleteFunctionRegistry[functionName] === 'function'
             if (!card.specialDepletion && functionCondition) {
-                depleteFunctionRegistry[functionName](card, tokenSprite,tokenSlot);
-
+                
                 // Add other cards with special depletion texts
-                if (card.key !== 'kirisuteGomen') {
+                if (card.key !== 'kirisuteGomen' && card.key !== 'laidoSoho') {
                     addInfoTextBox(`Permanent depleted.`);
                 }
+
+                depleteFunctionRegistry[functionName](card, tokenSprite,tokenSlot);
 
             } else {
                 self.cameras.main.shake(70, .002, false);
@@ -2483,6 +2534,7 @@ class Level2Fight2 extends BaseScene {
                 'hollidayInKamakura': () => handleHollidayInKamakura(card),
                 'chemicalWarfare': () => handleChemicalWarfare(card),
                 'stageInvasion': () => null,
+                'laidoSoho': () => null,
                 'chintaiShunyu': () => {
                     if (gameState.zaibatsuMax) {
                         gameState.zaibatsuMax += 2;

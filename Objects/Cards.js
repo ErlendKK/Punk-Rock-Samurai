@@ -79,7 +79,7 @@ class Card {
 
     reset() {
         if (this.usedOneShot) this.usedOneShot = false;
-        if (this.isGoldResetable) this.coldCost = 0;
+        if (this.isGoldResetable) this.goldCost = 0;
         if (this.isType('debuff')) {
             gameState.deck = gameState.deck.filter(c => c.key !== this.key);  
         }
@@ -209,9 +209,6 @@ class Cards extends Phaser.Scene {
 
         const bonusCardDefinitions = [
             // bonuscards: Permanents
-            { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
-            { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
-            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' },
             { key: 'rebelSpirit', type: 'permanent', cost: 1, token: 'rebelSpiritToken' },
             { key: 'foreverTrue', type: 'permanent', cost: 1, token: 'foreverTrueToken' },
             { key: 'toxicFrets', type: 'permanent', cost: 1, token: 'toxicFretsToken' },
@@ -222,9 +219,15 @@ class Cards extends Phaser.Scene {
             { key: 'bouncingSoles', type: 'permanent', cost: 3, goldCost: 3, token: 'bouncingSolesToken' },
             { key: 'shogunsShell', type: 'permanent', cost: 1, token: 'shogunsShellToken' },
             { key: 'steelToe', type: 'permanent', cost: 1, token: 'steelToeToken' },
+            { key: 'edoEruption', type: 'permanent', cost: 1, token: 'edoEruptionToken' },
+
+            // Token Cards
+            { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
+            { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
             { key: 'chemicalWarfare', type: 'permanent', cost: 2, turnsToDepletion: 3, token: 'chemicalWarfareToken' },
             { key: 'zaibatsuU', type: 'permanent', cost: 1, token: 'zaibatsuUndergroundToken' },
-            { key: 'edoEruption', type: 'permanent', cost: 1, token: 'edoEruptionToken' },
+            { key: 'laidoSoho', type: 'permanent', cost: 1, token: 'laidoSohoToken' },
+            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' },
 
             // bonuscards: Buffs
             { key: 'studdedLeather', type: 'buff', cost: 1, stancePoints: 2, armor: 5 },
@@ -247,6 +250,7 @@ class Cards extends Phaser.Scene {
             { key: 'canibalize', type: 'buff', cost: 1 },
             { key: 'saisenBlaster', type: 'buff', cost: 1, goldCost: 1, stancePoints: -2, armor: 10 },
             { key: 'rebelLife', type: 'buff', cost: 0, stancePoints: 1, heal: () => (gameState.player.stancePoints < 0) ? 2 : 0 },
+            { key: 'satomiSubterfuge', type: 'buff', cost: 2, goldCost: 0, isGoldResetable: true },
 
             // bonuscards: Target All
             { key: 'rottenResonance', type: 'targetAll', cost: 1, poison: 1 },
@@ -269,10 +273,9 @@ class Cards extends Phaser.Scene {
             { key: 'risingWakizashi', type: 'targetSelected', cost: 1, stancePoints: -1, damage: 9 },
             { key: 'nastyNihonto', type: 'targetSelected', cost: 2, damage: 10, poison: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0 },
             { key: 'shikoroStrike', type: 'targetSelected', cost: 1, damage: () => gameState.player.stancePoints < 0 ? 8 : 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 3 : 0 },
-            { key: 'laidoSoho', type: 'targetSelected', cost: 1, damage: () => gameState.player.armor > 0 ? gameState.player.armor : 0 },
             { key: 'roninMerc', type: 'targetSelected', cost: 1, goldCost: 1, damage: 18 },
             { key: 'pyroPunk', type: 'targetSelected', cost: 1, fire: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.15) },
-            { key: 'troopsOfTakamori', type: 'targetSelected', cost: 1, damage: 6 },
+            { key: 'troopsOfTakamori', type: 'targetSelected', cost: 1, damage: 7 },
             { key: 'wrathOfMoen', type: 'targetSelected', cost: 2, damage: 24, oneShot: true },
             { key: 'riotRonin', type: 'targetSelected', cost: 2, goldCost: 0, isGoldResetable: true, text: `Target skips a turn` },
         ];

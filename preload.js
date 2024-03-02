@@ -137,7 +137,6 @@ class Preload extends Phaser.Scene {
             this.load.image('shogunShred', 'assets/images/cards/shogunShred.jpg');  
             this.load.image('rocknRejuvinate', 'assets/images/cards/rocknRejuvinate.jpg');
             this.load.image('detox', 'assets/images/cards/detox.jpg');
-            this.load.image('laidoSoho', 'assets/images/cards/laidoSoho.jpg');
             this.load.image('dBeat', 'assets/images/cards/dBeat.jpg');
             this.load.image('shikoroStrike', 'assets/images/cards/shikoroStrike.jpg');
             this.load.image('rottenResonance', 'assets/images/cards/rottenResonance.jpg');
@@ -158,6 +157,7 @@ class Preload extends Phaser.Scene {
             this.load.image('saisenBlaster', 'assets/images/cards/saisenBlaster.jpg');
             this.load.image('riotRonin', 'assets/images/cards/riotRonin.jpg');
             this.load.image('rebelLife', 'assets/images/cards/rebelLife.jpg');
+            this.load.image('satomiSubterfuge', 'assets/images/cards/satomiSubterfuge.jpg');
             
             // Preload permanent cards and tokens
             this.load.image('soulSquatter', 'assets/images/cards/soulSquatter.jpg');
@@ -212,6 +212,8 @@ class Preload extends Phaser.Scene {
             this.load.image('chintaiShunyu', 'assets/images/cards/chintaiShunyu.jpg'); 
             this.load.image('stageInvasionToken', 'assets/images/tokens/stageInvasionToken.png');
             this.load.image('stageInvasion', 'assets/images/cards/stageInvasion.jpg'); 
+            this.load.image('laidoSoho', 'assets/images/cards/laidoSoho.jpg');
+            this.load.image('laidoSohoToken', 'assets/images/tokens/laidoSohoToken.png');
             
             // Preload basic background
             this.load.image('bgLoadingScreen', 'assets/images/backgrounds/bgLoadingScreen.jpg');
@@ -261,7 +263,8 @@ class Preload extends Phaser.Scene {
             { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
             { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
             { key: 'chintaiShunyu', type: 'permanent', cost: 1, token: 'chintaiShunyuToken' },
-            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' }
+            { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' },
+            { key: 'laidoSoho', type: 'permanent', cost: 1, token: 'laidoSohoToken' }
         ];
 
         // List of debuff cards with description to be displayed when used.
@@ -290,10 +293,11 @@ class Preload extends Phaser.Scene {
 
         // Pool of bonus permanent slots that can be added to gameState.permanentSlots
         gameState.bonusPermanentSlots = [
-            { available: true, x: 75, y: 180, index: 4 },
-            { available: true, x: 188, y: 180, index: 5 },
-            { available: true, x: 301, y: 180, index: 6 },
-            { available: true, x: 414, y: 180, index: 7 },
+            { available: true, x: 75,  y: 180, index: 5 },
+            { available: true, x: 170, y: 180, index: 6 },
+            { available: true, x: 265, y: 180, index: 7 },
+            { available: true, x: 360, y: 180, index: 8 },
+            { available: true, x: 455, y: 180, index: 9 },
         ];
 
         // Main pool of taunts

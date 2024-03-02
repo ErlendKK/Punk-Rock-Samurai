@@ -604,13 +604,13 @@ class Player extends Character {
     updateStanceBar(points) {
         gameState.stanceBar.clear();
         // Offset leftwards if stance points are negative 
-        const startXOffset = points < 0 ? points * 110 : 0;
+        const startXOffset = points < 0 ? points * 100 : 0;
         
         // Update stance bar and stance text
         gameState.stanceBar.fillRect(
-            gameState.stanceBarStartX + 330 + startXOffset, 
+            gameState.stanceBarStartX + 300 + startXOffset, 
             gameState.stanceBarMargin, 
-            Math.abs(points) * 110, 
+            Math.abs(points) * 100, 
             gameState.stanceBarHeight
         );
 

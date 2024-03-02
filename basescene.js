@@ -22,7 +22,7 @@ class BaseScene extends Phaser.Scene {
         this.input.keyboard.createCursorKeys();
         
         // Reset State
-        gameConfig.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(200).setVisible(false);
+        gameConfig.targetingCursor = this.add.image(0, 0, 'targetingCursor').setDepth(500).setVisible(false);
         gameState.turn = 0;
         gameState.redrawPrice = 1;
         gameState.endGameMenyExited = false;
@@ -202,21 +202,22 @@ class BaseScene extends Phaser.Scene {
 
     definePermanentSlots() {
         const permanentX = 75;
-        const permanentY = 65;
-        const permanentSpacing = 113;
+        const permanentY = 75;
+        const permanentSpacing = 95;
 
         gameState.permanentSlots = [
             { available: true, x: permanentX + 0 * permanentSpacing, y: permanentY, index: 0 },
             { available: true, x: permanentX + 1 * permanentSpacing, y: permanentY, index: 1 },
             { available: true, x: permanentX + 2 * permanentSpacing, y: permanentY, index: 2 },
             { available: true, x: permanentX + 3 * permanentSpacing, y: permanentY, index: 3 },
+            { available: true, x: permanentX + 4 * permanentSpacing, y: permanentY, index: 4 },
         ];
     }
 
     // Display the amount of gold the player has
     addGoldCounter() {
-        const goldCoin = this.add.image(1565, 65, 'goldCoin').setScale(.13).setDepth(220).setOrigin(.5).setInteractive();
-        gameState.goldCounter = this.add.text(1565, 66, gameState.player.gold, { fontSize: '75px', fill: '#000000'}).setDepth(221).setOrigin(.5);
+        const goldCoin = this.add.image(1570, 75, 'goldCoin').setScale(.12).setDepth(220).setOrigin(.5).setInteractive();
+        gameState.goldCounter = this.add.text(1570, 76, gameState.player.gold, { fontSize: '70px', fill: '#000000'}).setDepth(221).setOrigin(.5);
         let currentInput = "";
 
         goldCoin.on('pointerover', () => {
@@ -281,7 +282,7 @@ class BaseScene extends Phaser.Scene {
         character.stancePoints = 0;
 
         let screenCenterX = this.cameras.main.width / 2;
-        let barWidth = 660;
+        let barWidth = 600;
         gameState.stanceBarHeight = 30;
         gameState.stanceBarMargin = 90;
         gameState.stanceBarStartX = screenCenterX - barWidth / 2;
@@ -291,8 +292,8 @@ class BaseScene extends Phaser.Scene {
         gameState.stanceBarBackground.strokeRect(gameState.stanceBarStartX, gameState.stanceBarMargin, barWidth, gameState.stanceBarHeight).setDepth(20);
 
         for(let i = 1; i < 6; i++) { // draw internal lines
-            gameState.stanceBarBackground.moveTo(gameState.stanceBarStartX + i *110, gameState.stanceBarMargin);
-            gameState.stanceBarBackground.lineTo(gameState.stanceBarStartX + i * 110, gameState.stanceBarMargin + 30);
+            gameState.stanceBarBackground.moveTo(gameState.stanceBarStartX + i *100, gameState.stanceBarMargin);
+            gameState.stanceBarBackground.lineTo(gameState.stanceBarStartX + i * 100, gameState.stanceBarMargin + 30);
             gameState.stanceBarBackground.strokePath();
         }
 
@@ -454,6 +455,42 @@ class BaseScene extends Phaser.Scene {
                 gameState.deck.push(newCard);
             }
         })
+    }
+
+    // Restore active non-token permanents from the previous level.
+    // If there are no remaining availabel permanent slots, remove the permanent from the array
+    // This is to account for cases in which the number of slots are reduced.
+    restorePermanents(addPermanent) {
+        gameState.permanentSlots.forEach(slot => slot.available = true);
+
+        gameState.permanents.forEach(permanent => {
+            if (gameState.permanentSlots.some(slot => slot.available)) {
+                const card = permanent.card;
+
+                if (!gameConfig.tokenCardNames.some(item => item.key === card.key)) {
+                    console.log(`Recreated permanent: ${card.key}\nfor slot ${card.slot.index}`);
+                    addPermanent(card);
+                }
+
+            } else {
+                gameState.permanents = gameState.permanents.filter(p => p != permanent);
+            }
+        })
+    }
+
+    // Remove slots that were only avaiable for the completed level, and add them back into bonusPermanentSlots
+    updatePermanentSlots() {
+        const slots = gameState.permanentSlots;
+        let numberOfSlotsToRemove = slots.filter(slot => slot.singleFight).length;
+        slots.forEach(slot => slot.singleFight = false);
+
+        // Move the last slot in permanentSlots to the start of bonusPermanentSlots
+        while (numberOfSlotsToRemove > 0) {
+            const removedSlot = slots.pop();
+            removedSlot.available = true;
+            gameState.bonusPermanentSlots.unshift(removedSlot);
+            numberOfSlotsToRemove--;
+        }
     }
 
     addHealButton(scene, activateHealButton) {
