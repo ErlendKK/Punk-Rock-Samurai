@@ -81,7 +81,6 @@ class Level1Fight3 extends BaseScene {
 
          // Initialize cards and permanents
         this.addStanceBar(gameState.player, '#303030'); // colors: light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
-        this.addStanceBar(gameState.player, '#303030'); // colors: light:#a9a9a9 - medium:#808080 - dark:#696969 - vdark:#303030
         // self.scene.start('Level3Fight2'); // Keep for testing purposes!  
         this.restorePermanents(addPermanent);
         gameState.drawPile = [...gameState.deck];
@@ -1873,11 +1872,17 @@ class Level1Fight3 extends BaseScene {
             // Loop based on the length of the text
             for (let i = 0; i < fullText.length; i++) {
                 self.time.delayedCall(i * delay, () => {
-                    currentText += fullText.charAt(i);
-                    gameState.shopWelcomeText.setText(currentText);
-                    self.updateTextAndBackground(gameState.shopWelcomeText, 
-                        gameState.shopTextBackground, currentText, 7, 201
-                    );
+                    // Try/catch => no crash if the player exits the shop during text generation
+                    try {
+                        if (!gameState.shopWelcomeText) return; 
+                        currentText += fullText.charAt(i);
+                        gameState.shopWelcomeText.setText(currentText);
+                        self.updateTextAndBackground(gameState.shopWelcomeText, 
+                            gameState.shopTextBackground, currentText, 7, 201
+                        );
+                    } catch (error) {
+                        return;
+                    }
                 });
             }
         }

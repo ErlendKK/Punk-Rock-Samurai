@@ -1,15 +1,45 @@
-old_code = """enemy.sprite.on('pointerup', function() {
-                        enemy.sprite.off('pointerup'); 
-                        handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
-                        return;
-                    });"""
+old_code = """const textConfig = { fontSize: '60px', fill: '#000000' };
+            let currentText = ``;
+            const delay = 50;
+            gameState.shopWelcomeText = self.add.text(825, 90, currentText, textConfig).setOrigin(0.5)
+            gameState.shopTextBackground = self.add.graphics();
+        
+            // Loop based on the length of the text
+            for (let i = 0; i < fullText.length; i++) {
+                self.time.delayedCall(i * delay, () => {
+                    currentText += fullText.charAt(i);
+                    gameState.shopWelcomeText.setText(currentText);
+                    self.updateTextAndBackground(gameState.shopWelcomeText, 
+                        gameState.shopTextBackground, currentText, 7, 201
+                    );
+                });
+            }
+        }"""
 
 
-new_code = """enemy.sprite.on('pointerup', function() {
-                        gameState.enemies.forEach(enemy => enemy.sprite.off('pointerup')); 
-                        handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
+new_code = """const textConfig = { fontSize: '60px', fill: '#000000' };
+            let currentText = ``;
+            const delay = 50;
+            gameState.shopWelcomeText = self.add.text(825, 90, currentText, textConfig).setOrigin(0.5)
+            gameState.shopTextBackground = self.add.graphics();
+        
+            // Loop based on the length of the text
+            for (let i = 0; i < fullText.length; i++) {
+                self.time.delayedCall(i * delay, () => {
+                    // Try/catch => no crash if the player exits the shop during text generation
+                    try {
+                        if (!gameState.shopWelcomeText) return; 
+                        currentText += fullText.charAt(i);
+                        gameState.shopWelcomeText.setText(currentText);
+                        self.updateTextAndBackground(gameState.shopWelcomeText, 
+                            gameState.shopTextBackground, currentText, 7, 201
+                        );
+                    } catch (error) {
                         return;
-                    });"""
+                    }
+                });
+            }
+        }"""
 
 
 levels = [

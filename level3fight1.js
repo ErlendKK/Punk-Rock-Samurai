@@ -1849,11 +1849,17 @@ class Level3Fight1 extends BaseScene {
             // Loop based on the length of the text
             for (let i = 0; i < fullText.length; i++) {
                 self.time.delayedCall(i * delay, () => {
-                    currentText += fullText.charAt(i);
-                    gameState.shopWelcomeText.setText(currentText);
-                    self.updateTextAndBackground(gameState.shopWelcomeText, 
-                        gameState.shopTextBackground, currentText, 7, 201
-                    );
+                    // Try/catch => no crash if the player exits the shop during text generation
+                    try {
+                        if (!gameState.shopWelcomeText) return; 
+                        currentText += fullText.charAt(i);
+                        gameState.shopWelcomeText.setText(currentText);
+                        self.updateTextAndBackground(gameState.shopWelcomeText, 
+                            gameState.shopTextBackground, currentText, 7, 201
+                        );
+                    } catch (error) {
+                        return;
+                    }
                 });
             }
         }
