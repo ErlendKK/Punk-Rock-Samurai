@@ -1,44 +1,34 @@
-old_code = """const textConfig = { fontSize: '60px', fill: '#000000' };
-            let currentText = ``;
-            const delay = 50;
-            gameState.shopWelcomeText = self.add.text(825, 90, currentText, textConfig).setOrigin(0.5)
-            gameState.shopTextBackground = self.add.graphics();
-        
-            // Loop based on the length of the text
-            for (let i = 0; i < fullText.length; i++) {
-                self.time.delayedCall(i * delay, () => {
-                    currentText += fullText.charAt(i);
-                    gameState.shopWelcomeText.setText(currentText);
-                    self.updateTextAndBackground(gameState.shopWelcomeText, 
-                        gameState.shopTextBackground, currentText, 7, 201
-                    );
-                });
-            }
+old_code = """// Pointerover handler for token sprites
+        function displayTokenCard(card) {
+            card.tokenSprite.on('pointerover', function() {
+                // Inform the player about the number of remaining available slots
+                const numberOfSlots = gameState.permanentSlots.length;
+                const numOfAvailableSlots = gameState.permanentSlots.filter(slot => slot.available === true).length;
+                addInfoTextBox(`Available Permanent Slots: ${numOfAvailableSlots} / ${numberOfSlots}`, 2200);
+
+                gameConfig.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
+                card.permanentCardSprite = self.add.image(825, 450, card.key).setScale(0.83).setDepth(220);
+            });
+            card.tokenSprite.on('pointerout', function() {
+                card.permanentCardSprite.destroy();
+            });
         }"""
 
 
-new_code = """const textConfig = { fontSize: '60px', fill: '#000000' };
-            let currentText = ``;
-            const delay = 50;
-            gameState.shopWelcomeText = self.add.text(825, 90, currentText, textConfig).setOrigin(0.5)
-            gameState.shopTextBackground = self.add.graphics();
-        
-            // Loop based on the length of the text
-            for (let i = 0; i < fullText.length; i++) {
-                self.time.delayedCall(i * delay, () => {
-                    // Try/catch => no crash if the player exits the shop during text generation
-                    try {
-                        if (!gameState.shopWelcomeText) return; 
-                        currentText += fullText.charAt(i);
-                        gameState.shopWelcomeText.setText(currentText);
-                        self.updateTextAndBackground(gameState.shopWelcomeText, 
-                            gameState.shopTextBackground, currentText, 7, 201
-                        );
-                    } catch (error) {
-                        return;
-                    }
-                });
-            }
+new_code = """// Pointerover handler for token sprites
+        function displayTokenCard(card) {
+            card.tokenSprite.on('pointerover', function() {
+                // Inform the player about the number of remaining available slots
+                const numberOfSlots = gameState.permanentSlots.length;
+                const numOfAvailableSlots = gameState.permanentSlots.filter(slot => slot.available === true).length;
+                addInfoTextBox(`Available Permanent Slots: ${numOfAvailableSlots} / ${numberOfSlots}`, 2000);
+
+                gameConfig.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
+                card.permanentCardSprite = self.add.image(825, 450, card.key).setScale(0.83).setDepth(220);
+            });
+            card.tokenSprite.on('pointerout', function() {
+                card.permanentCardSprite.destroy();
+            });
         }"""
 
 

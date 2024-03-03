@@ -2023,17 +2023,18 @@ class Level3Fight1 extends BaseScene {
                 if (card.permanentCardSprite) card.permanentCardSprite.destroy();
                 gameState.permanents = gameState.permanents.filter(p => p.tokenSprite !== tokenSprite);
                 
-                const dmg = 3 * gameState.currentCards.length;
                 self.cameras.main.shake(100, .003, false);
                 gameConfig.attackSound.play({ volume: 0.8 });
 
                 const textConfig = { fontSize: '48px', fill: '#ff0000' };
                 const textCoordinates = { x: 825, y: 525, z: 201 };
-                const textContent =`Deals ${dmg} to all enemies`;
+                const textContent =`Damages to all enemies`;
                 const depleteText = new TextBox(self, textContent, textCoordinates, textConfig);
                 self.time.delayedCall(1800, () => depleteText.destroy());  
 
                 gameState.enemies.forEach(enemy => {
+                    const damageModifyer = (1 + 0.10 * gameState.player.strength) * (1 - enemy.armor / 20);
+                    const dmg = Math.round(2 * gameState.currentCards.length * damageModifyer);
                     enemy.takeDamage(dmg);
                     enemy.removeIfDead(handleTroopsOfTakamori);
                 });
@@ -2572,8 +2573,14 @@ class Level3Fight1 extends BaseScene {
             }
         }
 
+        // Pointerover handler for token sprites
         function displayTokenCard(card) {
             card.tokenSprite.on('pointerover', function() {
+                // Inform the player about the number of remaining available slots
+                const numberOfSlots = gameState.permanentSlots.length;
+                const numOfAvailableSlots = gameState.permanentSlots.filter(slot => slot.available === true).length;
+                addInfoTextBox(`Available Permanent Slots: ${numOfAvailableSlots} / ${numberOfSlots}`, 2000);
+
                 gameConfig.cardsDealtSound.play({ volume: 1.5, seek: 0.10 });
                 card.permanentCardSprite = self.add.image(825, 450, card.key).setScale(0.83).setDepth(220);
             });

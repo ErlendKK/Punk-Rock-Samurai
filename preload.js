@@ -11,7 +11,7 @@ Game design and programming by Erlend Kulander Kvitrud. Copyright 2023, all righ
 let gameState = {};
 const gameConfig = {};
 
-gameState.version = "1.3.11";
+gameState.version = "1.3.13";
 
 gameConfig.levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
@@ -44,8 +44,9 @@ const FadeOutBehavior = {
 };
 
 try {
-    console.log(`%cWelcome to Punk Rock Samurai v${gameState.version}`, 'color: red; font-size: 24px; font-weight: bold; background-color: lightgray');
-    console.log(`%cLogging will be on during beta testing`, 'color: red; font-size: 16px; font-weight: bold; background-color: lightgray')
+    console.log(
+        `%cWelcome to %cPunk Rock Samurai%c v${gameState.version}`, 'color: red; font-size: 26px; font-weight: bold; background-color: lightgray');
+    console.log(`%cConsole log in on during beta testing`, 'color: red; font-size: 16px; font-weight: bold; background-color: lightgray')
 } catch (e) {
     console.log(`Welcome to Punk Rock Samurai v${gameState.version}`); // Fallback without styling
     console.log(`Logging will me on during beta testing`); // Fallback without styling
