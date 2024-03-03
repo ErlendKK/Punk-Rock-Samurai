@@ -304,6 +304,7 @@ class BaseScene extends Phaser.Scene {
         gameState.stanceText = this.add.text(825, gameState.stanceBarMargin - 45, `Stance: ${gameState.player.stance}`, stanceTextConfig).setOrigin(0.5).setInteractive();      
         
         gameState.stanceText.on('pointerover', () => {
+            console.log(`Stance: ${gameState.player.stance}`)
 
             const stanceText = `Stance represents the balance between\nDiscipline and Freedom.\n\n` +
                 `Positive Discipline during your turn:\n+3 Strength\n\n` +

@@ -2074,7 +2074,7 @@ class Level1Fight3 extends BaseScene {
                     });
             
                     enemy.sprite.on('pointerup', function() {
-                        enemy.sprite.off('pointerup'); 
+                        gameState.enemies.forEach(enemy => enemy.sprite.off('pointerup')); 
                         handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
                         return;
                     });
@@ -2083,10 +2083,10 @@ class Level1Fight3 extends BaseScene {
         };
 
         function handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot) {
-            const dmg = gameState.player.armor * (1 + 0.10 * gameState.player.strength) * (1 - enemy.armor / 20)
+            const dmg = Math.round(gameState.player.armor * (1 + 0.10 * gameState.player.strength) * (1 - enemy.armor / 20));
             gameConfig.targetingCursor.setVisible(false);
             gameConfig.attackSound.play({ volume: 1 });
-            self.cameras.main.shake(120, .025, false);
+            self.cameras.main.shake(120, .020, false);
 
             if (card.sprite) card.sprite.destroy(); // Removes the card sprite incase the deplete effect was activated directely
             if (tokenSlot) tokenSlot.available = true;

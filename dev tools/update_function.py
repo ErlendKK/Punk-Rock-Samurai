@@ -1,34 +1,15 @@
-old_code = """function activateSatomiSubterfuge(card) {
-            if (!gameState.bonusPermanentSlots.length) {
-                addInfoTextBox('Maximum number of Permanent Slots Reached');
-                gameState.player.gold += card.goldCost;
-                return;
-            }
-            
-            card.goldCost ++;
-            const newSlot = gameState.bonusPermanentSlots.shift();
-            newSlot.singleFight = true;
-            gameState.permanentSlots.push(newSlot);
-
-            addInfoTextBox('Gained 1 Permanent Slot this fight');
-        }"""
+old_code = """enemy.sprite.on('pointerup', function() {
+                        enemy.sprite.off('pointerup'); 
+                        handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
+                        return;
+                    });"""
 
 
-new_code = """function activateSatomiSubterfuge(card) {
-            if (!gameState.bonusPermanentSlots.length) {
-                addInfoTextBox('Maximum number of Permanent Slots Reached');
-                gameState.player.gold += card.goldCost;
-                gameState.goldCounter.setText(gameState.player.gold);
-                return;
-            }
-            
-            card.goldCost ++;
-            const newSlot = gameState.bonusPermanentSlots.shift();
-            newSlot.singleFight = true;
-            gameState.permanentSlots.push(newSlot);
-
-            addInfoTextBox('Gained 1 Permanent Slot this fight');
-        }"""
+new_code = """enemy.sprite.on('pointerup', function() {
+                        gameState.enemies.forEach(enemy => enemy.sprite.off('pointerup')); 
+                        handleLaidoSohoPointerup(enemy, card, tokenSprite, tokenSlot);
+                        return;
+                    });"""
 
 
 levels = [
