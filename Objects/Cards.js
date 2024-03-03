@@ -205,9 +205,6 @@ class Cards extends Phaser.Scene {
             { key: 'tantoBlade',  type: 'targetSelected', cost: 2, damage: () => gameState.player.stancePoints < 0 ? 12 - 2 * gameState.player.stancePoints : 12 },
             { key: 'combatBoots', type: 'targetAll', cost: 2, damage: 5, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 1 + gameState.player.stancePoints : 1 },
             { key: 'discontent',  type: 'buff', cost: 1, stancePoints: () => gameState.player.stancePoints < 0 ? 2 : gameState.player.stancePoints > 0 ? -2 : 0 },
-            { key: 'rebelSpirit', type: 'permanent', cost: 1, token: 'rebelSpiritToken' },
-            { key: 'foreverTrue', type: 'permanent', cost: 1, token: 'foreverTrueToken' },
-            { key: 'laidoSoho', type: 'permanent', cost: 1, token: 'laidoSohoToken' },
         ];
 
         const bonusCardDefinitions = [
