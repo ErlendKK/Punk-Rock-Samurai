@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Punk Rock Samurai</title>
+    <link rel="icon" type="image/png" href="assets/images/div/PRSfavicorn2.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="canonical" href="https://punkrocksamurai.com/" />
+
+    <!-- Basic Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Erlend Kulander Kvitrud">
+    <meta name="description" content="Roguelike deckbuilder set in a punk rock samurai universe">
+    <meta name="copyright" content="Copyright © 2024 Erlend Kulander Kvitrud">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        img-src 'self' data: blob:;
+        font-src 'self' data:;
+        connect-src 'self' https://www.dreamlo.com;
+    ">
+
+    <!-- Open Graph/ Twitter Card Meta/  Tags -->
+    <meta property="og:title" content="Punk Rock Samurai" />
+    <meta property="og:description" content="Roguelike deckbuilder set in a punk rock samurai universe" />
+    <meta property="og:image" content="assets/images/backgrounds/bgLoadingScreen.jpg" />
+    <meta property="og:url" content="https://erlendkk.github.io/Punk-Rock-Samurai/" />
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Punk Rock Samurai">
+    <meta name="twitter:description" content="Roguelike deckbuilder set in a punk rock samurai universe">
+    <meta name="twitter:image" content="assets/images/backgrounds/bgLoadingScreen.jpg">
+    
+</head>
+<body>
+    <div id="imports">
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/@babel/polyfill/dist/polyfill.min.js"></script>
+        <script src="assets/data/webfont.js"></script>
+        <script src="assets/data/phaser.min.js"></script>
+    </div>
+    
+    <div id="game-container">
+        <!--Load data and scene methods--> 
+        <script src="basescene.js"></script>
+        <script src="preload.js"></script>
+        <script src="loadlazy.js"></script>
+
+        <!--Load classes-->
+        <script src="Objects/Buttons.js"></script>
+        <script src="Objects/Characters.js"></script>
+        <script src="Objects/Actions.js"></script>
+        <script src="Objects/Cards.js"></script>
+        <script src="Objects/TextBoxes.js"></script>
+        
+        <!--Load scenes-->
+        <script src="mainmenu.js"></script>
+        <script src="level1fight1.js"></script>
+        <script src="level1fight2.js"></script>
+        <script src="level1fight3.js"></script>
+        <script src="level2fight1.js"></script>
+        <script src="level2fight2.js"></script>
+        <script src="level2fight3.js"></script>
+        <script src="level3fight1.js"></script>
+        <script src="level3fight2.js"></script>
+        <script src="level3fight3.js"></script>
+        <script src="level4fight1.js"></script>
+        <script src="level4fight2.js"></script>
+        <script src="level4fight3.js"></script>
+        <script src="endscene.js"></script>
+
+        <!-- Config-->
+        <script src="config.js"></script>
+    </div>
+</body>
+</html>
+      

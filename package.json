@@ -1,0 +1,40 @@
+{
+  "author": "Erlend Kulander Kvitrud",
+  "bugs": {
+    "url": "https://github.com/ErlendKK/Punk-Rock-Samurai/issues"
+  },
+  "description": "Punk Rock Samurai",
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "python": "^3.8.0",
+    "terser": "^5.12.4"
+  },
+  "engines": {
+    "python": ">=3.8 <4.0"
+  },
+  "homepage": "https://punkrocksamurai.com",
+  "keywords": [
+    "punk",
+    "rock",
+    "samurai",
+    "roguelike",
+    "deckbuilder"
+  ],
+  "license": "ISC",
+  "main": "basescene.js",
+  "name": "punk-rock-samurai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ErlendKK/Punk-Rock-Samurai.git"
+  },
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "minify": "terser lib/preload.js lib/loadlazy.js lib/basescene.js lib/mainmenu.js lib/Objects/Cards.js lib/Objects/Characters.js lib/Objects/Buttons.js lib/Objects/TextBoxes.js lib/Objects/Actions.js lib/level*.js lib/endscene.js lib/config.js -c -m -o production/game.min.js",
+    "edit-all": "python ./scripts/edit_all.py",
+    "increment-version": "python ./scripts/increment_version.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.3.14"
+}

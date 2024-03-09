@@ -1,0 +1,21 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "edge": "17",
+          "firefox": "60",
+          "chrome": "67",
+          "safari": "11.1"
+        },
+        "useBuiltIns": false,
+        "corejs": "3.6.5",
+        "modules": false
+      }
+    ]
+  ]
+}
+
+// ./node_modules/.bin/babel src --out-dir lib
+// "minify": "terser src/preload.js src/loadlazy.js src/basescene.js src/mainmenu.js src/Objects/Cards.js src/Objects/Characters.js src/Objects/Buttons.js src/Objects/TextBoxes.js src/Objects/Actions.js src/level*.js src/endscene.js src/config.js -c -m -o game.min.js",

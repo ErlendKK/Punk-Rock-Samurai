@@ -3,7 +3,7 @@
 <head>
     <title>Punk Rock Samurai</title>
     <link rel="icon" type="image/png" href="assets/images/div/PRSfavicorn2.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="src/styles/styles.css">
     <link rel="canonical" href="https://punkrocksamurai.com/" />
 
     <!-- Basic Meta Tags -->
@@ -26,7 +26,7 @@
     <meta property="og:title" content="Punk Rock Samurai" />
     <meta property="og:description" content="Roguelike deckbuilder set in a punk rock samurai universe" />
     <meta property="og:image" content="assets/images/backgrounds/bgLoadingScreen.jpg" />
-    <meta property="og:url" content="https://erlendkk.github.io/Punk-Rock-Samurai/" />
+    <meta property="og:url" content="https://punkrocksamurai.com/" />
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Punk Rock Samurai">
@@ -36,42 +36,15 @@
 </head>
 <body>
     <div id="imports">
-        <!-- <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script> -->
         <script src="assets/data/webfont.js"></script>
+        <script src="assets/data/polyfill.min.js"></script>
         <script src="assets/data/phaser.min.js"></script>
     </div>
     
     <div id="game-container">
-        <!--Load data and scene methods--> 
-        <script src="basescene.js"></script>
-        <script src="preload.js"></script>
-
-        <!--Load classes-->
-        <script src="Objects/Buttons.js"></script>
-        <script src="Objects/Characters.js"></script>
-        <script src="Objects/Actions.js"></script>
-        <script src="Objects/Cards.js"></script>
-        <script src="Objects/TextBoxes.js"></script>
-        
-        <!--Load scenes-->
-        <script src="mainmenu.js"></script>
-        <script src="level1fight1.js"></script>
-        <script src="level1fight2.js"></script>
-        <script src="level1fight3.js"></script>
-        <script src="level2fight1.js"></script>
-        <script src="level2fight2.js"></script>
-        <script src="level2fight3.js"></script>
-        <script src="level3fight1.js"></script>
-        <script src="level3fight2.js"></script>
-        <script src="level3fight3.js"></script>
-        <script src="level4fight1.js"></script>
-        <script src="level4fight2.js"></script>
-        <script src="level4fight3.js"></script>
-        <script src="endscene.js"></script>
-
-        <!-- Config-->
-        <script src="config.js"></script>
+        <script src="production/game.min.js"></script>
     </div>
+    
 </body>
 </html>
       
