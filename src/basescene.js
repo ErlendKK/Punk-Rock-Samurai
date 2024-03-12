@@ -9,6 +9,9 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 "use strict";
 
 class BaseScene extends Phaser.Scene {
+    // constructor(key) {
+    //     super(key);
+    // }
 
     create() {
         console.log('BaseScene loaded');
@@ -542,24 +545,20 @@ class BaseScene extends Phaser.Scene {
             this.load.audio(asset.key, asset.path);
         }
 
-        this.load.once('filecomplete-' + asset.key, function() {
+        this.load.once(`filecomplete-${type}-${asset.key}`, () => {
             console.log(`${asset.key} loaded successfully.`);
         });
 
-        this.load.once('loaderror', function(file) {
+        this.load.once('loaderror', (file) => {
             if (file.key === asset.key) {
-                console.warn(`Loading error for asset: ${asset.key}. Retrying...`);
-                setTimeout(() => {
-                    this.loadAssetWithRetry(asset, type, attempt + 1, maxRetries);
-                }, 200 * (attempt + 1)); // Exponential back-off
+                console.warn(`Loading error for asset: ${asset.key}. Attemt: ${attempt} Retrying...`);
+                this.loadAssetWithRetry(asset, type, attempt + 1, maxRetries);
             }
-        }, this);
+        });
 
         // If this is the first attempt, start the loader manually incase other loads are triggered elsewhere.
         if (attempt === 0) {
             this.load.start();
         }
     }
-    
-
 } // End of scene

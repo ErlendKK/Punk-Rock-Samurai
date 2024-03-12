@@ -31,7 +31,7 @@
   },
   "scripts": {
     "build": "babel src --out-dir lib",
-    "minify": "terser lib/preload.js lib/loadlazy.js lib/basescene.js lib/mainmenu.js lib/Objects/Cards.js lib/Objects/Characters.js lib/Objects/Buttons.js lib/Objects/TextBoxes.js lib/Objects/Actions.js lib/level*.js lib/endscene.js lib/config.js -c -m -o production/game.min.js",
+    "minify": "terser lib/basescene.js lib/preload.js lib/loadlazy.js lib/mainmenu.js lib/Objects/Cards.js lib/Objects/Characters.js lib/Objects/Buttons.js lib/Objects/TextBoxes.js lib/Objects/Actions.js lib/level*.js lib/endscene.js lib/config.js -c -m -o production/game.min.js",
     "edit-all": "python ./scripts/edit_all.py",
     "increment-version": "python ./scripts/increment_version.py",
     "test": "echo \"Error: no test specified\" && exit 1"

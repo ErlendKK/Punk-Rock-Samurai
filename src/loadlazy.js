@@ -8,7 +8,7 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 
 "use strict";
 
-class LoadLazy extends Phaser.Scene {
+class LoadLazy extends BaseScene {
     constructor() {
         super('LoadLazy');
     }
@@ -65,39 +65,7 @@ class LoadLazy extends Phaser.Scene {
         ];
 
         assets.forEach(asset => {
-            try {
-                self.load.image(asset.key, asset.path);
-            } catch(e) {
-                asset.attempts = 1;
-                console.log(`failed to log ${asset.key}. Attempts: ${ asset.attempts }`);
-            }
-        });
-
-        const isLoadAble = (asset) => !asset.loaded &&  asset.attempts < 10;
-
-        const delay = (time) => {
-            return new Promise(resolve => setTimeout(resolve, time));
-        }
-
-        assets = assets.filter(asset => isLoadAble(asset));
-
-        while (assets.length) {
-            const delayTime = assets[0].attempts;
-            delay(delayTime);
-            assets.forEach(asset => {
-                try {
-                    self.load.image(asset.key, asset.path);
-                } catch(e) {
-                    asset.attempts++
-                    console.log(`failed to log ${asset.key}. Attempts: ${ asset.attempts }`);
-                }
-            })
-        }
-
-        this.load.start();
-
-        this.load.on('complete', () => {
-            console.log('lazyload assets loaded');
+            this.loadAssetWithRetry(asset, 'image', 0, 200); // asset, type, current attempt, max retries
         });
     }
 }

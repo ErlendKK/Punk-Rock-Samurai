@@ -21,7 +21,7 @@ class Level1Fight1 extends BaseScene {
         ];
 
         assets.forEach(asset => {
-            this.loadAssetWithRetry(asset, 'image', 0, 5);
+            this.loadAssetWithRetry(asset, 'image', 1, 200);
         });
     }; 
 

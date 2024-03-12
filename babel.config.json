@@ -16,6 +16,3 @@
     ]
   ]
 }
-
-// ./node_modules/.bin/babel src --out-dir lib
-// "minify": "terser src/preload.js src/loadlazy.js src/basescene.js src/mainmenu.js src/Objects/Cards.js src/Objects/Characters.js src/Objects/Buttons.js src/Objects/TextBoxes.js src/Objects/Actions.js src/level*.js src/endscene.js src/config.js -c -m -o game.min.js",

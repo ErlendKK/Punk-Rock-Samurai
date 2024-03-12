@@ -52,7 +52,7 @@ try {
     console.log(`Logging will me on during beta testing`); // Fallback without styling
 }
 
-class Preload extends Phaser.Scene {
+class Preload extends BaseScene {
     constructor() {
         super('Preload');
     }
@@ -115,7 +115,7 @@ class Preload extends Phaser.Scene {
             { key: 'tantoBlade', path: '../assets/images/cards/tantoBlade.jpg', loaded: false },
             { key: 'discontent', path: '../assets/images/cards/discontent.jpg', loaded: false },
 
-            // Permanents and tokens
+            // // Permanents and tokens
             { key: 'soulSquatter', path: '../assets/images/cards/soulSquatter.jpg', loaded: false },
             { key: 'soulSquatterToken', path: '../assets/images/tokens/soulSquatterToken.png', loaded: false },
             { key: 'punksNotDead', path: '../assets/images/cards/punksNotDead.jpg', loaded: false },
@@ -200,47 +200,14 @@ class Preload extends Phaser.Scene {
         // Preload files the first time the game runs, not on restart
         if (!gameState.restartGame) {
             images.forEach(asset => {
-                this.loadAssetWithRetry(asset, 'image', 0, 5); // asset, current attempt, max retries
+                this.loadAssetWithRetry(asset, 'image', 1, 200);
             });
 
             audios.forEach(asset => {
-                this.loadAssetWithRetry(asset, 'audio', 0, 5); // asset, current attempt, max retries
+                this.loadAssetWithRetry(asset, 'audio', 1, 200);
             });
         }
-    };
-
-    loadAssetWithRetry(asset, type, attempt, maxRetries) {
-        console.log('loadAssetWithRetry called!')
-        if (attempt >= maxRetries) {
-            console.error(`Failed to load asset: ${asset.key} after ${maxRetries} attempts.`);
-            return;
-        }
-
-        // Load asset based on type
-        if (type === 'image') {
-            this.load.image(asset.key, asset.path);
-        } else if (type === 'audio') {
-            this.load.audio(asset.key, asset.path);
-        }
-
-        this.load.once('filecomplete-' + asset.key, function() {
-            console.log(`${asset.key} loaded successfully.`);
-        });
-
-        this.load.once('loaderror', function(file) {
-            if (file.key === asset.key) {
-                console.warn(`Loading error for asset: ${asset.key}. Retrying...`);
-                setTimeout(() => {
-                    this.loadAssetWithRetry(asset, type, attempt + 1, maxRetries);
-                }, 200 * (attempt + 1)); // Exponential back-off
-            }
-        }, this);
-
-        // If this is the first attempt, start the loader manually incase other loads are triggered elsewhere.
-        if (attempt === 0) {
-            this.load.start();
-        }
-    }
+    }  
 
     create() {
         self = this;

@@ -14,7 +14,7 @@ class Card {
         const defaults = {
             cost: 0, type: "", goldCost: 0, stancePoints: 0, damage: 0, fire: 0, poison: 0, heal: 0, poisonRemove: 0, strength: 0, armor: 0, reduceTargetArmor: 0, isActive: false,
             reduceTargetStrength: 0, drawCard: 0, oneShot: false, usedOneShot: false, token: null, permanent: {}, freePermanent: false, reUseable: false, isGoldResetable: false,
-            turnsToDepletion: -1, usesTillDepletion: -1, slot: {}, angle: 0, sprite: null, isBeingPlayed: false, text: '', isPermanentAnimated: false
+            turnsToDepletion: -1, usesTillDepletion: -1, slot: {}, angle: 0, sprite: null, isBeingPlayed: false, text: '', isPermanentAnimated: false, hoverOver: false
         };
 
         // Assign default values and then override with provided properties
@@ -74,6 +74,7 @@ class Card {
         this.isActive = false;
         this.isBeingPlayed = false;
         this.sprite.removeInteractive();
+        this.hoverOver = false;
         return this;
     }
 
@@ -101,6 +102,7 @@ class Card {
             duration: duration,
             onComplete: () => { 
                 this.sprite.destroy();
+                this.hoverOver = false;
             }
         })
         return  this;
@@ -129,32 +131,77 @@ class Card {
     // Event listeners for pointerover and pointerout
     animatePointer(scene, depth) {
         this.sprite.on('pointerover', () => {
-            gameConfig.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
-            scene.tweens.add({
-                targets: this.sprite,
-                y: 740,
-                angle: 0,
-                scaleX: 0.60,
-                scaleY: 0.60,
-                duration: 300,
-                ease: 'Cubic'
-            });
-            this.sprite.setDepth(100);
-        }, scene)
+            this.focusCardSprite(scene);
+        }, scene);
 
         this.sprite.on('pointerout', () => {
-            if (this.isBeingPlayed) return;
-            scene.tweens.add({
-                targets: this.sprite,
-                y: this.startHeight,
-                angle: this.slot.angle,
-                scaleX: 0.47, // 0.35
-                scaleY: 0.47,
-                duration: 300,
-                ease: 'Cubic'
-            });
-            this.sprite.setDepth(depth);
-        }, scene)
+            this.focusCardSprite(scene, depth);
+        }, scene);
+
+        // !!!!  TO DO: Finnish function   !!!!!
+
+        // Animate the next card when the curser approaches the edge of the card to get a more smooth transition
+        // scene.input.on('pointermove', (pointer) => {
+        //     if (this.hoverOver) {
+        //         const spriteBounds = this.sprite.getBounds();
+        //         const distanceToLeftBorder = Math.abs(pointer.x - spriteBounds.x);
+        //         const distanceToRightBorder = Math.abs(pointer.x - (spriteBounds.x + spriteBounds.width));
+                
+        //         const x = 10; // Threshold for triggering the border proximity event
+                
+        //         if (distanceToLeftBorder <= x) {
+        //             console.log('Cursor is within', x, 'pixels of its left border');
+        //             const prevCard = gameState.currentCards.find(card => card.slot.index === this.slot.index - 1)
+        //             if (!prevCard) return;
+
+        //             prevCard.focusCardSprite(scene);
+        //             this.deFocusCardSprite(scene);
+        //         }
+
+        //         if (distanceToRightBorder <= x) {
+        //             console.log('Cursor is within', x, 'pixels of its right border');
+        //             const nextCard = gameState.currentCards.find(card => card.slot.index === this.slot.index + 1)
+        //             if (!nextCard) return;
+
+        //             nextCard.focusCardSprite(scene);
+        //             this.deFocusCardSprite(scene);
+        //         }
+        //     }
+        // });
+    }
+
+    focusCardSprite(scene) {
+        this.hoverOver = true;
+        gameConfig.cardsDealtSound.play({ volume: 0.6, seek: 0.08 });
+
+        scene.tweens.add({
+            targets: this.sprite,
+            y: 740,
+            angle: 0,
+            scaleX: 0.60,
+            scaleY: 0.60,
+            duration: 300,
+            ease: 'Cubic'
+        });
+
+        this.sprite.setDepth(100);
+    }
+
+    deFocusCardSprite(scene, depth) {
+        this.hoverOver = false;
+        if (this.isBeingPlayed) return;
+
+        scene.tweens.add({
+            targets: this.sprite,
+            y: this.startHeight,
+            angle: this.slot.angle,
+            scaleX: 0.47, // 0.35
+            scaleY: 0.47,
+            duration: 300,
+            ease: 'Cubic'
+        });
+
+        this.sprite.setDepth(depth);
     }
 
     // Method for animating resizes
