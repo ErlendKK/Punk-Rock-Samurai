@@ -135,7 +135,7 @@ class Card {
         }, scene);
 
         this.sprite.on('pointerout', () => {
-            this.focusCardSprite(scene, depth);
+            this.deFocusCardSprite(scene, depth);
         }, scene);
 
         // !!!!  TO DO: Finnish function   !!!!!
