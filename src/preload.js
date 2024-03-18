@@ -317,9 +317,8 @@ class Preload extends BaseScene {
                 return;
             }
                 
-            this.add.image(825, 720, 'bgLoadingScreen').setScale(2).setInteractive();
-            this.add.text(825, 255, 'Punk Rock Samurai', { fontSize: '135px', fill: '#000000', fontFamily: 'Rock Kapak' }).setOrigin(0.5);
-            this.add.text(825, 750, 'Click to start', { fontSize: '60px', fill: '#ff0000', fontWeight: 'bold' }).setOrigin(0.5); 
+            this.add.image(800, 510, 'bgLoadingScreen').setScale(1.25).setInteractive();
+            this.add.text(825, 895, 'Press to start', { fontSize: '90px', fill: '#9e2d20', fontWeight: 'bold' }).setOrigin(0.5); //825
 
             // Open Main Menu at the first keyboard or mouse buttonup
             this.input.keyboard.on('keydown', () => procedeToMainMenu());

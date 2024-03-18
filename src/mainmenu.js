@@ -55,7 +55,7 @@ class Mainmenu extends Phaser.Scene {
         const sceneElements = [];
         this.cameras.main.fadeIn(600, 0, 0, 0);
         this.input.keyboard.createCursorKeys();
-        this.add.image(825,720, 'bgLoadingScreen').setScale(2.1);
+        this.add.image(800, 510, 'bgLoadingScreen').setScale(1.25);
         const versionTextConfig = { fontSize: '17px', fill: '#ff0000'}
         this.add.text(23, 8, `Punk Rock Samurai Beta v${gameState.version}`, versionTextConfig);
         const textBox = {x: 390, xSpan: 1210, textOffsetX: 45, textOffsetY: 120, headlineOffsetY: 45, radius: 10 }
