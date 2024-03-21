@@ -162,7 +162,7 @@ class Preload extends BaseScene {
             { key: 'shogunsShellToken', path: '../assets/images/tokens/shogunsShellToken.png', loaded: false },
             { key: 'chemicalWarfare', path: '../assets/images/cards/chemicalWarfare.jpg', loaded: false },
             { key: 'chemicalWarfareToken', path: '../assets/images/tokens/chemicalWarfareToken.png', loaded: false },
-            { key: 'zaibatsuUnderground', path: '../assets/images/cards/zaibatsuUnderground.jpg', loaded: false },
+            { key: 'zaibatsuU', path: '../assets/images/cards/zaibatsuUnderground.jpg', loaded: false },
             { key: 'zaibatsuUndergroundToken', path: '../assets/images/tokens/zaibatsuUndergroundToken.png', loaded: false },
             { key: 'chintaiShunyu', path: '../assets/images/cards/chintaiShunyu.jpg', loaded: false },
             { key: 'chintaiShunyuToken', path: '../assets/images/tokens/chintaiShunyuToken.png', loaded: false },
