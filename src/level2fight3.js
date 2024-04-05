@@ -642,6 +642,34 @@ class Level2Fight3 extends BaseScene {
             }
         }
 
+        function activateBassSolo() {
+            if (!gameState.currentCards.length || gameState.bassSoloPlayed) {
+                return;
+            }
+
+            gameState.bassSoloPlayed = true;
+
+            // pick a random card on hand and discard it: move it from hand to discardpile and fade out sprite
+            const randomIndex = Math.floor(Math.random() * gameState.currentCards.length);
+            const randomCard = gameState.currentCards[randomIndex];
+            fadeOutGameObject(randomCard.sprite, 250);
+            gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
+            if (!randomCard.isType('debuff')) gameState.discardPile.push(randomCard);
+
+            gameState.player.gainMana(randomCard.cost);
+        }
+
+        function activateBloodOath() {
+            gameState.player.manaMax ++;
+            gameState.player.manaBase ++;
+            gameState.player.health -= 6;
+            gameState.player.updateManaBar();
+            if (gameState.player.health) {
+                gameConfig.powerUpSound.play({ volume: 0.15 });
+                gameState.player.powerUpTweens();
+            }
+        }
+
         function activateSatomiSubterfuge(card) {
             if (!gameState.bonusPermanentSlots.length) {
                 addInfoTextBox('Maximum number of Permanent Slots Reached');
@@ -669,7 +697,7 @@ class Level2Fight3 extends BaseScene {
             gameState.player.powerUpTweens();
         }
 
-        function activatePissDrunkBastards(target) {           
+        function activatePissDrunkBastards(target) {
             if (target.health >= 18) return;
             gameState.score.damageDealt += target.health;
             target.health = 0;
@@ -716,32 +744,6 @@ class Level2Fight3 extends BaseScene {
                     handleDrawDBeatCard(card, cardImage)
                 })
             })
-        }
-
-        function activateBassSolo() {
-            if (!gameState.currentCards.length || gameState.bassSoloPlayed) {
-                return;
-            }
-
-            gameState.bassSoloPlayed = true;
-
-            // pick a random card on hand and discard it: move it from hand to discardpile and fade out sprite
-            const randomIndex = Math.floor(Math.random() * gameState.currentCards.length);
-            const randomCard = gameState.currentCards[randomIndex];
-            fadeOutGameObject(randomCard.sprite, 250);
-            gameState.currentCards = gameState.currentCards.filter(c => c != randomCard);
-            if (!randomCard.isType('debuff')) gameState.discardPile.push(randomCard);
-        }
-
-        function activateBloodOath() {
-            gameState.player.manaMax ++;
-            gameState.player.manaBase ++;
-            gameState.player.health -= 6;
-            gameState.player.updateManaBar();
-            if (gameState.player.health) {
-                gameConfig.powerUpSound.play({ volume: 0.15 });
-                gameState.player.powerUpTweens();
-            }
         }
 
         function activateLibertySpikes() {

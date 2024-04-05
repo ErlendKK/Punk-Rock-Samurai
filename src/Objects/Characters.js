@@ -663,6 +663,13 @@ class Player extends Character {
         this.armorCard += armor;
     }
 
+    gainMana(amount) {
+        this.mana += amount;
+        this.manaMax += amount;
+        this.updateManaBar();
+        return this;
+    }
+
     sufferDebuffDamage(damage) {
         this.health -= damage;
         this.updateHealthBar();

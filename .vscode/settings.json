@@ -1,0 +1,10 @@
+{
+"typescript.validate.enable": false,
+"javascript.validate.enable": true,
+"compilerOptions": {
+    "checkJs": false
+},
+"exclude": [
+    "**/*"
+]
+}

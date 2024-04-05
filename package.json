@@ -30,13 +30,13 @@
     "url": "git+https://github.com/ErlendKK/Punk-Rock-Samurai.git"
   },
   "scripts": {
-    "transpile": "babel src --out-dir lib",
-    "minify": "terser lib/basescene.js lib/preload.js lib/loadlazy.js lib/mainmenu.js lib/Objects/Cards.js lib/Objects/Characters.js lib/Objects/Buttons.js lib/Objects/TextBoxes.js lib/Objects/Actions.js lib/level*.js lib/endscene.js lib/config.js -c -m -o lib/game.min.js",
-    "clean": "python ./scripts/clean.py",
     "build": "npm run transpile && npm run minify && npm run clean",
-    "push": "git add . && git commit -m \"Auto-commit\" && git push origin main",
+    "clean": "python ./scripts/clean.py",
     "edit-all": "python ./scripts/edit_all.py",
-    "increment-version": "python ./scripts/increment_version.py"
+    "increment-version": "python ./scripts/increment_version.py",
+    "minify": "terser lib/basescene.js lib/preload.js lib/loadlazy.js lib/mainmenu.js lib/Objects/Cards.js lib/Objects/Characters.js lib/Objects/Buttons.js lib/Objects/TextBoxes.js lib/Objects/Actions.js lib/level*.js lib/endscene.js lib/config.js -c -m -o lib/game.min.js",
+    "push": "git add . && git commit -m \"Auto-commit\" && git push origin main",
+    "transpile": "babel src --out-dir lib"
   },
-  "version": "1.3.14"
+  "version": "1.3.15"
 }

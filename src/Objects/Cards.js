@@ -271,7 +271,7 @@ class Cards extends Phaser.Scene {
             // Token Cards
             { key: 'kamishimoUberAlles', type: 'permanent', cost: 1, token: 'kamishimoUberAllesToken' },
             { key: 'hollidayInKamakura', type: 'permanent', cost: 0, token: 'hollidayInKamakuraToken', specialDepletion: true },
-            { key: 'chemicalWarfare', type: 'permanent', cost: 2, turnsToDepletion: 3, token: 'chemicalWarfareToken' },
+            { key: 'chemicalWarfare', type: 'permanent', cost: 2, turnsToDepletion: 4, token: 'chemicalWarfareToken' },
             { key: 'zaibatsuU', type: 'permanent', cost: 1, token: 'zaibatsuUndergroundToken' },
             { key: 'laidoSoho', type: 'permanent', cost: 1, token: 'laidoSohoToken' },
             { key: 'stageInvasion', type: 'permanent', cost: 2, token: 'stageInvasionToken' },
@@ -281,23 +281,23 @@ class Cards extends Phaser.Scene {
             { key: 'rocknRonin', type: 'buff', cost: 0, strength: () => gameState.player.strength > 0 ? gameState.player.strength : 0 },
             { key: 'rawEnergy', type: 'buff', cost: () => gameState.player.stancePoints > 0 ? -2 : -1 },
             { key: 'powerChord', type: 'buff', cost: 1, stancePoints: () => gameState.player.stancePoints <= 0 ? 1 : 0, drawCard: () => (gameState.player.stancePoints > 0) ? 3 : 0 },
-            { key: 'crowdSurfer', type: 'buff', cost: 1, heal: () => (gameState.player.stancePoints < 0) ? -2 * gameState.player.stancePoints : 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0 },
+            { key: 'crowdSurfer', type: 'buff', cost: 0, heal: () => (gameState.player.stancePoints < 0) ? -2 * gameState.player.stancePoints : 0, drawCard: () => (gameState.player.stancePoints > 0) ? gameState.player.stancePoints : 0 },
             { key: 'rocknRejuvinate', type: 'buff', cost: 3, heal: 10, poisonRemove: () => gameState.player.stancePoints > 0 ? 3 : 0, armor: () => gameState.player.stancePoints < 0 ? 3 : 0 },
             { key: 'detox', type: 'buff', cost: 2, heal: 4, poisonRemove: 4 },
             { key: 'dBeat', type: 'buff', cost: 2 },
             { key: 'shogunShred', type: 'buff', cost: 0, stancePoints: -1, drawCard: () => (gameState.player.stancePoints > 0) ? 1 : 0 },
             { key: 'bloodOath', type: 'buff', cost: 2, oneShot: true, text: 'Gains +1 mana this fight' },
-            { key: 'kabutuOverdrive', type: 'buff', cost: 1, stancePoints: -3, armor: 15, oneShot: true },
+            { key: 'kabutuOverdrive', type: 'buff', cost: 2, stancePoints: -2, armor: 10 },
             { key: 'nenguStyle', type: 'buff', cost: 2, oneShot: true, text: 'Gains 1 Gold' },
             { key: 'zenZine', type: 'buff', cost: () => gameState.player.mana, oneShot: true, usesTillDepletion: 4 },
-            { key: 'gutterGeisha', type: 'buff', cost: 1, armor: () => Math.floor((gameState.player.healthMax - gameState.player.health) * 0.1) },
+            { key: 'gutterGeisha', type: 'buff', cost: 1, stancePoints: -1, armor: () => Math.floor((gameState.player.healthMax - gameState.player.health) * 0.1) },
             { key: 'noFuture', type: 'buff', cost: 2, oneShot: true, text: 'Gains 5 Max Health' },
             { key: 'coverCharge', type: 'buff', cost: 1, oneShot: true },
             { key: 'seppuku', type: 'buff', cost: 1, heal: () => -Math.round(gameState.player.healthMax * 0.05), strength: () => gameState.player.stancePoints < 0 ? 1 - gameState.player.stancePoints : 1 },
             { key: 'canibalize', type: 'buff', cost: 1 },
             { key: 'saisenBlaster', type: 'buff', cost: 1, goldCost: 1, stancePoints: -2, armor: 10 },
-            { key: 'rebelLife', type: 'buff', cost: 0, stancePoints: 1, heal: () => (gameState.player.stancePoints < 0) ? 2 : 0 },
-            { key: 'satomiSubterfuge', type: 'buff', cost: 2, goldCost: 0, isGoldResetable: true },
+            { key: 'rebelLife', type: 'buff', cost: 0, stancePoints: 1, heal: () => (gameState.player.stancePoints < 0) ? 3 : 0 },
+            { key: 'satomiSubterfuge', type: 'buff', cost: 1, goldCost: 0, isGoldResetable: true },
 
             // bonuscards: Target All
             { key: 'rottenResonance', type: 'targetAll', cost: 1, poison: 1 },
@@ -305,7 +305,7 @@ class Cards extends Phaser.Scene {
             { key: 'circlePit', type: 'targetAll', cost: () => gameState.player.mana },
             { key: 'moshpitMassacre', type: 'targetAll', cost: 2, damage: 8 },
             { key: 'blackFumes', type: () => gameState.player.stancePoints >= 0 ? 'targetAll' : 'targetSelected', cost: 2, poison: () => gameState.player.stancePoints > 0 ? 3 : gameState.player.stancePoints < 0 ? 5 : 0 },
-            { key: 'deadCities', type: 'targetSelected', cost: 1, poison: 3 },
+            { key: 'bassSolo', type: 'targetAll', cost: 1, damage: 5 },
         
             // bonuscards: Target Selected
             { key: 'boneShredder', type: 'targetSelected', cost: 1, strength: 1, reduceTargetStrength: 1, drawCard: () => (gameState.player.stancePoints > 0) ? 1 : 0 },
@@ -319,12 +319,13 @@ class Cards extends Phaser.Scene {
             { key: 'katana', type: 'targetSelected', cost: 3, damage: () => gameState.player.stancePoints < 0 ? 13 * (1 - gameState.player.stancePoints * gameState.player.strength / 10) : 13 },
             { key: 'risingWakizashi', type: 'targetSelected', cost: 1, stancePoints: -1, damage: 9 },
             { key: 'nastyNihonto', type: 'targetSelected', cost: 2, damage: 10, poison: () => gameState.player.stancePoints > 0 ? 2 * gameState.player.stancePoints : 0 },
-            { key: 'shikoroStrike', type: 'targetSelected', cost: 1, damage: () => gameState.player.stancePoints < 0 ? 8 : 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 3 : 0 },
+            { key: 'shikoroStrike', type: 'targetSelected', cost: 1, damage: () => gameState.player.stancePoints < 0 ? 8 : 0, reduceTargetArmor: () => gameState.player.stancePoints > 0 ? 4 : 0 },
             { key: 'roninMerc', type: 'targetSelected', cost: 1, goldCost: 1, damage: 18 },
             { key: 'pyroPunk', type: 'targetSelected', cost: 1, fire: () => Math.round((gameState.player.healthMax - gameState.player.health) * 0.15) },
             { key: 'troopsOfTakamori', type: 'targetSelected', cost: 1, damage: 7 },
             { key: 'wrathOfMoen', type: 'targetSelected', cost: 2, damage: 24, oneShot: true },
             { key: 'riotRonin', type: 'targetSelected', cost: 2, goldCost: 0, isGoldResetable: true, text: `Target skips a turn` },
+            { key: 'deadCities', type: 'targetSelected', cost: 1, poison: 3 },
         ];
 
         const extraCardDefinitions = [
