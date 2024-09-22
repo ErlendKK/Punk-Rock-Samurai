@@ -114,7 +114,6 @@ class Level1Fight1 extends BaseScene {
                 fadeOutGameObject(levelimage, 2000); 
                 fadeOutGameObject(leveltextTop, 1300);
                 fadeOutGameObject(leveltextBottom, 1300);
-                // self.time.delayedCall(500, initializeFight);
                 self.time.delayedCall(500, levelSequenceFunction);
             };
         
@@ -138,8 +137,8 @@ class Level1Fight1 extends BaseScene {
         // Stop the theme music. Then start the fight music after a short delay
         async function handleMusicTransition() {
             self.sound.stopAll();
-            await self.delay(300);
-            gameConfig.music.play({ loop: true, volume: 0.35 });
+            await self.delay(50);
+            gameConfig.music.play({ loop: true, volume: 0.60 });
         }
         
         // Display text informing the player about the level and fight number
@@ -1253,15 +1252,16 @@ class Level1Fight1 extends BaseScene {
             gameState.gameOverText.setInteractive();
             let scenetransitionstarted = false;
 
-            await self.delay(400);
-            gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
-
+            await self.delay(50);
+            gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
+            
             const transitionToEndScene = () => {
                 if (scenetransitionstarted) return;
                 scenetransitionstarted = true;
                 self.scene.start('Endscene');
             }
 
+            await self.delay(300);
             gameState.gameOverText.on('pointerup', () => transitionToEndScene());
             self.time.delayedCall(2400, () => transitionToEndScene());
         };
@@ -1288,7 +1288,10 @@ class Level1Fight1 extends BaseScene {
             await self.delay(400);
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
             await self.delay(200);
-            gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
+            gameConfig.victorySound.play( { volume: 0.8, rate: 1, seek: 0.05 } );
+            await self.delay(750);
+            gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
+            await self.delay(300);
             
             // If gold is earned, call earnGoldUponWinningFight and wait while it runs
             const isGoldEarned = await earnGoldUponWinningFight();
@@ -1302,7 +1305,6 @@ class Level1Fight1 extends BaseScene {
             // After a short delay, play theme music and update the text
             const delayBeforeRemoveText = isGoldEarned ? 1500 : 1200;
             await self.delay(delayBeforeRemoveText);
-            gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
             victoryText.setText(levelCompleteText);
             victoryText.setStyle({fontSize: '90px'});
 

@@ -11,7 +11,7 @@ Game design and programming by Erlend Kulander Kvitrud. Copyright 2023, all righ
 let gameState = {};
 const gameConfig = {};
 
-gameState.version = "1.3.15";
+gameState.version = "1.3.16";
 
 gameConfig.levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
@@ -326,25 +326,25 @@ class Preload extends BaseScene {
 
             function procedeToMainMenu() {
                 if (self.screenClicked) return;
+
+                const themeStartTime = 44
                 self.screenClicked = true;
-                gameConfig.thunder.play( {volume: 0.9, seek: 0.25 } ); 
+                gameConfig.thunder.play( {volume: 0.8, seek: 0.25 } ); 
+                gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
                 self.cameras.main.shake(200, .002, false); 
                 self.cameras.main.flash(100);
 
                 self.time.delayedCall(100, () => {
                     self.cameras.main.fadeOut(100);
                 }, [], this);
-
-                self.time.delayedCall(200, () => { //1000
-                    gameConfig.musicTheme.play( { loop: true, volume: 0.30 } );
-                    self.time.delayedCall(100, () => { //500
-                        self.scene.launch('LoadLazy');
-                        self.scene.launch('Buttons');
-                        // self.scene.start('Buttons');
-                    })
+                    
+                self.time.delayedCall(300, () => { //500
+                    self.scene.launch('LoadLazy');
+                    self.scene.launch('Buttons');
+                    // self.scene.start('Buttons');
                 }, [], this);
             };
-    }
+        }
 
     displayPreloadSceen();
 

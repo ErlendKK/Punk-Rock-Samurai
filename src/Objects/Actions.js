@@ -52,7 +52,7 @@ class Action {
     // Helper function for adjusting action effects in light of difficulty level
     adjust(num) {
         const difficulty = gameState.difficulty;
-        const adjustment = difficulty === 'Easy' ? 0.85 : difficulty === 'Medium' ? 1 : 1.20;
+        const adjustment = difficulty === 'Easy' ? 0.9 : difficulty === 'Medium' ? 1 : 1.1;
         return Math.round(num * adjustment);
     }
 

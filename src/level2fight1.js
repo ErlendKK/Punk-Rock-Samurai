@@ -170,8 +170,8 @@ class Level2Fight1 extends BaseScene {
         // Stop the theme music. Then start the fight music after a short delay
         async function handleMusicTransition() {
             self.sound.stopAll();
-            await self.delay(300);
-            gameConfig.music.play({ loop: true, volume: 0.35 });
+            await self.delay(50);
+            gameConfig.music.play({ loop: true, volume: 0.60 });
         }
         
         // Display text informing the player about the level and fight number
