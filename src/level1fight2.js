@@ -154,7 +154,7 @@ class Level1Fight2 extends BaseScene {
         async function handleMusicTransition() {
             self.sound.stopAll();
             await self.delay(50);
-            gameConfig.music.play({ loop: true, volume: 0.60 });
+            gameConfig.music.play({ loop: true, volume: 0.60, seek: 25 });
         }
         
         // Display text informing the player about the level and fight number

@@ -11,7 +11,7 @@ Game design and programming: Copyright 2023 Erlend Kulander Kvitrud, all rights 
 // Defined globally to be available to scene.update() 
 const sceneState = {};
 const menuButtons = [];
-const willSkipMenu = false; 
+const willSkipMenu = true; 
 
 class Mainmenu extends Phaser.Scene {
     constructor() {

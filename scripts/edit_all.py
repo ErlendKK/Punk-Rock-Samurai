@@ -1,7 +1,5 @@
-# old_code = """'assets/"""
-# new_code = """'../assets/"""
-old_code = input("Enter the old code: ")
-new_code = input("Enter the new code: ")
+old_code = """gameConfig.music.play({ loop: true, volume: 0.60 });"""
+new_code = """gameConfig.music.play({ loop: true, volume: 0.60, seek: 25 });"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
