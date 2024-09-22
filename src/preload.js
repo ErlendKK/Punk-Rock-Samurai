@@ -11,7 +11,7 @@ Game design and programming by Erlend Kulander Kvitrud. Copyright 2023, all righ
 let gameState = {};
 const gameConfig = {};
 
-gameState.version = "1.3.16";
+gameState.version = "1.3.17";
 
 gameConfig.levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",
