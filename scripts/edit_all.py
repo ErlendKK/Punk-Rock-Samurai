@@ -1,5 +1,18 @@
-old_code = """gameConfig.music.play({ loop: true, volume: 0.60 });"""
-new_code = """gameConfig.music.play({ loop: true, volume: 0.60, seek: 25 });"""
+old_code = """await self.delay(400);
+            if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
+            await self.delay(200);
+            gameConfig.victorySound.play( { volume: 0.8, rate: 1, seek: 0.05 } );
+            await self.delay(750);
+            gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
+            await self.delay(300);"""
+
+new_code = """await self.delay(400);
+            if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
+            await self.delay(200);
+            gameConfig.victorySound.play( { volume: 0.8, rate: 1, seek: 0.05 } );
+            await self.delay(780);
+            gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
+            await self.delay(300);"""
 
 levels = [
     "Level1Fight1", "Level1Fight2", "Level1Fight3",

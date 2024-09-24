@@ -563,7 +563,7 @@ class Mainmenu extends Phaser.Scene {
             const creditsText = self.add.text(x + textOffsetX, y + textOffsetY,
 
                 `Game Design and Programming by Erlend Kulander Kvitrud\n` +
-                `Music by Marllon Silva (xDeviruchi) (https://soundcloud.com/xdeviruchi)\n` +
+                `Music by Ad Undas\n` +
                 `Punch sound by @danielsoundsgood (https://danielsoundsgood.itch.io/)\n` +
                 `Healing sound by Dylan Kelk (https://freesound.org/people/SilverIllusionist/)\n` +
                 `Power up sound by MATRIXXX (https://freesound.org/people/MATRIXXX_/)\n` +
@@ -700,15 +700,15 @@ class Mainmenu extends Phaser.Scene {
         // Method for skipping the level during play-testing
         function skipMenu(willSkipMenu) {
             if (!willSkipMenu) return;
-            // gameState.playerName = 'admin';
-            // gameState.player.name = 'PRS';
-            // gameState.difficulty = 'Medium';
-            // const rndIndex = Math.floor(Math.random()*gameState.extraCards.length);
-            // const bonusCard = gameState.extraCards[0];
-            // bonusCard.freePermanent = true;
-            // gameState.deck.push(bonusCard);
-            // gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
-            // self.scene.start('Level1Fight1');
+            gameState.playerName = 'admin';
+            gameState.player.name = 'PRS';
+            gameState.difficulty = 'Medium';
+            const rndIndex = Math.floor(Math.random()*gameState.extraCards.length);
+            const bonusCard = gameState.extraCards[0];
+            bonusCard.freePermanent = true;
+            gameState.deck.push(bonusCard);
+            gameState.extraCards.splice(gameState.extraCards.indexOf(bonusCard), 1);
+            self.scene.start('Level1Fight1');
         }
 
     } // end of create()

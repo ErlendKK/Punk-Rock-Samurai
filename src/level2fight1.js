@@ -171,7 +171,7 @@ class Level2Fight1 extends BaseScene {
         async function handleMusicTransition() {
             self.sound.stopAll();
             await self.delay(50);
-            gameConfig.music.play({ loop: true, volume: 0.60, seek: 25 });
+            gameConfig.music.play({ loop: true, volume: 0.60 });
         }
         
         // Display text informing the player about the level and fight number
@@ -1323,7 +1323,10 @@ class Level2Fight1 extends BaseScene {
             await self.delay(400);
             if (gameConfig.attackSound.isPlaying) gameConfig.attackSound.stop();
             await self.delay(200);
-            gameConfig.victorySound.play( { volume: 0.9, rate: 1, seek: 0.05 } );
+            gameConfig.victorySound.play( { volume: 0.8, rate: 1, seek: 0.05 } );
+            await self.delay(780);
+            gameConfig.musicTheme.play({ loop: true, volume: 0.6, seek: 44.4 });
+            await self.delay(300);
             
             // If gold is earned, call earnGoldUponWinningFight and wait while it runs
             const isGoldEarned = await earnGoldUponWinningFight();
